@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+
+
+<head>
+    <meta charset="utf-8">
+    <title>create my modle</title>
+
+    <style>
+        body {
+            margin: 0;
+        }
+
+        canvas {
+            width: 100%;
+            height: 100%
+        }
+    </style>
+</head>
+
+<body>
+    <script src="./js/three.js"></script>
+    <script type="module" src="GLTFLoader.js"></script>
+    <script type="module">
+
+        import { GLTFLoader } from "./Loader/GLTFLoader.js";
+
+        /*--------創造初始元素--------*/
+
+        var scene = new THREE.Scene();
+        var camera = new THREE.PerspectiveCamera(80, (window.innerWidth / window.innerHeight , 0.1, 10));
+        var renderer = new THREE.WebGLRenderer();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);//把renderer設定添加到HTML裡面
+
+        /*--------開始載我的模型--------*/
+
+        var loader = new GLTFLoader();
+
+        var obj;
+
+        loader.load("./3D_Object/scene.gltf", function (gltf) {
+            obj = gltf.scene;
+            scene.add(gltf.scene);
+        });
+        
+        /*-------更改場景的背景顏色---------*/
+
+        scene.background=new THREE.Color(0xffffff);
+
+        /*--------添加燈光--------*/
+
+        var light =new THREE.HemisphereLight(0xffffff,0x000000,2);
+        scene.add(light);
+
+        /*-------調整camera位置---------*/
+
+        camera.position.set(0,0,3);
+
+        /*--------Renderer Scene--------*/
+        
+        function animation(){
+            requestAnimationFrame(animation);//創造一個循環
+            renderer.render(scene, camera);//繪製場景
+            obj.rotation.y += 0.01;//旋轉(一定要在前兩個的後面)
+        }
+        animation();//呼叫動畫函數
+    </script>
+
+
+</body>
+
+</html>
