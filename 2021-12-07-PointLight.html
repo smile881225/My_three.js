@@ -39,14 +39,6 @@
 
         document.body.appendChild(renderer.domElement);//把renderer設定添加到HTML裡面
 
-
-        /*--------調整camera--------*/
-
-        camera.position.y = 5;
-        camera.position.z = 50;//相機Z軸=5(避免相機與我的object重疊)
-        camera.lookAt(0, 0, 0);
-
-
         /*--------設定PointLight影子選項--------*/
 
         //Create a WebGLRenderer and turn on shadows in the renderer
@@ -55,8 +47,8 @@
 
         //Create a PointLight and turn on shadows for the light
         const light = new THREE.PointLight(0xffffff, 1, 1000);//(顏色,強度,距離)
-        light.position.set(0, 20, 0);
-        light.rotation.set(50, 50, 50);
+        
+        // light.angle = Math.PI / 5;
         light.castShadow = true; // 投射陰影選項 default false
         scene.add(light);
 
@@ -72,24 +64,36 @@
         const sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
         sphere.castShadow = true; //default is false
         sphere.receiveShadow = false; //default 接受陰影? 
+        sphere.position.set(0,0,5);
         scene.add(sphere);
 
         //Create a plane that receives shadows (but does not cast them)
-        const planeGeometry = new THREE.PlaneGeometry(20, 20, 32, 32);
+        const planeGeometry = new THREE.PlaneGeometry(200, 200, 32, 32);
         const planeMaterial = new THREE.MeshStandardMaterial({ color: 0x00ff00 })
         const plane = new THREE.Mesh(planeGeometry, planeMaterial);
         plane.receiveShadow = true;
         scene.add(plane);
 
+
         //Create a helper for the shadow camera (optional)
         const helper = new THREE.CameraHelper(light.shadow.camera);
         scene.add(helper);
 
+        /*--------調整camera--------*/
+
+        // camera.position.set(20,0,30);
+        camera.position.set(-40,0,15);
+        camera.rotation.set(1.6,11,0);//?
+        light.position.set(-20, 40, 40);
+
+        // camera.rotation.set = 1;//旋轉X軸
+
+        // camera.lookAt(0, 0, 0);
          function animate() {
             requestAnimationFrame(animate);//創造一個循環
             renderer.render(scene, camera);//繪製場景
-            // cube.rotation.x += 0.01;//旋轉X軸
-            // cube.rotation.y += 0.01;//旋轉Y軸
+            // camera.rotation.x += 0.01;//旋轉X軸
+            // camera.post.y += 0.01;//旋轉Y軸
             // cube.rotation.z += 0.01;//旋轉Z軸
         }
 

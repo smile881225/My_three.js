@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html>
 
-
 <head>
     <meta charset="utf-8">
     <title>create my modle</title>
@@ -9,7 +8,6 @@
     <style>
         body {
             margin: 0;
-            position: relative;
         }
 
         canvas {
@@ -38,35 +36,35 @@
 </head>
 
 <body>
+
     <div class="container">
         <img class="music" src="https://renaultespace.littleworkshop.fr/img/hud/sound-on.png" alt="">
     </div>
 
     <script src="./js/three.js"></script>
-    <script type="module" src="./Loader/OBJLoader.js"></script>
-    <script type="module" src="./Loader/MTLLoader.js"></script>
+    <!-- <script type="module" src="./Loader/OBJLoader.js"></script>
+    <script type="module" src="./Loader/MTLLoader.js"></script> -->
     <script type="module">
+
         /*--------Java Script--------*/
 
         let musicBtn = document.querySelector('.music');
         musicBtn.addEventListener('click', function () {
             if (sound.isPlaying) {
                 sound.pause();
-                musicBtn.src="https://renaultespace.littleworkshop.fr/img/hud/sound-off.png";
+                musicBtn.src = "https://renaultespace.littleworkshop.fr/img/hud/sound-off.png";
             }
             else {
                 sound.play();
-                musicBtn.src="https://renaultespace.littleworkshop.fr/img/hud/sound-on.png";
+                musicBtn.src = "https://renaultespace.littleworkshop.fr/img/hud/sound-on.png";
             }
 
         })
-        /*---------------------------*/
+        /*------------Java Script--------------*/
 
-
-        /*---------three.js----------*/
-
+        import * as THREE from './js/three.module.js';
         import { OBJLoader } from './Loader/OBJLoader.js';
-        import { MTLLoader } from './Loader/MTLLoader.js';
+        import { MTLLoader } from './Loader/MTLLoader.js'
 
         /*--------創造初始元素--------*/
 
@@ -74,46 +72,48 @@
         var camera = new THREE.PerspectiveCamera(80, window.innerWidth / window.innerHeight, 0.1, 1000);
         var renderer = new THREE.WebGLRenderer();
         renderer.setSize(window.innerWidth, window.innerHeight);
-        document.body.appendChild(renderer.domElement);//把renderer設定添加到HTML裡面
+        document.body.appendChild(renderer.domElement);
 
         /*--------開始載我的模型--------*/
 
-        // instantiate a loader
-        const loader = new OBJLoader();
         // var mtlLoader = new THREE.MTLLoader();
+        var mtlLoader = new MTLLoader();
 
-        var obj;
+        // mtlLoader.setBaseUrl('./3D_Object/');
+        // mtlLoader.setPath('./3D_Object/');
 
-        // load a resource
-        loader.load(
+        //記住！！！！！OBJ、MTL、PNG貼圖來源檔一定要放在同個資料夾才可以
 
-            // resource URL
-            './3D_Object/teapot.obj',
-            // called when resource is loaded
-            function (object) {
+        // var url = "/3D_Object/test1.mtl";
+        var url = "/3D_Object/teapot.mtl";
+        mtlLoader.load(url, function (materials) {
 
-                obj = object.sence;
+            materials.preload();
+
+            var objLoader = new OBJLoader();
+            objLoader.setMaterials(materials);
+            // objLoader.load('./3D_Object/test1.obj', function (object) {
+            var teapot = objLoader.load('./3D_Object/teapot.obj', function (object) {
+
                 scene.add(object);
+                object.position.y=5;
+            });
 
-            },
-            // called when loading is in progresses
-            function (xhr) {
+        });
 
-                console.log((xhr.loaded / xhr.total * 100) + '% loaded');
 
-            },
-            // called when loading has errors
-            function (error) {
+        /*--------加入Palne--------*/
 
-                console.log('An error happened');
-
-            }
-        );
-        console.log(loader);
+        const plane_geometry = new THREE.PlaneGeometry(1000, 1000);
+        const plane_material = new THREE.MeshBasicMaterial({ color: 0x4F4F4F, side: THREE.DoubleSide });
+        const plane = new THREE.Mesh(plane_geometry, plane_material);
+        plane.rotateX(90);//旋轉平面
+        plane.position.set(0, 0, 0);
+        scene.add(plane);
 
         /*--------添加燈光--------*/
 
-        var light = new THREE.HemisphereLight(0xffffff, 0x000000, 1);
+        var light = new THREE.HemisphereLight(0xffffff, 0x000000, 2);
         scene.add(light);
 
         /*-------更改場景的背景顏色---------*/
@@ -122,7 +122,8 @@
 
         /*-------調整camera位置---------*/
 
-        camera.position.set(0, 80, 200);
+        camera.position.set(0, 50, 200);
+        camera.lookAt(0, 0, 0);
 
         /*--------添加音樂--------*/
 
@@ -150,7 +151,6 @@
         }
 
         animation();//呼叫動畫函數
-
     </script>
 
 
