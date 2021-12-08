@@ -39,46 +39,44 @@
 
         document.body.appendChild(renderer.domElement);//把renderer設定添加到HTML裡面
 
-        /*--------設定PointLight影子選項--------*/
+        /*--------設定SpotLight影子選項--------*/
 
         //Create a WebGLRenderer and turn on shadows in the renderer
+       
         renderer.shadowMap.enabled = true;//把Renderer的陰影選項打開
-        renderer.shadowMap.type = THREE.PCFSoftShadowMap; // 設定陰影類型 default 是 THREE.PCFShadowMap
+        renderer.shadowMap.type = THREE.PCFSoftShadowMap;// 設定陰影類型 default 是 THREE.PCFShadowMap
 
-        //Create a PointLight and turn on shadows for the light
-        const light = new THREE.PointLight(0xffffff, 1, 200,2);//( color : Integer, intensity : Float, distance : Number, decay : Float )
-
-        // light.angle = Math.PI / 5;
-        light.castShadow = true; // 投射陰影選項 default false
+        //Create a SpotLight and turn on shadows for the light
+        const light = new THREE.SpotLight(0xffffff,1,100);//( color : Integer, intensity : Float, distance : Number, decay : Float )
+        light.castShadow = true; // default false
         scene.add(light);
 
         //Set up shadow properties for the light
-        light.shadow.mapSize.width = 512; // default
-        light.shadow.mapSize.height = 512; // default
+        light.shadow.mapSize.width = 512; // default //限制陰影的顯示寬圖、高度，為了更好的效率，數字越大，陰影的品質越好
+        light.shadow.mapSize.height =512; // default
         light.shadow.camera.near = 0.5; // default
         light.shadow.camera.far = 500; // default
+        light.shadow.focus = 0.1; // default 用來聚焦我的陰影相機
 
         //Create a sphere that cast shadows (but does not receive them)
         const sphereGeometry = new THREE.SphereGeometry(5, 32, 32);
         const sphereMaterial = new THREE.MeshStandardMaterial({ color: 0xff0000 });
         const sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
         sphere.castShadow = true; //default is false
-        sphere.receiveShadow = false; //default 接受陰影? 
-        sphere.position.set(0, 0, 5);
+        sphere.receiveShadow = false; //default
         scene.add(sphere);
 
         //Create a plane that receives shadows (but does not cast them)
-        const planeGeometry = new THREE.PlaneGeometry(200, 200, 32, 32);
+        const planeGeometry = new THREE.PlaneGeometry(20, 20, 32, 32);
         const planeMaterial = new THREE.MeshStandardMaterial({ color: 0x00ff00 })
         const plane = new THREE.Mesh(planeGeometry, planeMaterial);
         plane.receiveShadow = true;
         scene.add(plane);
 
-
         //Create a helper for the shadow camera (optional)
         const helper = new THREE.CameraHelper(light.shadow.camera);
         scene.add(helper);
-
+        
         /*--------調整camera--------*/
 
 
@@ -89,7 +87,7 @@
         camera.position.set(0, 0, 50);
         light.position.set(-20, -20, 40);
 
-       
+
 
         // camera.lookAt(0, 0, 0);
         function animate() {
@@ -97,7 +95,7 @@
             renderer.render(scene, camera);//繪製場景
             // camera.rotation.x += 0.01;//旋轉X軸
             // camera.rotation.y += 0.01;//旋轉Y軸
-            camera.rotation.z += 0.01;//旋轉Z軸
+            // camera.rotation.z += 0.01;//旋轉Z軸
         }
 
         animate();//呼叫動畫函數

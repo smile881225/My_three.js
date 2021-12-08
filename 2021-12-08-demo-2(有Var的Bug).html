@@ -68,9 +68,6 @@
 
         })
 
-        var PointLight;
-        var AmbientLight;
-        var helper;
         let lightBtn = document.querySelector('.light');
         lightBtn.addEventListener('click', function () {
 
@@ -83,7 +80,7 @@
                 // var PointLight = new THREE.PointLight(0xffffff, 10);
                 // 這裡有個BUG！他用VAR宣告，會把記憶體中的PointLight刪掉，所以下一次我
                 // 找不到PointLight，所以也不能remove掉
-                PointLight = new THREE.PointLight(0xffffff, 10);
+                var PointLight = new THREE.PointLight(0xffffff, 10);
                 /*--------設定SpotLight影子選項--------*/
                 //Create a WebGLRenderer and turn on shadows in the renderer
                 renderer.shadowMap.enabled = true;//把Renderer的陰影選項打開
@@ -99,7 +96,7 @@
                 PointLight.position.x = -500;
                 PointLight.position.y = 300;
                 //Create a helper for the shadow camera (optional)
-                helper = new THREE.CameraHelper(PointLight.shadow.camera);
+                var helper = new THREE.CameraHelper(PointLight.shadow.camera);
                 scene.add(helper);
                 controlLight = false;
                 console.log(
@@ -115,7 +112,7 @@
                 console.log(
                     scene.children
                 );
-                AmbientLight = new THREE.AmbientLight(0xFFFFFF, 1);
+                var AmbientLight = new THREE.AmbientLight(0xFFFFFF, 1);
                 // var AmbientLight = new THREE.AmbientLight(0xFFFFFF, 3);
                 // 這裡有個BUG！他用VAR宣告，會把記憶體中的PointLight刪掉，所以下一次我
                 // 找不到PointLight，所以也不能remove掉

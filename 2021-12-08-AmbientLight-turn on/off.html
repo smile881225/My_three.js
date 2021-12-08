@@ -68,60 +68,56 @@
 
         })
 
-        var PointLight;
-        var AmbientLight;
-        var helper;
+
+
+
         let lightBtn = document.querySelector('.light');
         lightBtn.addEventListener('click', function () {
 
 
             if (controlLight) {
-                // console.log(PointLight);
-                scene.remove(PointLight);
+                // scene.remove(PointLight);
                 scene.remove(AmbientLight);
                 console.log('removeAmbientLight');
+                // console.log('addPointLight');
                 // var PointLight = new THREE.PointLight(0xffffff, 10);
-                // 這裡有個BUG！他用VAR宣告，會把記憶體中的PointLight刪掉，所以下一次我
-                // 找不到PointLight，所以也不能remove掉
-                PointLight = new THREE.PointLight(0xffffff, 10);
-                /*--------設定SpotLight影子選項--------*/
-                //Create a WebGLRenderer and turn on shadows in the renderer
-                renderer.shadowMap.enabled = true;//把Renderer的陰影選項打開
-                renderer.shadowMap.type = THREE.PCFSoftShadowMap;// 設定陰影類型 default 是 THREE.PCFShadowMap
-                //Create a SpotLight and turn on shadows for the light
-                //( color : Integer, intensity : Float, distance : Number, decay : Float )
-                PointLight.castShadow = true; // default false
-                //Set up shadow properties for the light
-                PointLight.shadow.mapSize.width = 512; // default //限制陰影的顯示寬圖、高度，為了更好的效率，數字越大，陰影的品質越好
-                PointLight.shadow.mapSize.height = 512; // default
-                PointLight.shadow.camera.near = 0.5; // default
-                PointLight.shadow.camera.far = 5000; // default
-                PointLight.position.x = -500;
-                PointLight.position.y = 300;
-                //Create a helper for the shadow camera (optional)
-                helper = new THREE.CameraHelper(PointLight.shadow.camera);
-                scene.add(helper);
+                // /*--------設定SpotLight影子選項--------*/
+                // //Create a WebGLRenderer and turn on shadows in the renderer
+                // renderer.shadowMap.enabled = true;//把Renderer的陰影選項打開
+                // renderer.shadowMap.type = THREE.PCFSoftShadowMap;// 設定陰影類型 default 是 THREE.PCFShadowMap
+                // //Create a SpotLight and turn on shadows for the light
+                // //( color : Integer, intensity : Float, distance : Number, decay : Float )
+                // PointLight.castShadow = true; // default false
+                // //Set up shadow properties for the light
+                // PointLight.shadow.mapSize.width = 512; // default //限制陰影的顯示寬圖、高度，為了更好的效率，數字越大，陰影的品質越好
+                // PointLight.shadow.mapSize.height = 512; // default
+                // PointLight.shadow.camera.near = 0.5; // default
+                // PointLight.shadow.camera.far = 5000; // default
+                // PointLight.position.x = -500;
+                // PointLight.position.y = 300;
+                // //Create a helper for the shadow camera (optional)
+                // const helper = new THREE.CameraHelper(PointLight.shadow.camera);
+                // scene.add(helper);
                 controlLight = false;
                 console.log(
                     scene.children
                 );
-                scene.add(PointLight);
+                // scene.add(PointLight);
+             
             }
             else {
-                scene.remove(helper);
-                scene.remove(PointLight);
-                scene.remove(AmbientLight);
+                // scene.remove(PointLight);
+                // scene.remove(AmbientLight);
                 console.log('addAmbientLight');
                 console.log(
                     scene.children
                 );
-                AmbientLight = new THREE.AmbientLight(0xFFFFFF, 1);
-                // var AmbientLight = new THREE.AmbientLight(0xFFFFFF, 3);
-                // 這裡有個BUG！他用VAR宣告，會把記憶體中的PointLight刪掉，所以下一次我
-                // 找不到PointLight，所以也不能remove掉
+                // console.log('removePointLight');
+                // var AmbientLight = new THREE.AmbientLight(0xFFFFFF, 1.5);
                 controlLight = true;
                 scene.add(AmbientLight);
             }
+
         })
         /*------------Java Script--------------*/
 
@@ -139,7 +135,7 @@
 
         let controlLight = true;
 
-        var AmbientLight = new THREE.AmbientLight(0xFFFFFF, 1);
+        var AmbientLight = new THREE.AmbientLight(0xFFFFFF, 1.5);
         scene.add(AmbientLight);
 
 
@@ -173,16 +169,16 @@
         /*--------加入Palne--------*/
 
         const plane_geometry = new THREE.PlaneGeometry(1000, 1000);
-        const plane_material = new THREE.MeshStandardMaterial({ color: 0x666666 })
+        const plane_material = new THREE.MeshBasicMaterial({ color: 0x4F4F4F, side: THREE.DoubleSide });
         const plane = new THREE.Mesh(plane_geometry, plane_material);
         // plane.rotateX(-30);//旋轉平面
         plane.rotateX(30);//旋轉平面
         plane.receiveShadow = true;
         scene.add(plane);
 
-        // /*-------更改場景的背景顏色---------*/
+        /*-------更改場景的背景顏色---------*/
 
-        // scene.background = new THREE.Color(0xffffff);
+        scene.background = new THREE.Color(0xffffff);
 
         /*-------調整camera位置---------*/
 
@@ -214,8 +210,8 @@
             // object.rotation.x += 0.01;//旋轉X軸
         }
         console.log(
-            scene.children
-        );
+                    scene.children
+                );
         animation();//呼叫動畫函數
     </script>
 
