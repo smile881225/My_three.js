@@ -47,25 +47,13 @@
         renderer.setSize(window.innerWidth, window.innerHeight);
         document.body.appendChild(renderer.domElement);
 
-        /*--------視角滑動--------*/
+        /*--------滑動變更視角--------*/
 
         const container = document.querySelector('.container');
-        container.addEventListener('mousewheel', mousewheel);
+        container.addEventListener('mousemove', change);
+        container.addEventListener('mousedown', change);
         // container.addEventListener('mouseScroll', mousewheel);
-        function mousewheel(e) {
-            console.log(camera.position.z);
-            camera.position.z += (e.deltaY / 1);
-            if (camera.position.z < 30) {
-                camera.position.z = 30;
-            }
-            else if (camera.position.z > 840) {
-                camera.position.z = 840;
-            }
-            // camera.position.z < 30?
-            // camera.position.z = 30:
-            // camera.position.z > 840?
-            // camera.position.z = 840:
-            // "";
+        function change(e) {
 
         }
 
