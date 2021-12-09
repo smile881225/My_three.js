@@ -48,6 +48,7 @@
         <img class="music" src="https://renaultespace.littleworkshop.fr/img/hud/sound-on.png" alt="">
         <img class="light" src="https://renaultespace.littleworkshop.fr/img/hud/light.png" alt="">
     </div>
+
     <script src="./js/three.js"></script>
     <!-- <script type="module" src="./Loader/OBJLoader.js"></script>
     <script type="module" src="./Loader/MTLLoader.js"></script> -->
@@ -68,61 +69,6 @@
 
         })
 
-        var PointLight;
-        var AmbientLight;
-        var helper;
-        let lightBtn = document.querySelector('.light');
-        lightBtn.addEventListener('click', function () {
-
-
-            if (controlLight) {
-                // console.log(PointLight);
-                scene.remove(PointLight);
-                scene.remove(AmbientLight);
-                console.log('removeAmbientLight');
-                // var PointLight = new THREE.PointLight(0xffffff, 10);
-                // 這裡有個BUG！他用VAR宣告，會把記憶體中的PointLight刪掉，所以下一次我
-                // 找不到PointLight，所以也不能remove掉
-                PointLight = new THREE.PointLight(0xffffff, 10);
-                /*--------設定SpotLight影子選項--------*/
-                //Create a WebGLRenderer and turn on shadows in the renderer
-                renderer.shadowMap.enabled = true;//把Renderer的陰影選項打開
-                renderer.shadowMap.type = THREE.PCFSoftShadowMap;// 設定陰影類型 default 是 THREE.PCFShadowMap
-                //Create a SpotLight and turn on shadows for the light
-                //( color : Integer, intensity : Float, distance : Number, decay : Float )
-                PointLight.castShadow = true; // default false
-                //Set up shadow properties for the light
-                PointLight.shadow.mapSize.width = 512; // default //限制陰影的顯示寬圖、高度，為了更好的效率，數字越大，陰影的品質越好
-                PointLight.shadow.mapSize.height = 512; // default
-                PointLight.shadow.camera.near = 0.5; // default
-                PointLight.shadow.camera.far = 5000; // default
-                PointLight.position.x = -500;
-                PointLight.position.y = 300;
-                //Create a helper for the shadow camera (optional)
-                helper = new THREE.CameraHelper(PointLight.shadow.camera);
-                scene.add(helper);
-                controlLight = false;
-                console.log(
-                    scene.children
-                );
-                scene.add(PointLight);
-            }
-            else {
-                scene.remove(helper);
-                scene.remove(PointLight);
-                scene.remove(AmbientLight);
-                console.log('addAmbientLight');
-                console.log(
-                    scene.children
-                );
-                AmbientLight = new THREE.AmbientLight(0xFFFFFF, 1);
-                // var AmbientLight = new THREE.AmbientLight(0xFFFFFF, 3);
-                // 這裡有個BUG！他用VAR宣告，會把記憶體中的PointLight刪掉，所以下一次我
-                // 找不到PointLight，所以也不能remove掉
-                controlLight = true;
-                scene.add(AmbientLight);
-            }
-        })
         /*------------Java Script--------------*/
 
         import * as THREE from './js/three.module.js';
@@ -137,11 +83,95 @@
         renderer.setSize(window.innerWidth, window.innerHeight);
         document.body.appendChild(renderer.domElement);
 
+        /*--------設定SpotLight影子選項--------*/
+        var PointLight;
+        var AmbientLight;
+        //Create a WebGLRenderer and turn on shadows in the renderer
+
+        renderer.shadowMap.enabled = true;//把Renderer的陰影選項打開
+        renderer.shadowMap.type = THREE.PCFSoftShadowMap;// 設定陰影類型 default 是 THREE.PCFShadowMap
+
+        //Create a SpotLight and turn on shadows for the light
+        PointLight = new THREE.PointLight(0xffffff, 10);//( color : Integer, intensity : Float, distance : Number, decay : Float )
+
+        PointLight.castShadow = true; // default false
+        scene.add(PointLight);
+
+        //Set up shadow properties for the light
+        PointLight.shadow.mapSize.width = 512; // default //限制陰影的顯示寬圖、高度，為了更好的效率，數字越大，陰影的品質越好
+        PointLight.shadow.mapSize.height = 512; // default
+        PointLight.shadow.camera.near = 0.5; // default
+        PointLight.shadow.camera.far = 5000; // default
+        PointLight.position.x = -500;
+        PointLight.position.y = 300;
+        //Create a helper for the shadow camera (optional)
+        const helper = new THREE.CameraHelper(PointLight.shadow.camera);
+        scene.add(helper);
+
+        /*--------設定燈光判斷--------*/
+
+
         let controlLight = true;
+        let lightBtn = document.querySelector('.light');
+        lightBtn.addEventListener('click', function () {
+            console.log(PointLight);
+            console.log(AmbientLight);
+            console.log(scene.children);
+            if (controlLight) {
+                controlLight = false;
+                scene.remove(PointLight);
+                scene.remove(AmbientLight);
+                switchAmbientLight();
+            }
+            else {
+                controlLight = true;
+                scene.remove(PointLight);
+                scene.remove(AmbientLight);
+                switchPointLight();
+            }
+            console.log(PointLight);
+            console.log(AmbientLight);
+            console.log(scene.children);
 
-        var AmbientLight = new THREE.AmbientLight(0xFFFFFF, 1);
-        scene.add(AmbientLight);
+        })
 
+        function switchAmbientLight() {//切換燈光至AmbientLight
+            console.log('switchAmbientLight');
+            AmbientLight = new THREE.AmbientLight(0xFFFFFF, 2);
+            scene.add(AmbientLight);
+        }
+        function switchPointLight() {//切換燈光至PointLight
+            console.log('switchPointLight');
+            renderer.shadowMap.enabled = true;//把Renderer的陰影選項打開
+            renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+            PointLight = new THREE.PointLight(0xffffff, 10);
+            PointLight.castShadow = true;
+            PointLight.shadow.mapSize.width = 512;
+            PointLight.shadow.mapSize.height = 512;
+            PointLight.shadow.camera.near = 0.5;
+            PointLight.shadow.camera.far = 5000;
+            PointLight.position.x = -500;
+            PointLight.position.y = 400;
+            scene.add(PointLight);
+            
+        }
+        function switchSpotLight() {//切換燈光至SpotLight
+            console.log('switchSpotLight');
+            renderer.shadowMap.enabled = true;
+            renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+            SpotLight = new THREE.SpotLight(0xffffff, 1);
+            SpotLight.shadow.mapSize.width = 512;
+            SpotLight.shadow.mapSize.height = 512;
+            SpotLight.shadow.camera.near = 0.5;
+            SpotLight.shadow.camera.far = 500;
+            SpotLight.shadow.focus = 0.1;
+            spotLight.target = plane;
+            scene.add(SpotLight);
+        }
+        /*-------調整camera位置---------*/
+
+        camera.position.set(0, 50, 200);
+        camera.lookAt(0, 0, 0);
 
         /*--------開始載我的模型--------*/
 
@@ -155,39 +185,54 @@
 
         // var url = "/3D_Object/test1.mtl";
         var url = "/3D_Object/teapot.mtl";
-        mtlLoader.load(url, function (materials) {
+        const teapot =mtlLoader.load(url, function (materials) {
             materials.preload();
             var objLoader = new OBJLoader();
             objLoader.setMaterials(materials);
             // objLoader.load('./3D_Object/test1.obj', function (object) {
-            var teapot = objLoader.load('./3D_Object/teapot.obj', function (object) {
-                object.castShadow = true; //default is false
-                object.receiveShadow = false; //default
+             objLoader.load('./3D_Object/teapot.obj', function (object) {
+                object.traverse(function (node) {
+                    if (node instanceof THREE.Mesh) {
+                        node.castShadow = true; //default is false
+                        // node.receiveShadow = false; //default
+                        node.receiveShadow = true; //default
+                    }
+                    
+                })
+                console.log(object);
                 object.position.y = 4;
                 scene.add(object);
             });
 
         });
-
+       
 
         /*--------加入Palne--------*/
 
-        const plane_geometry = new THREE.PlaneGeometry(1000, 1000);
-        const plane_material = new THREE.MeshBasicMaterial({ color: 0x4F4F4F, side: THREE.DoubleSide });
-        const plane = new THREE.Mesh(plane_geometry, plane_material);
-        // plane.rotateX(-30);//旋轉平面
-        plane.rotateX(30);//旋轉平面
+        const planeGeometry = new THREE.PlaneGeometry(2000, 2000, 32, 32);
+        const planeMaterial = new THREE.MeshStandardMaterial({ color: 0x00ff00 })
+        const plane = new THREE.Mesh(planeGeometry, planeMaterial);
         plane.receiveShadow = true;
+        plane.rotateX(30);//旋轉平面
         scene.add(plane);
+
+
+
+        //Create a sphere that cast shadows (but does not receive them)
+        const sphereGeometry = new THREE.SphereGeometry(50, 32, 32);
+        const sphereMaterial = new THREE.MeshStandardMaterial({ color: 0xff0000 });
+        const sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
+        sphere.castShadow = true; //default is false
+        sphere.receiveShadow = false; //default 接受陰影? 
+        sphere.position.set(100, 78, -200);
+        scene.add(sphere);
+
 
         /*-------更改場景的背景顏色---------*/
 
-        scene.background = new THREE.Color(0xffffff);
+        // scene.background = new THREE.Color(0xffffff);
 
-        /*-------調整camera位置---------*/
 
-        camera.position.set(0, 50, 200);
-        camera.lookAt(0, 0, 0);
 
         /*--------添加音樂--------*/
 
@@ -196,6 +241,8 @@
 
         // 增加一個global端的audio source
         const sound = new THREE.Audio(listener);
+
+        console.log(scene.children);
 
         // load a sound and set it as the Audio object's buffer
         const audioLoader = new THREE.AudioLoader();
@@ -213,9 +260,7 @@
             renderer.render(scene, camera);//繪製場景
             // object.rotation.x += 0.01;//旋轉X軸
         }
-        console.log(
-            scene.children
-        );
+
         animation();//呼叫動畫函數
     </script>
 

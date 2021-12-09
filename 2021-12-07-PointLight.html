@@ -63,7 +63,7 @@
         const sphereMaterial = new THREE.MeshStandardMaterial({ color: 0xff0000 });
         const sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
         sphere.castShadow = true; //default is false
-        sphere.receiveShadow = false; //default 接受陰影? 
+        sphere.receiveShadow = true; //default 接受陰影? 
         sphere.position.set(0, 0, 5);
         scene.add(sphere);
 

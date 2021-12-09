@@ -86,9 +86,8 @@
         /*--------設定影子選項--------*/
         var PointLight;
         var AmbientLight;
-        var SpotLight;
-        var helper;
-        // 設定預設的光線
+        //Create a WebGLRenderer and turn on shadows in the renderer
+
         renderer.shadowMap.enabled = true;//把Renderer的陰影選項打開
         renderer.shadowMap.type = THREE.PCFSoftShadowMap;// 設定陰影類型 default 是 THREE.PCFShadowMap
 
@@ -103,9 +102,10 @@
         PointLight.shadow.mapSize.height = 512; // default
         PointLight.shadow.camera.near = 0.5; // default
         PointLight.shadow.camera.far = 5000; // default
-        PointLight.position.set(-500,300,0);
+        PointLight.position.x = -500;
+        PointLight.position.y = 300;
         //Create a helper for the shadow camera (optional)
-        helper = new THREE.CameraHelper(PointLight.shadow.camera);
+        const helper = new THREE.CameraHelper(PointLight.shadow.camera);
         scene.add(helper);
 
         /*--------設定燈光判斷--------*/
@@ -114,23 +114,19 @@
         let controlLight = true;
         let lightBtn = document.querySelector('.light');
         lightBtn.addEventListener('click', function () {
-            console.log('PointLight是' + PointLight);
-            console.log('AmbientLight' + AmbientLight);
-            console.log('SpotLight' + SpotLight);
+            console.log(PointLight);
+            console.log(AmbientLight);
             console.log(scene.children);
-            
             if (controlLight) {
                 controlLight = false;
                 scene.remove(PointLight);
-                scene.remove(SpotLight);
-                scene.remove(helper);
-                switchSpotLight();
+                scene.remove(AmbientLight);
+                switchAmbientLight();
             }
             else {
                 controlLight = true;
                 scene.remove(PointLight);
-                scene.remove(SpotLight);
-                scene.remove(helper);
+                scene.remove(AmbientLight);
                 switchPointLight();
             }
             console.log(PointLight);
@@ -154,11 +150,10 @@
             PointLight.shadow.mapSize.height = 512;
             PointLight.shadow.camera.near = 0.5;
             PointLight.shadow.camera.far = 5000;
-            PointLight.position.set(-500,400,0);
+            PointLight.position.x = -500;
+            PointLight.position.y = 400;
             scene.add(PointLight);
-            helper = new THREE.CameraHelper(PointLight.shadow.camera);
-            scene.add(helper);
-
+            
         }
         function switchSpotLight() {//切換燈光至SpotLight
             console.log('switchSpotLight');
@@ -170,11 +165,8 @@
             SpotLight.shadow.camera.near = 0.5;
             SpotLight.shadow.camera.far = 500;
             SpotLight.shadow.focus = 0.1;
-            SpotLight.position.set(200, 1000, 20);
             // spotLight.target = ;
             scene.add(SpotLight);
-            helper = new THREE.CameraHelper(SpotLight.shadow.camera);
-            scene.add(helper);
         }
         /*-------調整camera位置---------*/
 
@@ -193,19 +185,19 @@
 
         // var url = "/3D_Object/test1.mtl";
         var url = "/3D_Object/teapot.mtl";
-        const teapot = mtlLoader.load(url, function (materials) {
+        const teapot =mtlLoader.load(url, function (materials) {
             materials.preload();
             var objLoader = new OBJLoader();
             objLoader.setMaterials(materials);
             // objLoader.load('./3D_Object/test1.obj', function (object) {
-            objLoader.load('./3D_Object/teapot.obj', function (object) {
+             objLoader.load('./3D_Object/teapot.obj', function (object) {
                 object.traverse(function (node) {
                     if (node instanceof THREE.Mesh) {
                         node.castShadow = true; //default is false
                         // node.receiveShadow = false; //default
                         node.receiveShadow = true; //default
                     }
-
+                    
                 })
                 // console.log(object);
                 object.position.y = 4;
@@ -213,7 +205,7 @@
             });
 
         });
-
+       
 
         /*--------加入Palne--------*/
 

@@ -115,9 +115,17 @@
             var objLoader = new OBJLoader();
             objLoader.setMaterials(materials);
             // objLoader.load('./3D_Object/test1.obj', function (object) {
-            var teapot = objLoader.load('./3D_Object/teapot.obj', function (object) {
-                object.castShadow = true; //default is false
-                object.receiveShadow = false; //default
+            objLoader.load('./3D_Object/teapot.obj', function (object) {
+                object.traverse(function (node) {
+                    if (node instanceof THREE.Mesh) {
+                        node.castShadow = true; //default is false
+                        // node.receiveShadow = false; //default
+                        node.receiveShadow = true; //default
+                    }
+
+                })
+
+
                 object.position.y = 4;
                 scene.add(object);
             });
@@ -133,7 +141,7 @@
         plane.receiveShadow = true;
         plane.rotateX(30);//旋轉平面
         scene.add(plane);
-        
+
 
 
         //Create a sphere that cast shadows (but does not receive them)

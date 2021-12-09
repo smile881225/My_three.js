@@ -26,27 +26,19 @@
             height: 43px;
             width: 43px;
             position: absolute;
-            top: 45.15vw;
-            left: 1.13vw;
+            top: 866.52px;
+            left: 21.76px;
             /* background-color: aquamarine; */
-            cursor: pointer;
-        }
-
-        .light {
-            position: absolute;
-            height: 43px;
-            width: 43px;
-            top: 45.15vw;
-            left: 94.384vw;
+            border-radius: 100%;
             cursor: pointer;
         }
     </style>
 </head>
 
 <body>
+
     <div class="container">
         <img class="music" src="https://renaultespace.littleworkshop.fr/img/hud/sound-on.png" alt="">
-        <img class="light" src="https://renaultespace.littleworkshop.fr/img/hud/light.png" alt="">
     </div>
 
     <script src="./js/three.js"></script>
@@ -68,7 +60,6 @@
             }
 
         })
-
         /*------------Java Script--------------*/
 
         import * as THREE from './js/three.module.js';
@@ -83,117 +74,36 @@
         renderer.setSize(window.innerWidth, window.innerHeight);
         document.body.appendChild(renderer.domElement);
 
-        /*--------設定影子選項--------*/
-        var PointLight;
-        var AmbientLight;
-        var SpotLight;
-        var helper;
-        // 設定預設的光線
+        /*--------設定SpotLight影子選項--------*/
+
         renderer.shadowMap.enabled = true;//把Renderer的陰影選項打開
         renderer.shadowMap.type = THREE.PCFSoftShadowMap;// 設定陰影類型 default 是 THREE.PCFShadowMap
 
         //Create a SpotLight and turn on shadows for the light
-        PointLight = new THREE.PointLight(0xffffff, 2);//( color : Integer, intensity : Float, distance : Number, decay : Float )
+        const light = new THREE.SpotLight(0xffffff, 1);//( color : Integer, intensity : Float, distance : Number, decay : Float )
 
-        PointLight.castShadow = true; // default false
-        scene.add(PointLight);
+        light.castShadow = true; // default false
+        scene.add(light);
 
         //Set up shadow properties for the light
-        PointLight.shadow.mapSize.width = 512; // default //限制陰影的顯示寬圖、高度，為了更好的效率，數字越大，陰影的品質越好
-        PointLight.shadow.mapSize.height = 512; // default
-        PointLight.shadow.camera.near = 0.5; // default
-        PointLight.shadow.camera.far = 5000; // default
-        PointLight.position.set(-500,300,0);
+        light.shadow.mapSize.width = 512; 
+        light.shadow.mapSize.height = 512; 
+        light.shadow.camera.near = 0.5; // default
+        light.shadow.camera.far = 5000; // default
+        light.position.set(-500,300,0);
         //Create a helper for the shadow camera (optional)
-        helper = new THREE.CameraHelper(PointLight.shadow.camera);
+        light.shadow.focus = 0.1;
+        const helper = new THREE.CameraHelper(light.shadow.camera);
         scene.add(helper);
-
-        /*--------設定燈光判斷--------*/
-
-
-        let controlLight = true;
-        let lightBtn = document.querySelector('.light');
-        lightBtn.addEventListener('click', function () {
-            console.log('PointLight是' + PointLight);
-            console.log('AmbientLight' + AmbientLight);
-            console.log('SpotLight' + SpotLight);
-            console.log(scene.children);
-            
-            if (controlLight) {
-                controlLight = false;
-                scene.remove(PointLight);
-                scene.remove(SpotLight);
-                scene.remove(helper);
-                switchSpotLight();
-            }
-            else {
-                controlLight = true;
-                scene.remove(PointLight);
-                scene.remove(SpotLight);
-                scene.remove(helper);
-                switchPointLight();
-            }
-            console.log(PointLight);
-            console.log(AmbientLight);
-            console.log(scene.children);
-
-        })
-
-        function switchAmbientLight() {//切換燈光至AmbientLight
-            console.log('switchAmbientLight');
-            AmbientLight = new THREE.AmbientLight(0xFFFFFF, 2);
-            scene.add(AmbientLight);
-        }
-        function switchPointLight() {//切換燈光至PointLight
-            console.log('switchPointLighta');
-            renderer.shadowMap.enabled = true;//把Renderer的陰影選項打開
-            renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-            PointLight = new THREE.PointLight(0xffffff, 2);
-            PointLight.castShadow = true;
-            PointLight.shadow.mapSize.width = 512;
-            PointLight.shadow.mapSize.height = 512;
-            PointLight.shadow.camera.near = 0.5;
-            PointLight.shadow.camera.far = 5000;
-            PointLight.position.set(-500,400,0);
-            scene.add(PointLight);
-            helper = new THREE.CameraHelper(PointLight.shadow.camera);
-            scene.add(helper);
-
-        }
-        function switchSpotLight() {//切換燈光至SpotLight
-            console.log('switchSpotLight');
-            renderer.shadowMap.enabled = true;
-            renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-            SpotLight = new THREE.SpotLight(0xffffff, 1);
-            SpotLight.shadow.mapSize.width = 512;
-            SpotLight.shadow.mapSize.height = 512;
-            SpotLight.shadow.camera.near = 0.5;
-            SpotLight.shadow.camera.far = 500;
-            SpotLight.shadow.focus = 0.1;
-            SpotLight.position.set(200, 1000, 20);
-            // spotLight.target = ;
-            scene.add(SpotLight);
-            helper = new THREE.CameraHelper(SpotLight.shadow.camera);
-            scene.add(helper);
-        }
-        /*-------調整camera位置---------*/
-
-        camera.position.set(0, 50, 200);
-        camera.lookAt(0, 0, 0);
 
         /*--------開始載我的模型--------*/
 
-        // var mtlLoader = new THREE.MTLLoader();
         var mtlLoader = new MTLLoader();
 
-        // mtlLoader.setBaseUrl('./3D_Object/');
-        // mtlLoader.setPath('./3D_Object/');
 
-        //記住！！！！！OBJ、MTL、PNG貼圖來源檔一定要放在同個資料夾才可以
 
-        // var url = "/3D_Object/test1.mtl";
         var url = "/3D_Object/teapot.mtl";
-        const teapot = mtlLoader.load(url, function (materials) {
+        mtlLoader.load(url, function (materials) {
             materials.preload();
             var objLoader = new OBJLoader();
             objLoader.setMaterials(materials);
@@ -207,7 +117,8 @@
                     }
 
                 })
-                // console.log(object);
+
+
                 object.position.y = 4;
                 scene.add(object);
             });
@@ -218,7 +129,7 @@
         /*--------加入Palne--------*/
 
         const planeGeometry = new THREE.PlaneGeometry(2000, 2000, 32, 32);
-        const planeMaterial = new THREE.MeshStandardMaterial({ color: 0x4F4F4F })
+        const planeMaterial = new THREE.MeshStandardMaterial({ color: 0x00ff00 })
         const plane = new THREE.Mesh(planeGeometry, planeMaterial);
         plane.receiveShadow = true;
         plane.rotateX(30);//旋轉平面
@@ -231,16 +142,19 @@
         const sphereMaterial = new THREE.MeshStandardMaterial({ color: 0xff0000 });
         const sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
         sphere.castShadow = true; //default is false
-        sphere.receiveShadow = false; //default 接受陰影? 
-        sphere.position.set(100, 78, -200);
+        sphere.receiveShadow = true; //default 接受陰影? 
+        sphere.position.set(100, 20, 100);
         scene.add(sphere);
 
 
         /*-------更改場景的背景顏色---------*/
 
-        scene.background = new THREE.Color(0xffffff);
+        // scene.background = new THREE.Color(0xffffff);
 
+        /*-------調整camera位置---------*/
 
+        camera.position.set(-300, 100, 400);
+        camera.lookAt(0, 0, 0);
 
         /*--------添加音樂--------*/
 
@@ -249,8 +163,6 @@
 
         // 增加一個global端的audio source
         const sound = new THREE.Audio(listener);
-
-        console.log(scene.children);
 
         // load a sound and set it as the Audio object's buffer
         const audioLoader = new THREE.AudioLoader();
