@@ -6,9 +6,10 @@
     <title>create my modle</title>
 
     <style>
-        html{
+        html {
             overflow: hidden;
         }
+
         body {
             margin: 0;
             padding: 0;
@@ -21,7 +22,7 @@
 
         .container {
             width: 100%;
-            height: 100vh;
+            height: 100%;
             /* background-color: white; */
             position: absolute;
         }
@@ -30,8 +31,9 @@
             height: 43px;
             width: 43px;
             position: absolute;
-            top: 45.15vw;
-            left: 1.13vw;
+            bottom: 1.75%;
+
+            left: 1.13%;
             /* background-color: aquamarine; */
             cursor: pointer;
         }
@@ -40,8 +42,8 @@
             position: absolute;
             height: 43px;
             width: 43px;
-            top: 45.15vw;
-            left: 94.384vw;
+            bottom: 13.99%;
+            right: 2.64%;
             cursor: pointer;
         }
     </style>
@@ -73,11 +75,33 @@
 
         })
 
+        /*--------視角縮放大小--------*/
+
+        const container = document.querySelector('.container');
+        container.addEventListener('mousewheel', mousewheel);
+        // container.addEventListener('mouseScroll', mousewheel);
+        function mousewheel(e) {
+            console.log(camera.position.z);
+            camera.position.z += (e.deltaY / 1);
+            if (camera.position.z < 30) {
+                camera.position.z = 30;
+            }
+            else if (camera.position.z > 600) {
+                camera.position.z = 600;
+            }
+            // camera.position.z < 30?
+            // camera.position.z = 30:
+            // camera.position.z > 840?
+            // camera.position.z = 840:
+            // "";
+
+        }
         /*------------Java Script--------------*/
 
         import * as THREE from './js/three.module.js';
         import { OBJLoader } from './Loader/OBJLoader.js';
         import { MTLLoader } from './Loader/MTLLoader.js'
+        import { OrbitControls } from './js/OrbitControls.js'
 
         /*--------創造初始元素--------*/
 
@@ -92,26 +116,18 @@
         var AmbientLight;
         var SpotLight;
         var helper;
-        // 設定預設的光線
         renderer.shadowMap.enabled = true;//把Renderer的陰影選項打開
-        renderer.shadowMap.type = THREE.PCFSoftShadowMap;// 設定陰影類型 default 是 THREE.PCFShadowMap
-
-        //Create a SpotLight and turn on shadows for the light
-        PointLight = new THREE.PointLight(0xffffff, 2);//( color : Integer, intensity : Float, distance : Number, decay : Float )
-
-        PointLight.castShadow = true; // default false
+        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        PointLight = new THREE.PointLight(0xffffff, 2);
+        PointLight.castShadow = true;
+        PointLight.shadow.mapSize.width = 2048;
+        PointLight.shadow.mapSize.height = 2048;
+        PointLight.shadow.camera.near = 0.5;
+        PointLight.shadow.camera.far = 5000;
+        PointLight.position.set(-500, 400, 0);
         scene.add(PointLight);
-
-        //Set up shadow properties for the light
-        PointLight.shadow.mapSize.width = 512; // default //限制陰影的顯示寬圖、高度，為了更好的效率，數字越大，陰影的品質越好
-        PointLight.shadow.mapSize.height = 512; // default
-        PointLight.shadow.camera.near = 0.5; // default
-        PointLight.shadow.camera.far = 5000; // default
-        PointLight.position.set(-500,300,0);
-        //Create a helper for the shadow camera (optional)
         helper = new THREE.CameraHelper(PointLight.shadow.camera);
         scene.add(helper);
-
         /*--------設定燈光判斷--------*/
 
 
@@ -122,7 +138,7 @@
             console.log('AmbientLight' + AmbientLight);
             console.log('SpotLight' + SpotLight);
             console.log(scene.children);
-            
+
             if (controlLight) {
                 controlLight = false;
                 scene.remove(PointLight);
@@ -158,7 +174,7 @@
             PointLight.shadow.mapSize.height = 512;
             PointLight.shadow.camera.near = 0.5;
             PointLight.shadow.camera.far = 5000;
-            PointLight.position.set(-500,400,0);
+            PointLight.position.set(-500, 400, 0);
             scene.add(PointLight);
             helper = new THREE.CameraHelper(PointLight.shadow.camera);
             scene.add(helper);
@@ -172,9 +188,9 @@
             SpotLight.shadow.mapSize.width = 512;
             SpotLight.shadow.mapSize.height = 512;
             SpotLight.shadow.camera.near = 0.5;
-            SpotLight.shadow.camera.far = 500;
-            SpotLight.shadow.focus = 0.1;
-            SpotLight.position.set(200, 1000, 20);
+            SpotLight.shadow.focus = 0.5;
+            SpotLight.position.set(0, 200, 20);
+            SpotLight.castShadow = true;
             // spotLight.target = ;
             scene.add(SpotLight);
             helper = new THREE.CameraHelper(SpotLight.shadow.camera);
@@ -184,6 +200,7 @@
 
         camera.position.set(0, 50, 200);
         camera.lookAt(0, 0, 0);
+        
 
         /*--------開始載我的模型--------*/
 
@@ -230,14 +247,7 @@
 
 
 
-        //Create a sphere that cast shadows (but does not receive them)
-        const sphereGeometry = new THREE.SphereGeometry(50, 32, 32);
-        const sphereMaterial = new THREE.MeshStandardMaterial({ color: 0xff0000 });
-        const sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
-        sphere.castShadow = true; //default is false
-        sphere.receiveShadow = false; //default 接受陰影? 
-        sphere.position.set(100, 78, -200);
-        scene.add(sphere);
+
 
 
         /*-------更改場景的背景顏色---------*/

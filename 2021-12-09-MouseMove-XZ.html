@@ -14,18 +14,30 @@
             width: 100%;
             height: 100%
         }
+
+        .container {
+            width: 100%;
+            height: 100vh;
+            /* background-color: paleturquoise; */
+            position: absolute;
+
+        }
     </style>
 </head>
 
 <body>
+    <div class="container">
+
+    </div>
     <script src="./js/three.js"></script>
     <!-- <script type="module" src="./Loader/OBJLoader.js"></script>
     <script type="module" src="./Loader/MTLLoader.js"></script> -->
     <script type="module">
-
         import * as THREE from './js/three.module.js';
         import { OBJLoader } from './Loader/OBJLoader.js';
-        import { MTLLoader } from './Loader/MTLLoader.js'
+        import { MTLLoader } from './Loader/MTLLoader.js';
+
+
 
         /*--------創造初始元素--------*/
 
@@ -35,6 +47,20 @@
         renderer.setSize(window.innerWidth, window.innerHeight);
         document.body.appendChild(renderer.domElement);
 
+        /*--------滑動變更視角--------*/
+        const container = document.querySelector('.container');
+
+        container.addEventListener('mousemove', onDocumentMouseMove);
+
+        let mouseX = 0;
+        let mouseY = 0;
+
+        function onDocumentMouseMove(event) {
+
+            mouseX = (event.clientX - windowHalfX) / 100;
+            mouseY = (event.clientY - windowHalfY) / 100;
+
+        }
         /*--------開始載我的模型--------*/
 
         // var mtlLoader = new THREE.MTLLoader();
@@ -55,13 +81,14 @@
             objLoader.setMaterials(materials);
             // objLoader.load('./3D_Object/test1.obj', function (object) {
             objLoader.load('./3D_Object/teapot.obj', function (object) {
-
-                object.position.y = - 95;
+                object.position.set(10,0,0);
                 scene.add(object);
 
             });
 
         });
+
+
 
         /*--------添加燈光--------*/
 
@@ -74,25 +101,22 @@
 
         /*-------調整camera位置---------*/
 
-        camera.position.copy(target);
-        camera.position.x += Math.sin(camera.rotationy) * 3;
-        camera.position.z += Math.cos(camera.rotationy) * 3;
-        camera.position.y += cameraHeight; // optional
-        tempVector.copy(target).y += cameraHeight; // the += is optional
-        camera.lookAt(tempVector);
-
+        camera.position.set(0, 120, 200);
+        camera.lookAt(0, 0, 0);
 
         /*--------Renderer Scene--------*/
 
         function animation() {
+            camera.position.x += (mouseX - camera.position.x) * .05;
+            camera.position.y += (-mouseY - camera.position.y) * .05;
             requestAnimationFrame(animation);//創造一個循環
             renderer.render(scene, camera);//繪製場景
+            
             // object.rotation.x += 0.01;//旋轉X軸
         }
 
         animation();//呼叫動畫函數
     </script>
-
 
 </body>
 

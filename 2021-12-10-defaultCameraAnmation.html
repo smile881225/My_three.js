@@ -47,17 +47,6 @@
         renderer.setSize(window.innerWidth, window.innerHeight);
         document.body.appendChild(renderer.domElement);
 
-        /*--------滑動變更視角--------*/
-
-        const container = document.querySelector('.container');
-        container.addEventListener('mousemove', change);
-        container.addEventListener('mousedown', change);
-        // container.addEventListener('mouseScroll', mousewheel);
-        function change(e) {
-
-        }
-
-
         /*--------開始載我的模型--------*/
 
         // var mtlLoader = new THREE.MTLLoader();
@@ -78,7 +67,7 @@
             objLoader.setMaterials(materials);
             // objLoader.load('./3D_Object/test1.obj', function (object) {
             objLoader.load('./3D_Object/teapot.obj', function (object) {
-
+                object.position.x = 10;
                 scene.add(object);
 
             });
@@ -98,15 +87,27 @@
 
         /*-------調整camera位置---------*/
 
-        camera.position.set(-20, 60, 200);
-        // camera.lookAt(0, 0, 0);
+        camera.position.set(0, 120, 200);
+        camera.lookAt(0, 0, 0);
 
+        var angle = 0
+        function render() {
+            renderer.render(scene, camera); //执行渲染操作
+           
+        }
         /*--------Renderer Scene--------*/
+
 
         function animation() {
             requestAnimationFrame(animation);//創造一個循環
             renderer.render(scene, camera);//繪製場景
-            // object.rotation.x += 0.01;//旋轉X軸
+            angle += 0.01;
+            // 重新设置相机位置，相机在XOY平面绕着坐标原点旋转运动
+            camera.position.x = 200 * Math.sin(angle);
+            camera.position.z = 200 * Math.cos(angle);
+            // 相机位置改变后，注意执行.looAt()方法重新计算视图矩阵旋转部分
+            // 如果不执行.looAt()方法，相当于相机镜头方向保持在首次执行`.lookAt()`的时候
+            camera.lookAt(0, 0, 0);
         }
 
         animation();//呼叫動畫函數

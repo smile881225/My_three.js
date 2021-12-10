@@ -14,18 +14,30 @@
             width: 100%;
             height: 100%
         }
+
+        .container {
+            width: 100%;
+            height: 100vh;
+            /* background-color: paleturquoise; */
+            position: absolute;
+
+        }
     </style>
 </head>
 
 <body>
+    <div class="container">
+
+    </div>
     <script src="./js/three.js"></script>
     <!-- <script type="module" src="./Loader/OBJLoader.js"></script>
     <script type="module" src="./Loader/MTLLoader.js"></script> -->
     <script type="module">
-
         import * as THREE from './js/three.module.js';
         import { OBJLoader } from './Loader/OBJLoader.js';
-        import { MTLLoader } from './Loader/MTLLoader.js'
+        import { MTLLoader } from './Loader/MTLLoader.js';
+
+
 
         /*--------創造初始元素--------*/
 
@@ -34,6 +46,63 @@
         var renderer = new THREE.WebGLRenderer();
         renderer.setSize(window.innerWidth, window.innerHeight);
         document.body.appendChild(renderer.domElement);
+
+        /*--------滑動變更視角--------*/
+        var circlePoint;
+        var circleRadius = 200;
+        var Move = 0;
+        var oldMove = 0;
+        var mouseDownX;
+        var mouseDownY;
+        var mouseMoveX;
+        var mouseMoveY;
+        var up = true;
+        var down = false;
+        const container = document.querySelector('.container');
+
+        container.addEventListener('mousedown', cameraStart);
+        function cameraStart(e) {
+            // console.log(camera.position);
+            up = false;
+            down = true;
+            mouseDownX = e.pageX;
+            mouseDownY = e.pageY;
+            circlePoint = new THREE.Vector3(0, 0, 0);
+        }
+        
+        container.addEventListener('mousemove', cameraMove); 
+        function cameraMove(e) {
+            if (down) {
+                mouseMoveX = e.pageX;
+                mouseMoveY = e.pageY;
+
+                // camera.position.x = circleRadius * (Math.sin(Move));
+
+                Move = (mouseMoveY - mouseDownY) / 100 + oldMove;
+                camera.position.y = circleRadius * (Math.cos(Move));
+                if(circleRadius * (Math.sin(Move))<0){
+                    camera.position.z=circleRadius * (Math.sin(Move))*-1;
+                }
+                else{
+                    camera.position.z = circleRadius * (Math.sin(Move));
+                }
+                console.log( Move);
+                let pos=[camera.position.x,camera.position.y,camera.position.z];
+                console.log(pos);
+                camera.lookAt(circlePoint);
+            }
+        }
+
+        container.addEventListener('mouseup', cameraEnd);
+        container.addEventListener('mouseleave', cameraEnd); 
+        function cameraEnd(e) {
+            up = true;
+            down = false;
+            // container.addEventListener('mousemove', cameraMove);
+            oldMove = Move;
+        }
+       
+
 
         /*--------開始載我的模型--------*/
 
@@ -55,13 +124,14 @@
             objLoader.setMaterials(materials);
             // objLoader.load('./3D_Object/test1.obj', function (object) {
             objLoader.load('./3D_Object/teapot.obj', function (object) {
-
-                object.position.y = - 95;
+                object.position.x = 10;
                 scene.add(object);
 
             });
 
         });
+
+
 
         /*--------添加燈光--------*/
 
@@ -74,13 +144,8 @@
 
         /*-------調整camera位置---------*/
 
-        camera.position.copy(target);
-        camera.position.x += Math.sin(camera.rotationy) * 3;
-        camera.position.z += Math.cos(camera.rotationy) * 3;
-        camera.position.y += cameraHeight; // optional
-        tempVector.copy(target).y += cameraHeight; // the += is optional
-        camera.lookAt(tempVector);
-
+        camera.position.set(0, 120, 200);
+        camera.lookAt(0, 0, 0);
 
         /*--------Renderer Scene--------*/
 
@@ -92,7 +157,6 @@
 
         animation();//呼叫動畫函數
     </script>
-
 
 </body>
 

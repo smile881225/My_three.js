@@ -18,116 +18,26 @@
         .container {
             width: 100%;
             height: 100vh;
-            /* background-color: white; */
+            /* background-color: paleturquoise; */
             position: absolute;
-        }
 
-        .music {
-            height: 43px;
-            width: 43px;
-            position: absolute;
-            top: 45.15vw;
-            left: 1.13vw;
-            /* background-color: aquamarine; */
-            cursor: pointer;
-        }
-
-        .light {
-            position: absolute;
-            height: 43px;
-            width: 43px;
-            top: 45.15vw;
-            left: 94.384vw;
-            cursor: pointer;
         }
     </style>
 </head>
 
 <body>
     <div class="container">
-        <img class="music" src="https://renaultespace.littleworkshop.fr/img/hud/sound-on.png" alt="">
-        <img class="light" src="https://renaultespace.littleworkshop.fr/img/hud/light.png" alt="">
+
     </div>
     <script src="./js/three.js"></script>
     <!-- <script type="module" src="./Loader/OBJLoader.js"></script>
     <script type="module" src="./Loader/MTLLoader.js"></script> -->
     <script type="module">
-
-        /*--------Java Script--------*/
-
-        let musicBtn = document.querySelector('.music');
-        musicBtn.addEventListener('click', function () {
-            if (sound.isPlaying) {
-                sound.pause();
-                musicBtn.src = "https://renaultespace.littleworkshop.fr/img/hud/sound-off.png";
-            }
-            else {
-                sound.play();
-                musicBtn.src = "https://renaultespace.littleworkshop.fr/img/hud/sound-on.png";
-            }
-
-        })
-
-        var PointLight;
-        var AmbientLight;
-        var helper;
-        let lightBtn = document.querySelector('.light');
-        lightBtn.addEventListener('click', function () {
-
-
-            if (controlLight) {
-                // console.log(PointLight);
-                scene.remove(PointLight);
-                scene.remove(AmbientLight);
-                console.log('removeAmbientLight');
-                // var PointLight = new THREE.PointLight(0xffffff, 10);
-                // 這裡有個BUG！他用VAR宣告，會把記憶體中的PointLight刪掉，所以下一次我
-                // 找不到PointLight，所以也不能remove掉
-                PointLight = new THREE.PointLight(0xffffff, 10);
-                /*--------設定SpotLight影子選項--------*/
-                //Create a WebGLRenderer and turn on shadows in the renderer
-                renderer.shadowMap.enabled = true;//把Renderer的陰影選項打開
-                renderer.shadowMap.type = THREE.PCFSoftShadowMap;// 設定陰影類型 default 是 THREE.PCFShadowMap
-                //Create a SpotLight and turn on shadows for the light
-                //( color : Integer, intensity : Float, distance : Number, decay : Float )
-                PointLight.castShadow = true; // default false
-                //Set up shadow properties for the light
-                PointLight.shadow.mapSize.width = 512; // default //限制陰影的顯示寬圖、高度，為了更好的效率，數字越大，陰影的品質越好
-                PointLight.shadow.mapSize.height = 512; // default
-                PointLight.shadow.camera.near = 0.5; // default
-                PointLight.shadow.camera.far = 5000; // default
-                PointLight.position.x = -500;
-                PointLight.position.y = 300;
-                //Create a helper for the shadow camera (optional)
-                helper = new THREE.CameraHelper(PointLight.shadow.camera);
-                scene.add(helper);
-                controlLight = false;
-                console.log(
-                    scene.children
-                );
-                scene.add(PointLight);
-            }
-            else {
-                scene.remove(helper);
-                scene.remove(PointLight);
-                scene.remove(AmbientLight);
-                console.log('addAmbientLight');
-                console.log(
-                    scene.children
-                );
-                AmbientLight = new THREE.AmbientLight(0xFFFFFF, 1);
-                // var AmbientLight = new THREE.AmbientLight(0xFFFFFF, 3);
-                // 這裡有個BUG！他用VAR宣告，會把記憶體中的PointLight刪掉，所以下一次我
-                // 找不到PointLight，所以也不能remove掉
-                controlLight = true;
-                scene.add(AmbientLight);
-            }
-        })
-        /*------------Java Script--------------*/
-
         import * as THREE from './js/three.module.js';
         import { OBJLoader } from './Loader/OBJLoader.js';
-        import { MTLLoader } from './Loader/MTLLoader.js'
+        import { MTLLoader } from './Loader/MTLLoader.js';
+
+
 
         /*--------創造初始元素--------*/
 
@@ -136,12 +46,6 @@
         var renderer = new THREE.WebGLRenderer();
         renderer.setSize(window.innerWidth, window.innerHeight);
         document.body.appendChild(renderer.domElement);
-
-        let controlLight = true;
-
-        var AmbientLight = new THREE.AmbientLight(0xFFFFFF, 1);
-        scene.add(AmbientLight);
-
 
         /*--------開始載我的模型--------*/
 
@@ -156,69 +60,59 @@
         // var url = "/3D_Object/test1.mtl";
         var url = "/3D_Object/teapot.mtl";
         mtlLoader.load(url, function (materials) {
+
             materials.preload();
+
             var objLoader = new OBJLoader();
             objLoader.setMaterials(materials);
             // objLoader.load('./3D_Object/test1.obj', function (object) {
-            var teapot = objLoader.load('./3D_Object/teapot.obj', function (object) {
-                object.castShadow = true; //default is false
-                object.receiveShadow = false; //default
-                object.position.y = 4;
+            objLoader.load('./3D_Object/teapot.obj', function (object) {
+                object.position.x = 10;
                 scene.add(object);
+
             });
 
         });
 
 
-        /*--------加入Palne--------*/
 
-        const plane_geometry = new THREE.PlaneGeometry(1000, 1000);
-        const plane_material = new THREE.MeshStandardMaterial({ color: 0x666666 })
-        const plane = new THREE.Mesh(plane_geometry, plane_material);
-        // plane.rotateX(-30);//旋轉平面
-        plane.rotateX(30);//旋轉平面
-        plane.receiveShadow = true;
-        scene.add(plane);
+        /*--------添加燈光--------*/
 
-        // /*-------更改場景的背景顏色---------*/
+        var light = new THREE.HemisphereLight(0xffffff, 0x000000, 2);
+        scene.add(light);
 
-        // scene.background = new THREE.Color(0xffffff);
+        /*-------更改場景的背景顏色---------*/
+
+        scene.background = new THREE.Color(0xffffff);
 
         /*-------調整camera位置---------*/
 
-        camera.position.set(0, 50, 200);
+        camera.position.set(0, 120, 200);
         camera.lookAt(0, 0, 0);
 
-        /*--------添加音樂--------*/
-
-        const listener = new THREE.AudioListener();
-        camera.add(listener);//在相機下面新增Listenter
-
-        // 增加一個global端的audio source
-        const sound = new THREE.Audio(listener);
-
-        // load a sound and set it as the Audio object's buffer
-        const audioLoader = new THREE.AudioLoader();
-        audioLoader.load('./audio/Play-1.mp3', function (buffer) {
-            sound.setBuffer(buffer);
-            sound.setLoop(true);
-            sound.setVolume(0.5);
-            sound.play();
-        });
-
+        var angle = 0
+        function render() {
+            renderer.render(scene, camera); //执行渲染操作
+           
+        }
         /*--------Renderer Scene--------*/
+
 
         function animation() {
             requestAnimationFrame(animation);//創造一個循環
             renderer.render(scene, camera);//繪製場景
             // object.rotation.x += 0.01;//旋轉X軸
+            angle += 0.05;
+            // 重新设置相机位置，相机在XOY平面绕着坐标原点旋转运动
+            camera.position.x = 200 * Math.sin(angle);
+            camera.position.z = 200 * Math.cos(angle);
+            // 相机位置改变后，注意执行.looAt()方法重新计算视图矩阵旋转部分
+            // 如果不执行.looAt()方法，相当于相机镜头方向保持在首次执行`.lookAt()`的时候
+            camera.lookAt(0, 0, 0);
         }
-        console.log(
-            scene.children
-        );
+
         animation();//呼叫動畫函數
     </script>
-
 
 </body>
 
