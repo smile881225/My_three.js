@@ -24,13 +24,13 @@
             width: 100%;
             height: 100%;
             /* background-color: white; */
-            position: absolute;
+            position: relative;
         }
 
         .music {
             height: 43px;
             width: 43px;
-            position: absolute;
+            position: fixed;
             bottom: 1.75%;
 
             left: 1.13%;
@@ -39,7 +39,7 @@
         }
 
         .light {
-            position: absolute;
+            position: fixed;
             height: 43px;
             width: 43px;
             bottom: 13.99%;
@@ -200,13 +200,13 @@
         camera.position.set(0, 50, 200);
         camera.lookAt(0, 0, 0);
 
-        controls = new OrbitControls(camera, renderer.domElement);
-            controls.target.set(4.5, 0, 4.5);
+        var controls = new OrbitControls(camera, renderer.domElement);
+        controls.target.set(4.5, 0, 4.5);
 
-            controls.enablePan = false;
-            controls.maxPolarAngle = Math.PI / 2;
+        controls.enablePan = false;
+        controls.maxPolarAngle = Math.PI / 2;
 
-            controls.enableDamping = true;
+        controls.enableDamping = true;
 
         /*--------開始載我的模型--------*/
 
