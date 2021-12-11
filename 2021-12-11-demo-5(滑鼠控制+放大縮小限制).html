@@ -51,6 +51,7 @@
 
 <body>
     <div class="container">
+       
         <img class="music" src="https://renaultespace.littleworkshop.fr/img/hud/sound-on.png" alt="">
         <img class="light" src="https://renaultespace.littleworkshop.fr/img/hud/light.png" alt="">
     </div>
@@ -64,6 +65,7 @@
 
         let musicBtn = document.querySelector('.music');
         musicBtn.addEventListener('click', function () {
+            console.log('changePlaymusic');
             if (sound.isPlaying) {
                 sound.pause();
                 musicBtn.src = "https://renaultespace.littleworkshop.fr/img/hud/sound-off.png";
@@ -75,27 +77,6 @@
 
         })
 
-        /*--------視角縮放大小--------*/
-
-        const container = document.querySelector('.container');
-        container.addEventListener('mousewheel', mousewheel);
-        // container.addEventListener('mouseScroll', mousewheel);
-        function mousewheel(e) {
-            console.log(camera.position.z);
-            camera.position.z += (e.deltaY / 1);
-            if (camera.position.z < 30) {
-                camera.position.z = 30;
-            }
-            else if (camera.position.z > 600) {
-                camera.position.z = 600;
-            }
-            // camera.position.z < 30?
-            // camera.position.z = 30:
-            // camera.position.z > 840?
-            // camera.position.z = 840:
-            // "";
-
-        }
         /*------------Java Script--------------*/
 
         import * as THREE from './js/three.module.js';
@@ -125,17 +106,14 @@
         PointLight.shadow.camera.far = 5000;
         PointLight.position.set(-500, 400, 0);
         scene.add(PointLight);
-        helper = new THREE.CameraHelper(PointLight.shadow.camera);
-        scene.add(helper);
+        // helper = new THREE.CameraHelper(PointLight.shadow.camera);
+        // scene.add(helper);
         /*--------設定燈光判斷--------*/
 
-
-        let controlLight = true;
+        var controlLight = true;
         let lightBtn = document.querySelector('.light');
         lightBtn.addEventListener('click', function () {
-            console.log('PointLight是' + PointLight);
-            console.log('AmbientLight' + AmbientLight);
-            console.log('SpotLight' + SpotLight);
+            console.log('changeLight');
             console.log(scene.children);
 
             if (controlLight) {
@@ -152,9 +130,6 @@
                 scene.remove(helper);
                 switchPointLight();
             }
-            console.log(PointLight);
-            console.log(AmbientLight);
-            console.log(scene.children);
 
         })
 
@@ -175,8 +150,8 @@
             PointLight.shadow.camera.far = 5000;
             PointLight.position.set(-500, 400, 0);
             scene.add(PointLight);
-            helper = new THREE.CameraHelper(PointLight.shadow.camera);
-            scene.add(helper);
+            // helper = new THREE.CameraHelper(PointLight.shadow.camera);
+            // scene.add(helper);
 
         }
         function switchSpotLight() {//切換燈光至SpotLight
@@ -192,22 +167,26 @@
             SpotLight.castShadow = true;
             // spotLight.target = ;
             scene.add(SpotLight);
-            helper = new THREE.CameraHelper(SpotLight.shadow.camera);
-            scene.add(helper);
+            // helper = new THREE.CameraHelper(SpotLight.shadow.camera);
+            // scene.add(helper);
         }
         /*-------調整camera位置---------*/
 
-        camera.position.set(0, 50, 200);
+        camera.position.set(0, 100, 200);
         camera.lookAt(0, 0, 0);
 
         var controls = new OrbitControls(camera, renderer.domElement);
-        controls.target.set(4.5, 0, 4.5);
+        controls.target.set(4.5, 5, 4.5);
 
         controls.enablePan = false;
         controls.maxPolarAngle = Math.PI / 2;
-
         controls.enableDamping = true;
 
+        controls.autoRotate = true;//自動旋轉
+        controls.autoRotateSpeed = 5;//控制旋轉速度
+
+        controls.minDistance = 100;//controls縮放最小距離
+        controls.maxDistance = 400;//controls縮放最大距離
         /*--------開始載我的模型--------*/
 
         // var mtlLoader = new THREE.MTLLoader();
@@ -251,11 +230,6 @@
         plane.rotateX(-1.57);//旋轉平面 會寫負的是因為Plane的背面預設是不會顯示的，所以要翻對邊
         scene.add(plane);
 
-
-
-
-
-
         /*-------更改場景的背景顏色---------*/
 
         scene.background = new THREE.Color(0xffffff);
@@ -281,13 +255,14 @@
             sound.play();
         });
 
+        /*-------預設鏡頭自動旋轉---------*/
+        var angle = 0;
         /*--------Renderer Scene--------*/
 
         function animation() {
             controls.update();
             requestAnimationFrame(animation);//創造一個循環
             renderer.render(scene, camera);//繪製場景
-            // object.rotation.x += 0.01;//旋轉X軸
         }
 
         animation();//呼叫動畫函數

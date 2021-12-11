@@ -90,10 +90,9 @@
         camera.position.set(0, 120, 200);
         camera.lookAt(0, 0, 0);
 
-        var angle = 0
+        var angle = 0;
         function render() {
-            renderer.render(scene, camera); //执行渲染操作
-           
+            renderer.render(scene, camera); 
         }
         /*--------Renderer Scene--------*/
 
@@ -102,11 +101,9 @@
             requestAnimationFrame(animation);//創造一個循環
             renderer.render(scene, camera);//繪製場景
             angle += 0.01;
-            // 重新设置相机位置，相机在XOY平面绕着坐标原点旋转运动
+            // 重設相機位置
             camera.position.x = 200 * Math.sin(angle);
             camera.position.z = 200 * Math.cos(angle);
-            // 相机位置改变后，注意执行.looAt()方法重新计算视图矩阵旋转部分
-            // 如果不执行.looAt()方法，相当于相机镜头方向保持在首次执行`.lookAt()`的时候
             camera.lookAt(0, 0, 0);
         }
 
