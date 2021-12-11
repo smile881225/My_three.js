@@ -105,7 +105,7 @@
         /*--------創造初始元素--------*/
 
         var scene = new THREE.Scene();
-        var camera = new THREE.PerspectiveCamera(80, window.innerWidth / window.innerHeight, 0.1, 1000);
+        var camera = new THREE.PerspectiveCamera(80, window.innerWidth / window.innerHeight, 0.1, 10000);
         var renderer = new THREE.WebGLRenderer();
         renderer.setSize(window.innerWidth, window.innerHeight);
         document.body.appendChild(renderer.domElement);
@@ -248,7 +248,7 @@
         const planeMaterial = new THREE.MeshStandardMaterial({ color: 0x4F4F4F })
         const plane = new THREE.Mesh(planeGeometry, planeMaterial);
         plane.receiveShadow = true;
-        plane.rotateX(30);//旋轉平面
+        plane.rotateX(-1.57);//旋轉平面 會寫負的是因為Plane的背面預設是不會顯示的，所以要翻對邊
         scene.add(plane);
 
 
