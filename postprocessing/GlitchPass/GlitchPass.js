@@ -5,9 +5,9 @@ import {
 	RGBFormat,
 	ShaderMaterial,
 	UniformsUtils
-} from '../../../build/three.module.js';
+} from '../../js/three.module.js';
 import { Pass, FullScreenQuad } from './Pass.js';
-import { DigitalGlitch } from '../shaders/DigitalGlitch.js';
+import { DigitalGlitch } from './DigitalGlitch.js';
 
 class GlitchPass extends Pass {
 
