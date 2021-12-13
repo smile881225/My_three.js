@@ -30,14 +30,16 @@
     <script type="module">
 
         /*------------Java Script--------------*/
-
         import * as THREE from './js/three.module.js';
+        import Stats from './js/stats.module.js';
         import { OBJLoader } from './Loader/OBJLoader.js';
         import { MTLLoader } from './Loader/MTLLoader.js'
         import { OrbitControls } from './js/OrbitControls.js';
-
+       
         /*--------創造初始元素--------*/
-
+        var mtlLoader
+        var PointLight, AmbientLight, SpotLight, helper;//light
+        var controls;
         var scene = new THREE.Scene();
         var camera = new THREE.PerspectiveCamera(80, window.innerWidth / window.innerHeight, 0.1, 10000);
         var renderer = new THREE.WebGLRenderer();
@@ -48,12 +50,9 @@
 
         camera.position.set(0, 100, 200);
         camera.lookAt(0, 0, 0);
-
+        
         /*--------燈光選項--------*/
-        var PointLight;
-        var AmbientLight;
-        var SpotLight;
-        var helper;
+
         renderer.shadowMap.enabled = true;//把Renderer的陰影選項打開
         renderer.shadowMap.type = THREE.PCFSoftShadowMap;
         PointLight = new THREE.PointLight(0xffffff, 2);
@@ -67,7 +66,7 @@
 
         /*-------滑鼠Controls---------*/
 
-        var controls = new OrbitControls(camera, renderer.domElement);
+        controls = new OrbitControls(camera, renderer.domElement);
         controls.target.set(4.5, 5, 4.5);
         controls.enablePan = false;
         controls.maxPolarAngle = Math.PI / 2;
@@ -79,7 +78,7 @@
         /*--------開始載我的模型--------*/
 
         // var mtlLoader = new THREE.MTLLoader();
-        var mtlLoader = new MTLLoader();
+        mtlLoader = new MTLLoader();
 
         // mtlLoader.setBaseUrl('./3D_Object/');
         // mtlLoader.setPath('./3D_Object/');
@@ -110,9 +109,6 @@
             console.log(teapot);
         });
 
-
-
-
         /*--------加入Palne--------*/
         const texture = new THREE.TextureLoader().load("./img/carpet-2.jpg");
         const planeGeometry = new THREE.PlaneGeometry(2000, 2000, 32, 32);
@@ -126,9 +122,19 @@
 
         scene.background = new THREE.Color(0xffffff);
 
+        let statsUI;
+        statsUI = initStats(); // stats初始化
+        // 建立監測器
+        function initStats() {
+            const stats = new Stats()
+            stats.setMode(0) // FPS mode
+            document.getElementById('stats').appendChild(stats.domElement)
+            return stats
+        }
+
         function animation() {
 
-            // scene.position.y+=4;
+            statsUI.update() // 需設定 update 才會持續更新
             controls.update();
             requestAnimationFrame(animation);//創造一個循環
             renderer.render(scene, camera);//繪製場景

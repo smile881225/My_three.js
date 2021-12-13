@@ -95,10 +95,13 @@
         var scene, camera, renderer;//初始化
         var controls;//滑鼠控制camera
         var PointLight, AmbientLight, SpotLight, helper;//Light
-        let musicBtn, lightBtn, Animationtn//Btn
-        let changeLight;//判斷試
+        var musicBtn, lightBtn, Animationtn//Btn
         var mtlLoader, url//模型
-        let listener;
+        var changeLight, isPlaying;
+        var sound, listener, audioLoader
+
+        init();
+        animation();
 
         function init() {
 
@@ -115,6 +118,13 @@
 
             camera.position.set(0, 100, 200);
             camera.lookAt(0, 0, 0);
+
+            //sence 背景顏色
+
+            scene.background = new THREE.Color(0xffffff);
+
+            //滑鼠controls
+
             controls = new OrbitControls(camera, renderer.domElement);
             controls.target.set(4.5, 5, 4.5);
             controls.enablePan = false;
@@ -124,7 +134,6 @@
             controls.autoRotaeSpeed = 5;//控制旋轉速度
             controls.minDistance = 100;//controls縮放最小距離
             controls.maxDistance = 400;//controls縮放最大距離
-
 
             //燈光
 
@@ -143,6 +152,7 @@
 
 
             //模型
+
             mtlLoader = new MTLLoader();
             url = "/3D_Object/teapot.mtl";
             mtlLoader.load(url, function (materials) {
@@ -166,7 +176,8 @@
                 console.log(teapot);
             });
 
-            /*--------加入Palne--------*/
+            //Palne
+
             const texture = new THREE.TextureLoader().load("./img/carpet-2.jpg");
             const planeGeometry = new THREE.PlaneGeometry(2000, 2000, 32, 32);
             const planeMaterial = new THREE.MeshStandardMaterial({ map: texture })
@@ -176,13 +187,31 @@
             scene.add(plane);
 
 
+            /*--------音樂--------*/
+
+            listener = new THREE.AudioListener();
+            camera.add(listener);
+
+            // 增加一個global端的audio source
+            sound = new THREE.Audio(listener);
+
+            // load a sound and set it as the Audio object's buffer
+            audioLoader = new THREE.AudioLoader();
+            audioLoader.load('./audio/Play-1.mp3', function (buffer) {
+                sound.setBuffer(buffer);
+                sound.setLoop(true);
+                sound.setVolume(0.5);
+                sound.play();
+            });
+
         }
 
         //音樂按鈕控制
 
         musicBtn = document.querySelector('.music');
-        musicBtn.addEventListener('click', musicBtn);
-        function musicBtn() {
+        musicBtn.addEventListener('click', isChange);
+
+        function isChange() {
             console.log('changePlaymusic');
             if (sound.isPlaying) {
                 sound.pause();
@@ -198,8 +227,8 @@
 
         changeLight = true;
         lightBtn = document.querySelector('.light');
-        lightBtn.addEventListener('click', lightBtn);
-        function lightBtn() {
+        lightBtn.addEventListener('click', islight);
+        function islight() {
             console.log('changeLight');
             if (changeLight) {
                 changeLight = false;
@@ -218,17 +247,19 @@
 
         }
 
-        //各種燈光判斷
+        //燈光切換至AmbientLight
 
-        function switchAmbientLight() {//切換燈光至AmbientLight
+        function switchAmbientLight() {
             console.log('switchAmbientLight');
-            AmbientLight = new THREE.AmbientLight(0xFFFFFF, 2);
+            AmbientLight = new THREE.AmbientLight(0xffffff, 2);
             scene.add(AmbientLight);
         }
 
-        function switchPointLight() {//切換燈光至PointLight
+        //切換燈光至PointLight
+
+        function switchPointLight() {
             console.log('switchPointLighta');
-            renderer.shadowMap.enabled = true;//把Renderer的陰影選項打開
+            renderer.shadowMap.enabled = true;
             renderer.shadowMap.type = THREE.PCFSoftShadowMap;
             PointLight = new THREE.PointLight(0xffffff, 2);
             PointLight.castShadow = true;
@@ -242,7 +273,9 @@
             // scene.add(helper);
         }
 
-        function switchSpotLight() {//切換燈光至SpotLight
+        //切換燈光至SpotLight
+
+        function switchSpotLight() {
             console.log('switchSpotLight');
             renderer.shadowMap.enabled = true;
             renderer.shadowMap.type = THREE.PCFSoftShadowMap;
@@ -259,37 +292,14 @@
             // scene.add(helper);
         }
 
-
-
-
-
-        /*--------添加音樂--------*/
-
-        listener = new THREE.AudioListener();
-        camera.add(listener);//在相機下面新增Listenter
-
-        // 增加一個global端的audio source
-        const sound = new THREE.Audio(listener);
-
-
-
-        // load a sound and set it as the Audio object's buffer
-        const audioLoader = new THREE.AudioLoader();
-        audioLoader.load('./audio/Play-1.mp3', function (buffer) {
-            sound.setBuffer(buffer);
-            sound.setLoop(true);
-            sound.setVolume(0.5);
-            sound.play();
-        });
-
         function animation() {
 
             controls.update();
             requestAnimationFrame(animation);//創造一個循環
+            renderer.render(scene, camera);//繪製場景
 
         }
-        // teapot.position.y = 100;
-        animation();//呼叫動畫函數
+
     </script>
 
 

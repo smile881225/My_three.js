@@ -90,14 +90,17 @@
         import { OBJLoader } from './Loader/OBJLoader.js';
         import { MTLLoader } from './Loader/MTLLoader.js'
         import { OrbitControls } from './js/OrbitControls.js';
+        import { EffectComposer  } from './js/EffectComposer.js';
 
         //變數
         var scene, camera, renderer;//初始化
         var controls;//滑鼠控制camera
         var PointLight, AmbientLight, SpotLight, helper;//Light
-        let musicBtn, lightBtn, Animationtn//Btn
         var mtlLoader, url//模型
-        let listener,changeLight;
+        var composer;
+        let musicBtn, lightBtn, Animationtn//Btn
+        let listener, changeLight;//控制燈光與音樂
+
 
 
         init();
@@ -143,60 +146,78 @@
             scene.add(PointLight);
             // helper = new THREE.CameraHelper(PointLight.shadow.camera);
             // scene.add(helper);
+         
+            //SSAO
+
+            composer = new POSTPROCESSING.EffectComposer(renderer);
+            composer.addPass(new POSTPROCESSING.renderPass(scene, camera));
+
+            const effectPass = new POSTPROCESSING.EffectPass((
+
+                camera,
+                new POSTPROCESSING.BloomEffect()
+            ));
+
+            effectPass.renderToScreem = true;
+            composer.addPass(effectPass);
+        
 
 
-            //模型
 
-            mtlLoader = new MTLLoader();
-            url = "/3D_Object/teapot.mtl";
-            mtlLoader.load(url, function (materials) {
-                var teapot;
-                materials.preload();
-                var objLoader = new OBJLoader();
-                objLoader.setMaterials(materials);
-                var teapot = objLoader.load('./3D_Object/teapot.obj', function (object) {
 
-                    object.traverse(function (node) {
-                        if (node instanceof THREE.Mesh) {
-                            node.castShadow = true; //default is false
-                            // node.receiveShadow = false; //default
-                            node.receiveShadow = true; //default
-                        }
-                    })
-                    object.position.y = -0.2;
-                    scene.add(object);
-                    console.log(teapot);
-                });
+        //模型
+
+        mtlLoader = new MTLLoader();
+        url = "/3D_Object/teapot.mtl";
+        mtlLoader.load(url, function (materials) {
+            var teapot;
+            materials.preload();
+            var objLoader = new OBJLoader();
+            objLoader.setMaterials(materials);
+            var teapot = objLoader.load('./3D_Object/teapot.obj', function (object) {
+
+                object.traverse(function (node) {
+                    if (node instanceof THREE.Mesh) {
+                        node.castShadow = true; //default is false
+                        // node.receiveShadow = false; //default
+                        node.receiveShadow = true; //default
+                    }
+                })
+                object.position.y = -0.2;
+                scene.add(object);
                 console.log(teapot);
             });
+            console.log(teapot);
+        });
 
-            //Palne
+        //Palne
 
-            const texture = new THREE.TextureLoader().load("./img/carpet-2.jpg");
-            const planeGeometry = new THREE.PlaneGeometry(2000, 2000, 32, 32);
-            const planeMaterial = new THREE.MeshStandardMaterial({ map: texture })
-            const plane = new THREE.Mesh(planeGeometry, planeMaterial);
-            plane.receiveShadow = true;
-            plane.rotateX(-1.57);//旋轉平面 會寫負的是因為Plane的背面預設是不會顯示的，所以要翻對邊
-            scene.add(plane);
+        const texture = new THREE.TextureLoader().load("./img/carpet-2.jpg");
+        const planeGeometry = new THREE.PlaneGeometry(2000, 2000, 32, 32);
+        const planeMaterial = new THREE.MeshStandardMaterial({ map: texture })
+        const plane = new THREE.Mesh(planeGeometry, planeMaterial);
+        plane.receiveShadow = true;
+        plane.rotateX(-1.57);//旋轉平面 會寫負的是因為Plane的背面預設是不會顯示的，所以要翻對邊
+        scene.add(plane);
 
 
-            /*--------音樂--------*/
+        /*--------音樂--------*/
 
-            listener = new THREE.AudioListener();
-            camera.add(listener);
+        listener = new THREE.AudioListener();
+        camera.add(listener);
 
-            // 增加一個global端的audio source
-            const sound = new THREE.Audio(listener);
+        // 增加一個global端的audio source
+        const sound = new THREE.Audio(listener);
 
-            // load a sound and set it as the Audio object's buffer
-            const audioLoader = new THREE.AudioLoader();
-            audioLoader.load('./audio/Play-1.mp3', function (buffer) {
-                sound.setBuffer(buffer);
-                sound.setLoop(true);
-                sound.setVolume(0.5);
-                sound.play();
-            });
+        // load a sound and set it as the Audio object's buffer
+        const audioLoader = new THREE.AudioLoader();
+        audioLoader.load('./audio/Play-1.mp3', function (buffer) {
+            sound.setBuffer(buffer);
+            sound.setLoop(true);
+            sound.setVolume(0.5);
+            sound.play();
+        });
+
         }
 
         //音樂按鈕控制
@@ -288,8 +309,9 @@
         function animation() {
 
             controls.update();
+            composer.render(scene, camera);//繪製場景
             requestAnimationFrame(animation);//創造一個循環
-            renderer.render(scene, camera);//繪製場景
+
 
         }
 
