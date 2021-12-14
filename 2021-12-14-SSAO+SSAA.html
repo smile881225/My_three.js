@@ -88,13 +88,15 @@
 
         //導入外掛
         import * as THREE from './js/three.module.js';
-        import { OBJLoader } from './Loader/OBJLoader.js';
-        import { MTLLoader } from './Loader/MTLLoader.js'
-        import { OrbitControls } from './js/OrbitControls.js';
+        import { OBJLoader } from './Loader/OBJLoader.js';//模型
+        import { MTLLoader } from './Loader/MTLLoader.js'//材質
+        import { OrbitControls } from './js/OrbitControls.js';//滑鼠控制
+        import Stats from './js/stats.module.js';//幀數顯示器
         import { EffectComposer } from './postprocessing/EffectComposer/EffectComposer.js';
         import { SSAOPass } from './postprocessing/SSAO/SSAOPass.js';
-        import { GUI } from './postprocessing/test/lil-gui.module.min.js';
-
+        import { SSAARenderPass } from './postprocessing/SSAA/SSAARenderPass.js';//反鋸齒
+        import { GUI } from './js/lil-gui.module.min.js';//GUI介面
+        
         //變數
         var scene, camera, renderer;//初始化
         var controls;//滑鼠控制camera
@@ -165,6 +167,15 @@
         controls.minDistance = 100;//controls縮放最小距離
         controls.maxDistance = 400;//controls縮放最大距離
 
+        /*-------Stats---------*/
+
+        const stats = Stats();
+        stats.showPanel(0);
+        // 0：FPS，最近1秒的幀率，值越大表示性能越好；
+        // 1：MS，每一幀需要多少毫秒，值越小表示性能越好；
+        // 2：MB，所分配的内存，開Google的時候要加參數
+
+        document.body.appendChild(stats.dom);
 
         //音樂
 
@@ -285,7 +296,7 @@
             // scene.add(helper);
         }
 
-        //SSAO
+        //SSAO環境光遮蔽
 
         const width = window.innerWidth;
         const height = window.innerHeight;
@@ -306,6 +317,11 @@
         renderer.setSize(width, height);
         composer.setSize(width, height);
 
+        //SSAA反鋸齒
+
+
+
+
         //GUI
 
         const gui = new GUI();
@@ -316,6 +332,7 @@
 
         function animation() {
 
+            stats.update() // 需設定 update 才會持續更新
             controls.update();
             requestAnimationFrame(animation);//創造一個循環
             composer.render(scene, camera);//繪製場景

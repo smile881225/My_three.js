@@ -1,149 +1,143 @@
 <!DOCTYPE html>
-<html lang="en">
-	<head>
-		<title>three.js webgl - postprocessing - Screen Space Ambient Occlusion</title>
-		<meta charset="utf-8">
-		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link type="text/css" rel="stylesheet" href="main.css">
-		<style>
-			body {
-				background-color: #aaa;
-			}
-		</style>
-	</head>
-	<body>
-		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - screen space ambient occlusion<br/>
-		</div>
+<html>
 
-		<script type="module">
+<head>
+    <meta charset="utf-8">
+    <title>create my modle</title>
 
-			import * as THREE from './js/three.module.js';
+    <style>
+        html {
+            overflow: hidden;
+        }
 
-			import Stats from './postprocessing/test/stats.module.js';
-			import { GUI } from './postprocessing/test/lil-gui.module.min.js';
+        body {
+            margin: 0;
+            padding: 0;
+        }
 
-			import { EffectComposer } from './postprocessing/EffectComposer/EffectComposer.js';
-			import { SSAOPass } from './postprocessing/SSAO/SSAOPass.js';
+        canvas {
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+</head>
 
-			let container, stats;
-			let camera, scene, renderer;
-			let composer;
-			let group;
+<body>
 
-			init();
-			animate();
+    <script src="./js/three.js"></script>
+    <script type="module">
 
-			function init() {
+        /*------------Java Script--------------*/
 
-				container = document.createElement( 'div' );
-				document.body.appendChild( container );
+        import * as THREE from './js/three.module.js';
+        import { OBJLoader } from './Loader/OBJLoader.js';
+        import { MTLLoader } from './Loader/MTLLoader.js'
+        import { OrbitControls } from './js/OrbitControls.js';
 
-				renderer = new THREE.WebGLRenderer();
-				renderer.setSize( window.innerWidth, window.innerHeight );
-				document.body.appendChild( renderer.domElement );
+        /*--------創造初始元素--------*/
+        var mtlLoader;
+        var PointLight, AmbientLight, SpotLight, helper;//light
+        var controls
+        var scene = new THREE.Scene();
+        var camera = new THREE.PerspectiveCamera(80, window.innerWidth / window.innerHeight, 0.1, 10000);
+        var renderer = new THREE.WebGLRenderer();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
 
-				camera = new THREE.PerspectiveCamera( 65, window.innerWidth / window.innerHeight, 100, 700 );
-				camera.position.z = 500;
+        /*-------調整camera位置---------*/
 
-				scene = new THREE.Scene();
-				scene.background = new THREE.Color( 0xaaaaaa );
+		camera.position.set(-100, 50, 70);
+        // camera.lookAt(0, 0, 0);
 
-				scene.add( new THREE.DirectionalLight() );
-				scene.add( new THREE.HemisphereLight() );
+        /*--------燈光選項--------*/
 
-				group = new THREE.Group();
-				scene.add( group );
+        renderer.shadowMap.enabled = true;//把Renderer的陰影選項打開
+        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        PointLight = new THREE.PointLight(0xffffff, 1);
+        PointLight.castShadow = true;
+        PointLight.shadow.mapSize.width = 2048;
+        PointLight.shadow.mapSize.height = 2048;
+        PointLight.shadow.camera.near = 0.5;
+        PointLight.shadow.camera.far = 5000;
+        PointLight.position.set(-500, 400, 0);
+        scene.add(PointLight);
 
-				const geometry = new THREE.BoxGeometry( 10, 10, 10 );
+		scene.add(new THREE.DirectionalLight(0xffffff, 0.01));//加第一盞燈-平行光
+        scene.add(new THREE.HemisphereLight(0xffffff, 0.01));//加第二盞燈-環境光
 
-				for ( let i = 0; i < 100; i ++ ) {
+        /*-------滑鼠Controls---------*/
 
-					const material = new THREE.MeshLambertMaterial( {
-						color: Math.random() * 0xffffff
-					} );
+        controls = new OrbitControls(camera, renderer.domElement);
+        controls.target.set(4.5, 5, 4.5);
+        controls.enablePan = false;
+        controls.maxPolarAngle = Math.PI / 2;
+        controls.enableDamping = true;
+        controls.autoRotate = true;//自動旋轉
+        controls.autoRotateSpeed = 5;//控制旋轉速度
+        controls.minDistance = 100;//controls縮放最小距離
+        controls.maxDistance = 400;//controls縮放最大距離
+        /*--------開始載我的模型--------*/
 
-					const mesh = new THREE.Mesh( geometry, material );
-					mesh.position.x = Math.random() * 400 - 200;
-					mesh.position.y = Math.random() * 400 - 200;
-					mesh.position.z = Math.random() * 400 - 200;
-					mesh.rotation.x = Math.random();
-					mesh.rotation.y = Math.random();
-					mesh.rotation.z = Math.random();
+        // var mtlLoader = new THREE.MTLLoader();
+        mtlLoader = new MTLLoader();
 
-					mesh.scale.setScalar( Math.random() * 10 + 2 );
-					group.add( mesh );
+        // mtlLoader.setBaseUrl('./3D_Object/');
+        // mtlLoader.setPath('./3D_Object/');
 
-				}
+        //記住！！！！！OBJ、MTL、PNG貼圖來源檔一定要放在同個資料夾才可以
 
-				stats = new Stats();
-				container.appendChild( stats.dom );
+        // var url = "/3D_Object/test1.mtl";
+        var url = "/3D_Object/teapot.mtl";
+        mtlLoader.load(url, function (materials) {
+            var teapot;
+            materials.preload();
+            var objLoader = new OBJLoader();
+            objLoader.setMaterials(materials);
+            // objLoader.load('./3D_Object/test1.obj', function (object) {
+            var teapot = objLoader.load('./3D_Object/teapot.obj', function (object) {
 
-				const width = window.innerWidth;
-				const height = window.innerHeight;
+                object.traverse(function (node) {
+                    if (node instanceof THREE.Mesh) {
+                        node.castShadow = true; //default is false
+                        // node.receiveShadow = false; //default
+                        node.receiveShadow = true; //default
+                    }
+                })
+                object.position.y = -0.2;
+                scene.add(object);
+                console.log(teapot);
+            });
+            console.log(teapot);
+        });
 
-				composer = new EffectComposer( renderer );
 
-				const ssaoPass = new SSAOPass( scene, camera, width, height );
-				ssaoPass.kernelRadius = 16;
-				composer.addPass( ssaoPass );
 
-				// Init gui
-				const gui = new GUI();
 
-				gui.add( ssaoPass, 'output', {
-					'Default': SSAOPass.OUTPUT.Default,
-					'SSAO Only': SSAOPass.OUTPUT.SSAO,
-					'SSAO Only + Blur': SSAOPass.OUTPUT.Blur,
-					'Beauty': SSAOPass.OUTPUT.Beauty,
-					'Depth': SSAOPass.OUTPUT.Depth,
-					'Normal': SSAOPass.OUTPUT.Normal
-				} ).onChange( function ( value ) {
+        /*--------加入Palne--------*/
+        const texture = new THREE.TextureLoader().load("./img/carpet-2.jpg");
+        const planeGeometry = new THREE.PlaneGeometry(2000, 2000, 32, 32);
+        const planeMaterial = new THREE.MeshStandardMaterial({ map: texture })
+        const plane = new THREE.Mesh(planeGeometry, planeMaterial);
+        plane.receiveShadow = true;
+        plane.rotateX(-1.57);//旋轉平面 會寫負的是因為Plane的背面預設是不會顯示的，所以要翻對邊
+        scene.add(plane);
 
-					ssaoPass.output = parseInt( value );
+        /*-------更改場景的背景顏色---------*/
 
-				} );
-				gui.add( ssaoPass, 'kernelRadius' ).min( 0 ).max( 32 );
-				gui.add( ssaoPass, 'minDistance' ).min( 0.001 ).max( 0.02 );
-				gui.add( ssaoPass, 'maxDistance' ).min( 0.01 ).max( 0.3 );
+        scene.background = new THREE.Color(0xffffff);
 
-				window.addEventListener( 'resize', onWindowResize );
+        function animation() {
 
-			}
+            // scene.position.y+=4;
+            controls.update();
+            requestAnimationFrame(animation);//創造一個循環
+            renderer.render(scene, camera);//繪製場景
+        }
 
-			function onWindowResize() {
+        animation();//呼叫動畫函數
+    </script>
 
-				const width = window.innerWidth;
-				const height = window.innerHeight;
 
-				camera.aspect = width / height;
-				camera.updateProjectionMatrix();
+</body>
 
-				renderer.setSize( width, height );
-				composer.setSize( width, height );
-
-			}
-
-			function animate() {
-
-				requestAnimationFrame( animate );
-
-				stats.begin();
-				render();
-				stats.end();
-
-			}
-
-			function render() {
-
-				const timer = performance.now();
-				group.rotation.x = timer * 0.0002;
-				group.rotation.y = timer * 0.0001;
-
-				composer.render();
-
-			}
-
-		</script>
-	</body>
 </html>

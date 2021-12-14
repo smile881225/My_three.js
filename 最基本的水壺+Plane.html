@@ -25,8 +25,6 @@
 <body>
 
     <script src="./js/three.js"></script>
-    <!-- <script type="module" src="./Loader/OBJLoader.js"></script>
-    <script type="module" src="./Loader/MTLLoader.js"></script> -->
     <script type="module">
 
         /*------------Java Script--------------*/
@@ -35,11 +33,11 @@
         import { OBJLoader } from './Loader/OBJLoader.js';
         import { MTLLoader } from './Loader/MTLLoader.js'
         import { OrbitControls } from './js/OrbitControls.js';
-        import { EffectComposer } from '.postprocessing/EffectComposer.js';
+
         /*--------創造初始元素--------*/
-        var mtlLoader
-var PointLight,AmbientLight,SpotLight,helper;//light
-var controls
+        var mtlLoader;
+        var PointLight, AmbientLight, SpotLight, helper;//light
+        var controls
         var scene = new THREE.Scene();
         var camera = new THREE.PerspectiveCamera(80, window.innerWidth / window.innerHeight, 0.1, 10000);
         var renderer = new THREE.WebGLRenderer();
@@ -52,7 +50,7 @@ var controls
         camera.lookAt(0, 0, 0);
 
         /*--------燈光選項--------*/
-      
+
         renderer.shadowMap.enabled = true;//把Renderer的陰影選項打開
         renderer.shadowMap.type = THREE.PCFSoftShadowMap;
         PointLight = new THREE.PointLight(0xffffff, 2);
@@ -78,7 +76,7 @@ var controls
         /*--------開始載我的模型--------*/
 
         // var mtlLoader = new THREE.MTLLoader();
-       mtlLoader = new MTLLoader();
+        mtlLoader = new MTLLoader();
 
         // mtlLoader.setBaseUrl('./3D_Object/');
         // mtlLoader.setPath('./3D_Object/');

@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>create my modle</title>
+
+    <style>
+        html {
+            overflow: hidden;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+        }
+
+        canvas {
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+</head>
+
+<body>
+    <script src="./js/three.js"></script>
+    <script type="module">
+
+        import { GUI } from './js/lil-gui.module.min.js';
+        import * as THREE from './js/three.module.js';
+
+        /*--------創造初始元素--------*/
+
+        var scene = new THREE.Scene();
+        var camera = new THREE.PerspectiveCamera(80, window.innerWidth / window.innerHeight, 0.1, 1000);
+        var renderer = new THREE.WebGLRenderer();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
+
+        /*-------更改場景的背景顏色---------*/
+
+        scene.background = new THREE.Color(0xffffff);
+
+        /*-------新增一個Group---------*/
+
+        const geometry = new THREE.BoxGeometry(3, 3, 3);
+        const material = new THREE.MeshBasicMaterial({ color: 0x921AFF });
+
+        const cubeA = new THREE.Mesh(geometry, material);
+        cubeA.position.set(0, 2, 0);
+
+        const cubeB = new THREE.Mesh(geometry, material);
+        cubeB.position.set(-10, 0, 0);
+
+        //create a group and add the two cubes
+        //These cubes can now be rotated / scaled etc as a group
+        const group = new THREE.Group();
+
+        group.add(cubeA);
+        group.add(cubeB);
+
+        scene.add(group);
+
+        /*-------調整camera---------*/
+
+        camera.position.y = 10;
+        camera.position.z = 12;
+        camera.lookAt(0, 0, 0);
+
+        /*-------GUI---------*/
+
+        const gui = new GUI();
+        const cubeFolder = gui.addFolder('group');
+        
+        //資料夾名稱.add(要改變的東西,標題,最小值,最大值)
+        cubeFolder.add(group.rotation, 'x', 0, Math.PI * 2);
+        cubeFolder.add(group.rotation, 'y', 0, Math.PI * 2);
+        cubeFolder.add(group.rotation, 'z', 0, Math.PI * 2);
+        cubeFolder.open();
+        
+        const cameraFolder = gui.addFolder('Camera');
+        cameraFolder.add(camera.position, 'z', 0, 10);
+        cameraFolder.open();
+
+
+
+        function animation() {
+
+            requestAnimationFrame(animation);//創造一個循環
+            renderer.render(scene, camera);//繪製場景
+
+        }
+
+        animation();//呼叫動畫函數
+
+    </script>
+
+</body>
+
+</html>

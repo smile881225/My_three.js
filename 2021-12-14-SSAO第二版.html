@@ -25,21 +25,23 @@
 <body>
 
     <script src="./js/three.js"></script>
-    <!-- <script type="module" src="./Loader/OBJLoader.js"></script>
-    <script type="module" src="./Loader/MTLLoader.js"></script> -->
     <script type="module">
 
         /*------------Java Script--------------*/
+
         import * as THREE from './js/three.module.js';
-        import Stats from './js/stats.module.js';
         import { OBJLoader } from './Loader/OBJLoader.js';
         import { MTLLoader } from './Loader/MTLLoader.js'
         import { OrbitControls } from './js/OrbitControls.js';
-       
+        import { EffectComposer } from './postprocessing/EffectComposer/EffectComposer.js';
+        import { SSAOPass } from './postprocessing/SSAO/SSAOPass.js';
+        import { GUI } from './postprocessing/test/lil-gui.module.min.js';
+        let composer;
+        
         /*--------創造初始元素--------*/
-        var mtlLoader
+        var mtlLoader;
         var PointLight, AmbientLight, SpotLight, helper;//light
-        var controls;
+        var controls
         var scene = new THREE.Scene();
         var camera = new THREE.PerspectiveCamera(80, window.innerWidth / window.innerHeight, 0.1, 10000);
         var renderer = new THREE.WebGLRenderer();
@@ -48,14 +50,14 @@
 
         /*-------調整camera位置---------*/
 
-        camera.position.set(0, 100, 200);
-        camera.lookAt(0, 0, 0);
-        
+        camera.position.set(-100, 50, 70);
+        // camera.lookAt(0, 0, 0);
+
         /*--------燈光選項--------*/
 
         renderer.shadowMap.enabled = true;//把Renderer的陰影選項打開
         renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-        PointLight = new THREE.PointLight(0xffffff, 2);
+        PointLight = new THREE.PointLight(0xffffff, 1);
         PointLight.castShadow = true;
         PointLight.shadow.mapSize.width = 2048;
         PointLight.shadow.mapSize.height = 2048;
@@ -63,6 +65,9 @@
         PointLight.shadow.camera.far = 5000;
         PointLight.position.set(-500, 400, 0);
         scene.add(PointLight);
+
+        scene.add(new THREE.DirectionalLight(0xffffff, 0.01));//加第一盞燈-平行光
+        scene.add(new THREE.HemisphereLight(0xffffff, 0.01));//加第二盞燈-環境光
 
         /*-------滑鼠Controls---------*/
 
@@ -75,6 +80,7 @@
         controls.autoRotateSpeed = 5;//控制旋轉速度
         controls.minDistance = 100;//controls縮放最小距離
         controls.maxDistance = 400;//controls縮放最大距離
+
         /*--------開始載我的模型--------*/
 
         // var mtlLoader = new THREE.MTLLoader();
@@ -109,7 +115,9 @@
             console.log(teapot);
         });
 
+
         /*--------加入Palne--------*/
+        
         const texture = new THREE.TextureLoader().load("./img/carpet-2.jpg");
         const planeGeometry = new THREE.PlaneGeometry(2000, 2000, 32, 32);
         const planeMaterial = new THREE.MeshStandardMaterial({ map: texture })
@@ -122,25 +130,49 @@
 
         scene.background = new THREE.Color(0xffffff);
 
-        let statsUI;
-        statsUI = initStats(); // stats初始化
-        // 建立監測器
-        function initStats() {
-            const stats = new Stats()
-            stats.setMode(0) // FPS mode
-            document.getElementById('stats').appendChild(stats.domElement)
-            return stats
-        }
+        const width = window.innerWidth;
+        const height = window.innerHeight;
+
+        composer = new EffectComposer(renderer);//設定Renderer為基底來做composer
+
+        const ssaoPass = new SSAOPass(scene, camera, width, height);
+
+        composer.addPass(ssaoPass);
+
+        ssaoPass.output = 0;//輸出哪種樣式
+        ssaoPass.kernelRadius = 12.736;//?
+        ssaoPass.minDistance = 0.001;//最小距離
+        ssaoPass.maxDistance = 0.01479;//最大距離
+
+        camera.aspect = width / height;
+        camera.updateProjectionMatrix();
+        renderer.setSize(width, height);
+        composer.setSize(width, height);
+
+
+        /*--------GUI--------*/
+
+        const gui = new GUI();
+
+        gui.add(ssaoPass, 'kernelRadius').min(0).max(32);
+        gui.add(ssaoPass, 'minDistance').min(0.001).max(0.02);
+        gui.add(ssaoPass, 'maxDistance').min(0.01).max(0.3);
+
+
 
         function animation() {
 
-            statsUI.update() // 需設定 update 才會持續更新
+            // scene.position.y+=4;
             controls.update();
             requestAnimationFrame(animation);//創造一個循環
-            renderer.render(scene, camera);//繪製場景
+            composer.render(scene, camera);//繪製場景
+
         }
 
         animation();//呼叫動畫函數
+
+
+
     </script>
 
 

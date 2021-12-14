@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>three.js webgl - postprocessing - Screen Space Ambient Occlusion</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <link type="text/css" rel="stylesheet" href="main.css">
+    <style>
+        body {
+            background-color: #aaa;
+            margin: 0;
+            padding: 0;
+        }
+    </style>
+</head>
+
+<body>
+
+    <script type="module">
+
+        import * as THREE from './js/three.module.js';
+
+        import { EffectComposer } from './postprocessing/EffectComposer/EffectComposer.js';
+        import { SSAOPass } from './postprocessing/SSAO/SSAOPass.js';
+
+        let container;
+        let camera, scene, renderer;
+        let composer;
+        let group;
+
+        init();
+        animate();
+
+        function init() {
+
+            container = document.createElement('div');//新增一塊div
+            document.body.appendChild(container);//把新增的div加入這個節點上面
+
+            renderer = new THREE.WebGLRenderer();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            document.body.appendChild(renderer.domElement);
+
+            camera = new THREE.PerspectiveCamera(65, window.innerWidth / window.innerHeight, 100, 700);
+            camera.position.z = 500;
+
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0xaaaaaa);//改變Scene背景顏色
+
+            scene.add(new THREE.DirectionalLight());//加第一盞燈-平行光
+            scene.add(new THREE.HemisphereLight());//加第二盞燈-環境光
+
+            group = new THREE.Group();//新增一個空白的Group
+            scene.add(group);
+
+            const geometry = new THREE.BoxGeometry(10, 10, 10);//創造幾何圖形
+
+            for (let i = 0; i < 100; i++) {//創造100個幾何圖形
+
+                const material = new THREE.MeshLambertMaterial({
+                    color: Math.random() * 0xffffff //亂數設定材質
+                });
+
+                const mesh = new THREE.Mesh(geometry, material);//材質+圖形
+
+                mesh.position.x = Math.random() * 400 - 200;//亂數設定位置
+                mesh.position.y = Math.random() * 400 - 200;
+                mesh.position.z = Math.random() * 400 - 200;
+
+                mesh.rotation.x = Math.random();//亂數設定旋轉
+                mesh.rotation.y = Math.random();
+                mesh.rotation.z = Math.random();
+
+                mesh.scale.setScalar(Math.random() * 10 + 2);//亂數設定大小
+
+                group.add(mesh);//每一次都把幾何圖形新增到group裡
+
+            }
+
+            /*---------未知----------*/
+
+            const width = window.innerWidth;
+            const height = window.innerHeight;
+
+            composer = new EffectComposer(renderer);//設定Renderer為基底來做composer
+
+            const ssaoPass = new SSAOPass(scene, camera, width, height);
+         
+            composer.addPass(ssaoPass);
+
+            ssaoPass.output=0;//輸出哪種樣式
+            ssaoPass.kernelRadius = 14;//?
+            ssaoPass.minDistance=0.005;//最小距離
+            ssaoPass.maxDistance=0.1;//最大距離
+            /*
+                ssaoPass.output=0;//SSAOPass.OUTPUT.Default
+                ssaoPass.output=1;//SSAOPass.OUTPUT.SSAO
+                ssaoPass.output=2;//SSAOPass.OUTPUT.Blur
+                ssaoPass.output=3;//SSAOPass.OUTPUT.Beauty
+                ssaoPass.output=4;//SSAOPass.OUTPUT.Depth
+                ssaoPass.output=5;//SSAOPass.OUTPUT.Normal
+            */
+
+            /*----------未知---------*/
+
+            window.addEventListener('resize', onWindowResize);//監聽window調整大小的時候，重新設定
+
+        }
+
+        function onWindowResize() {
+
+            const width = window.innerWidth;
+            const height = window.innerHeight;
+
+            camera.aspect = width / height;
+            camera.updateProjectionMatrix();
+
+            renderer.setSize(width, height);
+            composer.setSize(width, height);
+
+        }
+
+        function animate() {
+
+            requestAnimationFrame(animate);
+
+            render();
+        }
+
+        function render() {
+
+            const timer = performance.now();
+
+            group.rotation.x = timer * 0.0002;//持續旋轉
+            group.rotation.y = timer * 0.0001;//持續旋轉
+
+            composer.render();
+
+        }
+
+    </script>
+</body>
+
+</html>

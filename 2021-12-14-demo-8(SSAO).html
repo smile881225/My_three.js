@@ -85,85 +85,38 @@
     <!-- <script type="module" src="./Loader/OBJLoader.js"></script>
     <script type="module" src="./Loader/MTLLoader.js"></script> -->
     <script type="module">
+
         //導入外掛
         import * as THREE from './js/three.module.js';
         import { OBJLoader } from './Loader/OBJLoader.js';
         import { MTLLoader } from './Loader/MTLLoader.js'
         import { OrbitControls } from './js/OrbitControls.js';
-        import { EffectComposer  } from './js/EffectComposer.js';
+        import { EffectComposer } from './postprocessing/EffectComposer/EffectComposer.js';
+        import { SSAOPass } from './postprocessing/SSAO/SSAOPass.js';
+        import { GUI } from './postprocessing/test/lil-gui.module.min.js';
 
         //變數
         var scene, camera, renderer;//初始化
         var controls;//滑鼠控制camera
         var PointLight, AmbientLight, SpotLight, helper;//Light
+        var musicBtn, lightBtn, Animationtn//Btn
         var mtlLoader, url//模型
+        var changeLight, isPlaying;
+        var sound, listener, audioLoader
         var composer;
-        let musicBtn, lightBtn, Animationtn//Btn
-        let listener, changeLight;//控制燈光與音樂
 
+        //初始化
 
+        scene = new THREE.Scene();
+        camera = new THREE.PerspectiveCamera(80, window.innerWidth / window.innerHeight, 0.1, 10000);
+        renderer = new THREE.WebGLRenderer();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
 
-        init();
-        animation();
+        //camera設定
 
-        function init() {
-
-            //初始化
-
-            scene = new THREE.Scene();
-            camera = new THREE.PerspectiveCamera(80, window.innerWidth / window.innerHeight, 0.1, 10000);
-            renderer = new THREE.WebGLRenderer();
-            renderer.setSize(window.innerWidth, window.innerHeight);
-            document.body.appendChild(renderer.domElement);
-
-
-            //camera設定
-
-            camera.position.set(0, 100, 200);
-            camera.lookAt(0, 0, 0);
-            controls = new OrbitControls(camera, renderer.domElement);
-            controls.target.set(4.5, 5, 4.5);
-            controls.enablePan = false;
-            controls.maxPolarAngle = Math.PI / 2;
-            controls.enableDamping = true;
-            controls.autoRotate = true;//自動旋轉
-            controls.autoRotaeSpeed = 5;//控制旋轉速度
-            controls.minDistance = 100;//controls縮放最小距離
-            controls.maxDistance = 400;//controls縮放最大距離
-
-
-            //燈光
-
-            PointLight = new THREE.PointLight(0xffffff, 2);
-            renderer.shadowMap.enabled = true;//把Renderer的陰影選項打開
-            renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-            PointLight.castShadow = true;
-            PointLight.shadow.mapSize.width = 2048;
-            PointLight.shadow.mapSize.height = 2048;
-            PointLight.shadow.camera.near = 0.5;
-            PointLight.shadow.camera.far = 5000;
-            PointLight.position.set(-500, 400, 0);
-            scene.add(PointLight);
-            // helper = new THREE.CameraHelper(PointLight.shadow.camera);
-            // scene.add(helper);
-         
-            //SSAO
-
-            composer = new POSTPROCESSING.EffectComposer(renderer);
-            composer.addPass(new POSTPROCESSING.renderPass(scene, camera));
-
-            const effectPass = new POSTPROCESSING.EffectPass((
-
-                camera,
-                new POSTPROCESSING.BloomEffect()
-            ));
-
-            effectPass.renderToScreem = true;
-            composer.addPass(effectPass);
-        
-
-
-
+        camera.position.set(0, 100, 200);
+        camera.lookAt(0, 0, 0);
 
         //模型
 
@@ -200,25 +153,33 @@
         plane.rotateX(-1.57);//旋轉平面 會寫負的是因為Plane的背面預設是不會顯示的，所以要翻對邊
         scene.add(plane);
 
+        //滑鼠controls
 
-        /*--------音樂--------*/
+        controls = new OrbitControls(camera, renderer.domElement);
+        controls.target.set(4.5, 5, 4.5);
+        controls.enablePan = false;
+        controls.maxPolarAngle = Math.PI / 2;
+        controls.enableDamping = true;
+        controls.autoRotate = true;//自動旋轉
+        controls.autoRotaeSpeed = 5;//控制旋轉速度
+        controls.minDistance = 100;//controls縮放最小距離
+        controls.maxDistance = 400;//controls縮放最大距離
+
+
+        //音樂
 
         listener = new THREE.AudioListener();
         camera.add(listener);
 
-        // 增加一個global端的audio source
-        const sound = new THREE.Audio(listener);
+        sound = new THREE.Audio(listener);
 
-        // load a sound and set it as the Audio object's buffer
-        const audioLoader = new THREE.AudioLoader();
+        audioLoader = new THREE.AudioLoader();
         audioLoader.load('./audio/Play-1.mp3', function (buffer) {
             sound.setBuffer(buffer);
             sound.setLoop(true);
             sound.setVolume(0.5);
             sound.play();
         });
-
-        }
 
         //音樂按鈕控制
 
@@ -237,6 +198,28 @@
             }
         }
 
+        //sence 背景顏色
+
+        scene.background = new THREE.Color(0xffffff);
+
+        //燈光
+
+        scene.add(new THREE.DirectionalLight(0xffffff, 0.01));//加第一盞燈-平行光
+        scene.add(new THREE.HemisphereLight(0xffffff, 0.01));//加第二盞燈-環境光
+
+        PointLight = new THREE.PointLight(0xffffff, 1);
+        renderer.shadowMap.enabled = true;//把Renderer的陰影選項打開
+        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        PointLight.castShadow = true;
+        PointLight.shadow.mapSize.width = 2048;
+        PointLight.shadow.mapSize.height = 2048;
+        PointLight.shadow.camera.near = 0.5;
+        PointLight.shadow.camera.far = 5000;
+        PointLight.position.set(-500, 400, 0);
+        scene.add(PointLight);
+        // helper = new THREE.CameraHelper(PointLight.shadow.camera);
+        // scene.add(helper);
+
         //燈光按鈕控制
 
         changeLight = true;
@@ -247,15 +230,11 @@
             if (changeLight) {
                 changeLight = false;
                 scene.remove(PointLight);
-                scene.remove(SpotLight);
-                scene.remove(helper);
                 switchSpotLight();
             }
             else {
                 changeLight = true;
-                scene.remove(PointLight);
                 scene.remove(SpotLight);
-                scene.remove(helper);
                 switchPointLight();
             }
 
@@ -265,7 +244,7 @@
 
         function switchAmbientLight() {
             console.log('switchAmbientLight');
-            AmbientLight = new THREE.AmbientLight(0xFFFFFF, 2);
+            AmbientLight = new THREE.AmbientLight(0xffffff, 2);
             scene.add(AmbientLight);
         }
 
@@ -275,7 +254,7 @@
             console.log('switchPointLighta');
             renderer.shadowMap.enabled = true;
             renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-            PointLight = new THREE.PointLight(0xffffff, 2);
+            PointLight = new THREE.PointLight(0xffffff, 1);
             PointLight.castShadow = true;
             PointLight.shadow.mapSize.width = 512;
             PointLight.shadow.mapSize.height = 512;
@@ -306,14 +285,44 @@
             // scene.add(helper);
         }
 
+        //SSAO
+
+        const width = window.innerWidth;
+        const height = window.innerHeight;
+
+        composer = new EffectComposer(renderer);//設定Renderer為基底來做composer
+
+        const ssaoPass = new SSAOPass(scene, camera, width, height);
+
+        composer.addPass(ssaoPass);
+
+        ssaoPass.output = 0;//輸出哪種樣式
+        ssaoPass.kernelRadius = 12.736;//?
+        ssaoPass.minDistance = 0.001;//最小距離
+        ssaoPass.maxDistance = 0.01479;//最大距離
+
+        camera.aspect = width / height;
+        camera.updateProjectionMatrix();
+        renderer.setSize(width, height);
+        composer.setSize(width, height);
+
+        //GUI
+
+        const gui = new GUI();
+        
+        gui.add(ssaoPass, 'kernelRadius').min(0).max(32);
+        gui.add(ssaoPass, 'minDistance').min(0.001).max(0.02);
+        gui.add(ssaoPass, 'maxDistance').min(0.01).max(0.3);
+
         function animation() {
 
             controls.update();
-            composer.render(scene, camera);//繪製場景
             requestAnimationFrame(animation);//創造一個循環
-
+            composer.render(scene, camera);//繪製場景
 
         }
+
+        animation();
 
     </script>
 
