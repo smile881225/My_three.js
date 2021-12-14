@@ -136,8 +136,9 @@
             controls.maxDistance = 400;//controls縮放最大距離
 
             //燈光
-
+            
             PointLight = new THREE.PointLight(0xffffff, 2);
+
             renderer.shadowMap.enabled = true;//把Renderer的陰影選項打開
             renderer.shadowMap.type = THREE.PCFSoftShadowMap;
             PointLight.castShadow = true;

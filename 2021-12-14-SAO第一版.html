@@ -91,8 +91,8 @@
         import { OBJLoader } from './Loader/OBJLoader.js';
         import { MTLLoader } from './Loader/MTLLoader.js'
         import { OrbitControls } from './js/OrbitControls.js';
-        import { GUI } from './js/lil-gui.module.min.js';
         import { EffectComposer } from './postprocessing/EffectComposer/EffectComposer.js';
+        import { GUI } from './js/lil-gui.module.min.js';
         import { RenderPass } from './postprocessing/SAO/RenderPass.js';
         import { SAOPass } from './postprocessing/SAO/SAOPass.js';
 
@@ -103,8 +103,8 @@
         var musicBtn, lightBtn, Animationtn//Btn
         var mtlLoader, url//模型
         var changeLight, isPlaying;
-        var sound, listener, audioLoader;
-        var composer, renderPass, saoPass;//SAO
+        var sound, listener, audioLoader
+
 
         //初始化
 
@@ -205,22 +205,22 @@
         scene.background = new THREE.Color(0xffffff);
 
         //燈光
-        const light1 = new THREE.PointLight(0xddffdd, 0.5);
+        const light1 = new THREE.PointLight(0xddffdd, 1);
         light1.position.z = 0;
         light1.position.y = 300;
         light1.position.x = 200;
         scene.add(light1);
 
-        const light2 = new THREE.PointLight(0xddffdd, 0.5);
+        const light2 = new THREE.PointLight(0xddffdd, 1);
         light2.position.z = -200;
         light2.position.y = 300;
         light2.position.x = 0;
         scene.add(light2);
 
-        AmbientLight = new THREE.AmbientLight(0xffffff, 0.05);
+        AmbientLight = new THREE.AmbientLight(0xffffff, 0.5);
         scene.add(AmbientLight);
 
-        PointLight = new THREE.PointLight(0xffffff, 0.5);
+        PointLight = new THREE.PointLight(0xffffff, 2);
         renderer.shadowMap.enabled = true;//把Renderer的陰影選項打開
         renderer.shadowMap.type = THREE.PCFSoftShadowMap;
         PointLight.castShadow = true;
@@ -257,7 +257,7 @@
 
         function switchAmbientLight() {
             console.log('switchAmbientLight');
-            AmbientLight = new THREE.AmbientLight(0xffffff, 0.05);
+            AmbientLight = new THREE.AmbientLight(0xffffff, 0.5);
             scene.add(AmbientLight);
         }
 
@@ -267,7 +267,7 @@
             console.log('switchPointLighta');
             renderer.shadowMap.enabled = true;
             renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-            PointLight = new THREE.PointLight(0xffffff, 0.5);
+            PointLight = new THREE.PointLight(0xffffff, 1);
             PointLight.castShadow = true;
             PointLight.shadow.mapSize.width = 512;
             PointLight.shadow.mapSize.height = 512;
@@ -285,7 +285,7 @@
             console.log('switchSpotLight');
             renderer.shadowMap.enabled = true;
             renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-            SpotLight = new THREE.SpotLight(0xffffff, 0.8);
+            SpotLight = new THREE.SpotLight(0xffffff, 1);
             SpotLight.shadow.mapSize.width = 512;
             SpotLight.shadow.mapSize.height = 512;
             SpotLight.shadow.camera.near = 0.5;
@@ -298,9 +298,9 @@
             // scene.add(helper);
         }
 
-
-
         //SAO
+
+        var composer, renderPass, saoPass;
 
         composer = new EffectComposer(renderer);
         renderPass = new RenderPass(scene, camera);
@@ -308,40 +308,15 @@
         saoPass = new SAOPass(scene, camera, false, true);
         composer.addPass(saoPass);
 
-        saoPass.params.output = 0;
-        saoPass.params.saoBias = -0.204;
-        saoPass.params.saoIntensity = 1;
-        saoPass.params.saoScale = 6.31;
-        saoPass.params.saoKernelRadius = 1.485;
-        saoPass.params.saoMinResolution = 0.001;
+        saoPass.params.saoBias = 0.5;
+        saoPass.params.saoIntensity = 0.18;
+        saoPass.params.saoScale = 1;
+        saoPass.params.saoKernelRadius = 100;
+        saoPass.params.saoMinResolution = 0;
         saoPass.params.saoBlur = true;
         saoPass.params.saoBlurRadius = 8;
         saoPass.params.saoBlurStdDev = 4;
         saoPass.params.saoBlurDepthCutoff = 0.01;
-
-        //GUI
-
-        const gui = new GUI();
-
-        gui.add(saoPass.params, 'output', {
-            'Beauty+SAO': SAOPass.OUTPUT.Default,
-            'Beauty': SAOPass.OUTPUT.Beauty,
-            'SAO': SAOPass.OUTPUT.SAO,
-            'Depth': SAOPass.OUTPUT.Depth,
-            'Normal': SAOPass.OUTPUT.Normal
-        }).onChange(function (value) {
-            saoPass.params.output = parseInt(value);
-        });
-
-        gui.add(saoPass.params, 'saoBias', - 1, 1);
-        gui.add(saoPass.params, 'saoIntensity', 0, 1);
-        gui.add(saoPass.params, 'saoScale', 0, 10);
-        gui.add(saoPass.params, 'saoKernelRadius', 1, 100);
-        gui.add(saoPass.params, 'saoMinResolution', 0, 1);
-        gui.add(saoPass.params, 'saoBlur');
-        gui.add(saoPass.params, 'saoBlurRadius', 0, 200);
-        gui.add(saoPass.params, 'saoBlurStdDev', 0.5, 150);
-        gui.add(saoPass.params, 'saoBlurDepthCutoff', 0.0, 0.1);
 
         function animation() {
 

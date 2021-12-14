@@ -26,7 +26,6 @@
 
         import * as THREE from './js/three.module.js';
 
-        import Stats from './js/stats.module.js';
         import { GUI } from './js/lil-gui.module.min.js';
 
         import { EffectComposer } from './postprocessing/EffectComposer/EffectComposer.js';
@@ -38,7 +37,7 @@
         let scene, renderer, composer, copyPass;
         let cameraP, ssaaRenderPassP;
         let cameraO, ssaaRenderPassO;
-        let gui, stats;
+        let gui;
 
         const params = {//給SSAA預設值
             
@@ -59,8 +58,6 @@
         clearGui();
 
         function clearGui() {
-
-            if (gui) gui.destroy();//如果有GUI 直接銷毀
 
             gui = new GUI();
 
@@ -97,9 +94,6 @@
             renderer.setPixelRatio(devicePixelRatio);
             renderer.setSize(width, height);
             document.body.appendChild(renderer.domElement);
-
-            stats = new Stats();
-            container.appendChild(stats.dom);
 
             //兩種Camera
 
@@ -209,7 +203,7 @@
 
             requestAnimationFrame(animate);
 
-            stats.begin();
+           
 
             if (params.autoRotate) {
 
@@ -251,7 +245,7 @@
 
             composer.render();
 
-            stats.end();
+
 
         }
 

@@ -88,15 +88,14 @@
 
         //導入外掛
         import * as THREE from './js/three.module.js';
-        import { OBJLoader } from './Loader/OBJLoader.js';//模型
-        import { MTLLoader } from './Loader/MTLLoader.js'//材質
-        import { OrbitControls } from './js/OrbitControls.js';//滑鼠控制
-        import Stats from './js/stats.module.js';//幀數顯示器
+        import { OBJLoader } from './Loader/OBJLoader.js';
+        import { MTLLoader } from './Loader/MTLLoader.js'
+        import { OrbitControls } from './js/OrbitControls.js';
+        import { GUI } from './js/lil-gui.module.min.js';
         import { EffectComposer } from './postprocessing/EffectComposer/EffectComposer.js';
-        import { SSAOPass } from './postprocessing/SSAO/SSAOPass.js';
-        import { SSAARenderPass } from './postprocessing/SSAA/SSAARenderPass.js';//反鋸齒
-        import { GUI } from './js/lil-gui.module.min.js';//GUI介面
-        
+        import { RenderPass } from './postprocessing/SAO/RenderPass.js';
+        import { SAOPass } from './postprocessing/SAO/SAOPass.js';
+
         //變數
         var scene, camera, renderer;//初始化
         var controls;//滑鼠控制camera
@@ -104,14 +103,15 @@
         var musicBtn, lightBtn, Animationtn//Btn
         var mtlLoader, url//模型
         var changeLight, isPlaying;
-        var sound, listener, audioLoader
-        var composer;
+        var sound, listener, audioLoader;
+        var composer, renderPass, saoPass;//SAO
 
         //初始化
 
         scene = new THREE.Scene();
         camera = new THREE.PerspectiveCamera(80, window.innerWidth / window.innerHeight, 0.1, 10000);
-        renderer = new THREE.WebGLRenderer();
+        // renderer = new THREE.WebGLRenderer();
+        renderer = new THREE.WebGLRenderer({ antialias: true });//抗鋸齒
         renderer.setSize(window.innerWidth, window.innerHeight);
         document.body.appendChild(renderer.domElement);
 
@@ -167,15 +167,6 @@
         controls.minDistance = 100;//controls縮放最小距離
         controls.maxDistance = 400;//controls縮放最大距離
 
-        /*-------Stats---------*/
-
-        const stats = Stats();
-        stats.showPanel(0);
-        // 0：FPS，最近1秒的幀率，值越大表示性能越好；
-        // 1：MS，每一幀需要多少毫秒，值越小表示性能越好；
-        // 2：MB，所分配的内存，開Google的時候要加參數
-
-        document.body.appendChild(stats.dom);
 
         //音樂
 
@@ -214,11 +205,22 @@
         scene.background = new THREE.Color(0xffffff);
 
         //燈光
+        const light1 = new THREE.PointLight(0xddffdd, 0.5);
+        light1.position.z = 0;
+        light1.position.y = 300;
+        light1.position.x = 200;
+        scene.add(light1);
 
-        scene.add(new THREE.DirectionalLight(0xffffff, 0.01));//加第一盞燈-平行光
-        scene.add(new THREE.HemisphereLight(0xffffff, 0.01));//加第二盞燈-環境光
+        const light2 = new THREE.PointLight(0xddffdd, 0.5);
+        light2.position.z = -200;
+        light2.position.y = 300;
+        light2.position.x = 0;
+        scene.add(light2);
 
-        PointLight = new THREE.PointLight(0xffffff, 1);
+        AmbientLight = new THREE.AmbientLight(0xffffff, 0.05);
+        scene.add(AmbientLight);
+
+        PointLight = new THREE.PointLight(0xffffff, 0.5);
         renderer.shadowMap.enabled = true;//把Renderer的陰影選項打開
         renderer.shadowMap.type = THREE.PCFSoftShadowMap;
         PointLight.castShadow = true;
@@ -226,7 +228,7 @@
         PointLight.shadow.mapSize.height = 2048;
         PointLight.shadow.camera.near = 0.5;
         PointLight.shadow.camera.far = 5000;
-        PointLight.position.set(-500, 400, 0);
+        PointLight.position.set(-200, 300, 0);
         scene.add(PointLight);
         // helper = new THREE.CameraHelper(PointLight.shadow.camera);
         // scene.add(helper);
@@ -255,7 +257,7 @@
 
         function switchAmbientLight() {
             console.log('switchAmbientLight');
-            AmbientLight = new THREE.AmbientLight(0xffffff, 2);
+            AmbientLight = new THREE.AmbientLight(0xffffff, 0.05);
             scene.add(AmbientLight);
         }
 
@@ -265,13 +267,13 @@
             console.log('switchPointLighta');
             renderer.shadowMap.enabled = true;
             renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-            PointLight = new THREE.PointLight(0xffffff, 1);
+            PointLight = new THREE.PointLight(0xffffff, 0.5);
             PointLight.castShadow = true;
             PointLight.shadow.mapSize.width = 512;
             PointLight.shadow.mapSize.height = 512;
             PointLight.shadow.camera.near = 0.5;
             PointLight.shadow.camera.far = 5000;
-            PointLight.position.set(-500, 400, 0);
+            PointLight.position.set(-200, 300, 0);
             scene.add(PointLight);
             // helper = new THREE.CameraHelper(PointLight.shadow.camera);
             // scene.add(helper);
@@ -283,7 +285,7 @@
             console.log('switchSpotLight');
             renderer.shadowMap.enabled = true;
             renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-            SpotLight = new THREE.SpotLight(0xffffff, 1);
+            SpotLight = new THREE.SpotLight(0xffffff, 0.8);
             SpotLight.shadow.mapSize.width = 512;
             SpotLight.shadow.mapSize.height = 512;
             SpotLight.shadow.camera.near = 0.5;
@@ -296,43 +298,56 @@
             // scene.add(helper);
         }
 
-        //SSAO環境光遮蔽
-
-        const width = window.innerWidth;
-        const height = window.innerHeight;
-
-        composer = new EffectComposer(renderer);//設定Renderer為基底來做composer
-
-        const ssaoPass = new SSAOPass(scene, camera, width, height);
-
-        composer.addPass(ssaoPass);
-
-        ssaoPass.output = 0;//輸出哪種樣式
-        ssaoPass.kernelRadius = 12.736;//?
-        ssaoPass.minDistance = 0.001;//最小距離
-        ssaoPass.maxDistance = 0.01479;//最大距離
-
-        camera.aspect = width / height;
-        camera.updateProjectionMatrix();
-        renderer.setSize(width, height);
-        composer.setSize(width, height);
-
-        //SSAA反鋸齒
 
 
+        //SAO
 
+        composer = new EffectComposer(renderer);
+        renderPass = new RenderPass(scene, camera);
+        composer.addPass(renderPass);
+        saoPass = new SAOPass(scene, camera, false, true);
+        composer.addPass(saoPass);
+
+        saoPass.params.output = 0;
+        saoPass.params.saoBias = -0.204;
+        saoPass.params.saoIntensity = 1;
+        saoPass.params.saoScale = 6.31;
+        saoPass.params.saoKernelRadius = 1.485;
+        saoPass.params.saoMinResolution = 0.001;
+        saoPass.params.saoBlur = true;
+        saoPass.params.saoBlurRadius = 8;
+        saoPass.params.saoBlurStdDev = 4;
+        saoPass.params.saoBlurDepthCutoff = 0.01;
 
         //GUI
 
         const gui = new GUI();
 
-        gui.add(ssaoPass, 'kernelRadius').min(0).max(32);
-        gui.add(ssaoPass, 'minDistance').min(0.001).max(0.02);
-        gui.add(ssaoPass, 'maxDistance').min(0.01).max(0.3);
+        gui.add(saoPass.params, 'output', {
+            'Beauty+SAO': SAOPass.OUTPUT.Default,
+            'Beauty': SAOPass.OUTPUT.Beauty,
+            'SAO': SAOPass.OUTPUT.SAO,
+            'Depth': SAOPass.OUTPUT.Depth,
+            'Normal': SAOPass.OUTPUT.Normal
+        }).onChange(function (value) {
+            saoPass.params.output = parseInt(value);
+        });
+
+        gui.add(saoPass.params, 'saoBias', - 1, 1);
+        gui.add(saoPass.params, 'saoIntensity', 0, 1);
+        gui.add(saoPass.params, 'saoScale', 0, 10);
+        gui.add(saoPass.params, 'saoKernelRadius', 1, 100);
+        gui.add(saoPass.params, 'saoMinResolution', 0, 1);
+        gui.add(saoPass.params, 'saoBlur');
+        gui.add(saoPass.params, 'saoBlurRadius', 0, 200);
+        gui.add(saoPass.params, 'saoBlurStdDev', 0.5, 150);
+        gui.add(saoPass.params, 'saoBlurDepthCutoff', 0.0, 0.1);
+
+
+
 
         function animation() {
 
-            stats.update() // 需設定 update 才會持續更新
             controls.update();
             requestAnimationFrame(animation);//創造一個循環
             composer.render(scene, camera);//繪製場景
