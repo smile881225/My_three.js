@@ -33,11 +33,7 @@
         import { OBJLoader } from './Loader/OBJLoader.js';
         import { MTLLoader } from './Loader/MTLLoader.js'
         import { OrbitControls } from './js/OrbitControls.js';
-        import { EffectComposer } from './postprocessing/EffectComposer/EffectComposer.js';
-        import { SSAOPass } from './postprocessing/SSAO/SSAOPass.js';
-        import { GUI } from './js/lil-gui.module.min.js';
-        let composer;
-        
+
         /*--------創造初始元素--------*/
         var mtlLoader;
         var PointLight, AmbientLight, SpotLight, helper;//light
@@ -50,14 +46,14 @@
 
         /*-------調整camera位置---------*/
 
-        camera.position.set(-100, 50, 70);
-        // camera.lookAt(0, 0, 0);
+        camera.position.set(0, 100, 200);
+        camera.lookAt(0, 0, 0);
 
         /*--------燈光選項--------*/
 
         renderer.shadowMap.enabled = true;//把Renderer的陰影選項打開
         renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-        PointLight = new THREE.PointLight(0xffffff, 1);
+        PointLight = new THREE.PointLight(0xffffff, 1.3);
         PointLight.castShadow = true;
         PointLight.shadow.mapSize.width = 2048;
         PointLight.shadow.mapSize.height = 2048;
@@ -66,9 +62,6 @@
         PointLight.position.set(-500, 400, 0);
         scene.add(PointLight);
 
-        scene.add(new THREE.DirectionalLight(0xffffff, 0.01));//加第一盞燈-平行光
-        scene.add(new THREE.HemisphereLight(0xffffff, 0.01));//加第二盞燈-環境光
-
         /*-------滑鼠Controls---------*/
 
         controls = new OrbitControls(camera, renderer.domElement);
@@ -76,11 +69,10 @@
         controls.enablePan = false;
         controls.maxPolarAngle = Math.PI / 2;
         controls.enableDamping = true;
-        controls.autoRotate = true;//自動旋轉
+        // controls.autoRotate = true;//自動旋轉
         controls.autoRotateSpeed = 5;//控制旋轉速度
         controls.minDistance = 100;//controls縮放最小距離
         controls.maxDistance = 400;//controls縮放最大距離
-
         /*--------開始載我的模型--------*/
 
         // var mtlLoader = new THREE.MTLLoader();
@@ -92,14 +84,12 @@
         //記住！！！！！OBJ、MTL、PNG貼圖來源檔一定要放在同個資料夾才可以
 
         // var url = "/3D_Object/test1.mtl";
-        var url = "/3D_Object/teapot.mtl";
-        mtlLoader.load(url, function (materials) {
-            var teapot;
+        var Archer_mtl = "./3D_Object/東駿的模型/弓箭手.mtl";
+        mtlLoader.load(Archer_mtl, function (materials) {
             materials.preload();
             var objLoader = new OBJLoader();
             objLoader.setMaterials(materials);
-            // objLoader.load('./3D_Object/test1.obj', function (object) {
-             objLoader.load('./3D_Object/teapot.obj', function (object) {
+            var teapot = objLoader.load('./3D_Object/東駿的模型/弓箭手.obj', function (object) {
 
                 object.traverse(function (node) {
                     if (node instanceof THREE.Mesh) {
@@ -108,71 +98,80 @@
                         node.receiveShadow = true; //default
                     }
                 })
-                object.position.y = -0.2;
+                object.position.x = 100;
+                object.position.y = 65;
                 scene.add(object);
-                console.log(teapot);
+
             });
-            console.log(teapot);
+ 
+        });
+        var Warrior_mtl = "./3D_Object/東駿的模型/戰士.mtl";
+        mtlLoader.load(Warrior_mtl, function (materials) {
+            materials.preload();
+            var objLoader = new OBJLoader();
+            objLoader.setMaterials(materials);
+            var teapot = objLoader.load('./3D_Object/東駿的模型/戰士.obj', function (object) {
+
+                object.traverse(function (node) {
+                    if (node instanceof THREE.Mesh) {
+                        node.castShadow = true; //default is false
+                        // node.receiveShadow = false; //default
+                        node.receiveShadow = true; //default
+                    }
+                })
+                object.position.x = 0;
+                object.position.y = 65;
+                scene.add(object);
+
+            });
+ 
+        });
+        var Cavalry_mtl = "./3D_Object/東駿的模型/騎兵.mtl";
+        mtlLoader.load(Cavalry_mtl, function (materials) {
+            materials.preload();
+            var objLoader = new OBJLoader();
+            objLoader.setMaterials(materials);
+            var teapot = objLoader.load('./3D_Object/東駿的模型/騎兵.obj', function (object) {
+
+                object.traverse(function (node) {
+                    if (node instanceof THREE.Mesh) {
+                        node.castShadow = true; //default is false
+                        // node.receiveShadow = false; //default
+                        node.receiveShadow = true; //default
+                    }
+                })
+                object.position.x = -100;
+                object.position.y = 110;
+                scene.add(object);
+            });
         });
 
 
+
         /*--------加入Palne--------*/
-        
         const texture = new THREE.TextureLoader().load("./img/carpet-2.jpg");
         const planeGeometry = new THREE.PlaneGeometry(2000, 2000, 32, 32);
         const planeMaterial = new THREE.MeshStandardMaterial({ map: texture })
         const plane = new THREE.Mesh(planeGeometry, planeMaterial);
         plane.receiveShadow = true;
         plane.rotateX(-1.57);//旋轉平面 會寫負的是因為Plane的背面預設是不會顯示的，所以要翻對邊
+        plane.position.x=-500;
+        plane.position.z=-100;
         scene.add(plane);
 
         /*-------更改場景的背景顏色---------*/
 
         scene.background = new THREE.Color(0xffffff);
 
-        const width = window.innerWidth;
-        const height = window.innerHeight;
-
-        composer = new EffectComposer(renderer);//設定Renderer為基底來做composer
-
-        const ssaoPass = new SSAOPass(scene, camera);//通常放在開頭，方便提供scene作為之後的輸入
-
-        composer.addPass(ssaoPass);
-
-        ssaoPass.output = 0;//輸出哪種樣式
-        ssaoPass.kernelRadius = 12.736;//?
-        ssaoPass.minDistance = 0.001;//最小距離
-        ssaoPass.maxDistance = 0.01479;//最大距離
-
-        // camera.aspect = width / height;//縱橫比
-        // camera.updateProjectionMatrix();//更新相機投影矩陣
-        // renderer.setSize(width, height);
-        // composer.setSize(width, height);
-
-
-        /*--------GUI--------*/
-
-        const gui = new GUI();
-
-        gui.add(ssaoPass, 'kernelRadius').min(0).max(32);
-        gui.add(ssaoPass, 'minDistance').min(0.001).max(0.02);
-        gui.add(ssaoPass, 'maxDistance').min(0.01).max(0.3);
-
-
-
         function animation() {
 
             // scene.position.y+=4;
             controls.update();
             requestAnimationFrame(animation);//創造一個循環
-            composer.render(scene, camera);//繪製場景
-
+            renderer.render(scene, camera);//繪製場景
         }
 
         animation();//呼叫動畫函數
-
-
-
     </script>
 
 
