@@ -35,7 +35,7 @@
         import { OrbitControls } from './js/OrbitControls.js';
         import { EffectComposer } from './postprocessing/EffectComposer/EffectComposer.js';
         import { SSAOPass } from './postprocessing/SSAO/SSAOPass.js';
-        import { GUI } from './postprocessing/test/lil-gui.module.min.js';
+        import { GUI } from './js/lil-gui.module.min.js';
         let composer;
         
         /*--------創造初始元素--------*/
@@ -135,7 +135,7 @@
 
         composer = new EffectComposer(renderer);//設定Renderer為基底來做composer
 
-        const ssaoPass = new SSAOPass(scene, camera, width, height);
+        const ssaoPass = new SSAOPass(scene, camera);//通常放在開頭，方便提供scene作為之後的輸入
 
         composer.addPass(ssaoPass);
 
@@ -144,10 +144,10 @@
         ssaoPass.minDistance = 0.001;//最小距離
         ssaoPass.maxDistance = 0.01479;//最大距離
 
-        camera.aspect = width / height;
-        camera.updateProjectionMatrix();
-        renderer.setSize(width, height);
-        composer.setSize(width, height);
+        // camera.aspect = width / height;//縱橫比
+        // camera.updateProjectionMatrix();//更新相機投影矩陣
+        // renderer.setSize(width, height);
+        // composer.setSize(width, height);
 
 
         /*--------GUI--------*/

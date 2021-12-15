@@ -104,7 +104,7 @@
         var mtlLoader, url//模型
         var changeLight, isPlaying;
         var sound, listener, audioLoader;
-        var composer, renderPass, saoPass;//SAO
+        var composer, renderPass;//SAO
 
         //初始化
 
@@ -303,9 +303,11 @@
         //SAO
 
         composer = new EffectComposer(renderer);
-        renderPass = new RenderPass(scene, camera);
+        
+        renderPass = new RenderPass(scene, camera);//設定好之後Renderer的通道
         composer.addPass(renderPass);
-        saoPass = new SAOPass(scene, camera, false, true);
+
+        const saoPass = new SAOPass(scene, camera);
         composer.addPass(saoPass);
 
         saoPass.params.output = 0;
@@ -314,8 +316,8 @@
         saoPass.params.saoScale = 6.31;
         saoPass.params.saoKernelRadius = 1.485;
         saoPass.params.saoMinResolution = 0.001;
-        saoPass.params.saoBlur = true;
-        saoPass.params.saoBlurRadius = 8;
+        saoPass.params.saoBlur = true;//模糊
+        saoPass.params.saoBlurRadius = 8;//模糊半徑
         saoPass.params.saoBlurStdDev = 4;
         saoPass.params.saoBlurDepthCutoff = 0.01;
 

@@ -106,8 +106,10 @@
 
             //後處理
 
-            composer = new EffectComposer(renderer);
             renderPass = new RenderPass(scene, camera);
+            
+            composer = new EffectComposer(renderer);
+            
             composer.addPass(renderPass);
             saoPass = new SAOPass(scene, camera, false, true);
             composer.addPass(saoPass);
