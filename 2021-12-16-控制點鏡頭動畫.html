@@ -248,7 +248,7 @@
 
         var raycaster = new THREE.Raycaster();//設定2D的射線(不懂請看觀念->滑鼠互動->58 Three.js.....)
         var mouse = new THREE.Vector2();
-        var ooxx;
+        var ooxx,isnear;
         var intersects;
         function onMouseClick(event) {
 
@@ -271,6 +271,7 @@
 
             if (intersects.length > 0 && intersects[0].object.geometry.type == "CircleGeometry") {
                 ooxx = intersects[0].object.name;
+                isnear=false;
                 console.log('逮到你瞜');
                 console.log(ooxx);
 
@@ -303,8 +304,7 @@
         console.log(camera.position);
         function cameraZoomin() {
             if (ooxx == 'control_Archer') {
-
-                if (intersects[0].object.material.color.r == 1) {//如果是紅色
+                if (isnear==true) {//如果鏡頭是近的
                     intersects[0].object.material.color.set(0xD7FFEE);
                     Math.floor(camera.position.x) == 0 ? camera.position.x = 0 : camera.position.x > 0 ? camera.position.x -= 1 : camera.position.x += 1;
                     Math.floor(camera.position.y) == 320 ? camera.position.y = 320 : camera.position.y > 320 ? camera.position.y -= 1 : camera.position.y += 1;
@@ -316,12 +316,15 @@
 
                     if (camera.position.x == 0 && camera.position.y == 320 && camera.position.z == 434 && controls.target.x == 16 && controls.target.y == 90 && controls.target.z == 0) {
                         ooxx = '';
+                        isnear=false;
+                        console.log('拉遠');
                     }
+                    console.log(isnear)
                     // camera.position.set(0, 320, 434);//初始的Camera位置
                     // controls.target.set(16, 90, 0);//初始的滑鼠控制中心點
-                    console.log('拉遠');
+                   
                 }
-                else {//如果不是紅色
+                else if(isnear==false){//如果鏡頭不是近的
                     intersects[0].object.material.color.set(0xff0000);
 
                     Math.floor(camera.position.x) == 170 ? camera.position.x = 170 : camera.position.x > 170 ? camera.position.x -= 1 : camera.position.x += 1;
@@ -334,7 +337,11 @@
 
                     if (camera.position.x == 170 && camera.position.y == 140 && camera.position.z == 164 && controls.target.x == 178 && controls.target.y == 110 && controls.target.z == 16) {
                         ooxx = '';
+                        isnear=true;
+                        console.log(isnear)
+                        console.log('拉近');
                     }
+                    
                     // console.log(camera.position.x);
                     // console.log(camera.position.y);
                     // console.log(camera.position.z);
@@ -343,11 +350,12 @@
                     // console.log(controls.target.z);
                     // camera.position.set(170, 140, 164);//弓箭手的Camera
                     // controls.target.set(178, 110, 16);//弓箭手的滑鼠控制中心點
-                    console.log('拉近');
+                   
                 }
 
             }
             else if (ooxx == 'control_Warrior') {
+
                 if (intersects[0].object.material.color.r == 1) {
                     intersects[0].object.material.color.set(0xD7FFEE);
 
@@ -363,8 +371,8 @@
                         ooxx = '';
                     }
 
-                    camera.position.set(0, 320, 434);//初始的Camera位置
-                    controls.target.set(16, 90, 0);//初始的滑鼠控制中心點
+                    // camera.position.set(0, 320, 434);//初始的Camera位置
+                    // controls.target.set(16, 90, 0);//初始的滑鼠控制中心點
                     console.log('拉遠');
                 }
                 else {
@@ -382,14 +390,14 @@
                         ooxx = '';
                     }
 
-
-                    camera.position.set(16, 116, 140);//戰士的Camera
-                    controls.target.set(16, 90, 0);//戰士的滑鼠控制中心點
-
+                    // camera.position.set(16, 116, 140);//戰士的Camera
+                    // controls.target.set(16, 90, 0);//戰士的滑鼠控制中心點
+                    console.log('拉近');
                 }
 
             }
             else if (ooxx == 'control_Cavalry') {
+
                 if (intersects[0].object.material.color.r == 1) {
                     intersects[0].object.material.color.set(0xD7FFEE);
 
@@ -424,8 +432,9 @@
                         ooxx = '';
                     }
 
-                    camera.position.set(-130, 164, 130);//騎兵的Camera
-                    controls.target.set(-156, 110, -58);//騎兵的滑鼠控制中心點
+                    // camera.position.set(-130, 164, 130);//騎兵的Camera
+                    // controls.target.set(-156, 110, -58);//騎兵的滑鼠控制中心點
+                    console.log('拉近');
                 }
 
             }

@@ -33,7 +33,7 @@
 		import { OBJLoader } from './Loader/OBJLoader.js';
 		import { MTLLoader } from './Loader/MTLLoader.js'
 		import { OrbitControls } from './js/OrbitControls.js';
-
+		import { GUI } from './js/lil-gui.module.min.js';
 
 		/*--------創造初始元素--------*/
 		var mtlLoader;
@@ -47,8 +47,8 @@
 
 		/*-------調整camera位置---------*/
 
-		camera.position.set(0, 150, 200);//300,65,150
-		camera.lookAt(0, 0, 0);
+		camera.position.set(0, 150, 300);//300,65,150
+		// camera.lookAt(0, 0, 0);
 
 		/*--------燈光選項--------*/
 
@@ -74,6 +74,7 @@
 		controls.autoRotateSpeed = 5;//控制旋轉速度
 		controls.minDistance = 100;//controls縮放最小距離
 		controls.maxDistance = 400;//controls縮放最大距離
+
 		/*--------開始載我的模型--------*/
 
 		// var mtlLoader = new THREE.MTLLoader();
@@ -85,6 +86,8 @@
 		//記住！！！！！OBJ、MTL、PNG貼圖來源檔一定要放在同個資料夾才可以
 
 		// var url = "/3D_Object/test1.mtl";
+		let gui = new GUI();
+
 		var Archer_mtl = "./3D_Object/東駿的模型/弓箭手.mtl";
 		mtlLoader.load(Archer_mtl, function (materials) {
 			materials.preload();
@@ -108,7 +111,29 @@
 
 		});
 
+		//加入弓箭手的控制點/
 
+		const circle_Archer = new THREE.CircleGeometry(3, 32);
+		const material_Archer = new THREE.MeshBasicMaterial({
+			color: 0xBEBEBE,
+			side: THREE.DoubleSide//雙面列印
+		});
+		const trollor_Archer = new THREE.Mesh(circle_Archer, material_Archer);
+
+		trollor_Archer.position.set(172, 120, 1.2);
+
+		scene.add(trollor_Archer);
+
+		//加入弓箭手GUI
+
+		const Archer_trollor = gui.addFolder('Archer_trollor');
+		Archer_trollor.add(trollor_Archer.position, 'x', 0, 300);
+		Archer_trollor.add(trollor_Archer.position, 'y', 0, 300);
+		Archer_trollor.add(trollor_Archer.position, 'z', 0, 300);
+		Archer_trollor.open();
+
+
+		//加入戰士的模型
 
 		var Warrior_mtl = "./3D_Object/東駿的模型/戰士.mtl";
 		mtlLoader.load(Warrior_mtl, function (materials) {
@@ -131,15 +156,26 @@
 
 		});
 
-		/*--------加入戰士的控制點--------*/
+		//加入戰士的控制點
 
 		const circle_Warrior = new THREE.CircleGeometry(3, 32);
-		const material_Warrior = new THREE.MeshBasicMaterial({ color: 0xBEBEBE });
+		const material_Warrior = new THREE.MeshBasicMaterial({
+			color: 0xBEBEBE,
+			side: THREE.DoubleSide//雙面列印
+		});
 		const trollor_Warrior = new THREE.Mesh(circle_Warrior, material_Warrior);
 
 		trollor_Warrior.position.set(17, 120, -5);
 
 		scene.add(trollor_Warrior);
+
+		//加入戰士GUI
+
+		const Warrior_trollor = gui.addFolder('trollor_Warrior');
+		Warrior_trollor.add(trollor_Warrior.position, 'x', 0, 300);
+		Warrior_trollor.add(trollor_Warrior.position, 'y', 0, 300);
+		Warrior_trollor.add(trollor_Warrior.position, 'z', 0, 300);
+		Warrior_trollor.open();
 
 		//加入騎兵的模型
 
@@ -164,7 +200,24 @@
 			});
 		});
 
+		//加入騎兵的控制點
 
+		const circle_Cavalry = new THREE.CircleGeometry(3, 32);
+		const material_Cavalry = new THREE.MeshBasicMaterial({
+			color: 0xBEBEBE,
+			side: THREE.DoubleSide//雙面列印
+		});
+		const trollor_Cavalry = new THREE.Mesh(circle_Cavalry, material_Cavalry);
+		trollor_Cavalry.position.set(-132, 171, -27);
+		scene.add(trollor_Cavalry);
+
+		//加入騎兵GUI
+
+		const Cavalry_trollor = gui.addFolder('trollor_Cavalry');
+		Cavalry_trollor.add(trollor_Cavalry.position, 'x', -300, 300);
+		Cavalry_trollor.add(trollor_Cavalry.position, 'y', 0, 300);
+		Cavalry_trollor.add(trollor_Cavalry.position, 'z', -300, 300);
+		Cavalry_trollor.open();
 
 		/*--------加入Palne--------*/
 
@@ -211,21 +264,21 @@
 			if (intersects[0].object.geometry.type == "CircleGeometry") {
 
 				console.log('逮到你瞜');
-				
-				if(intersects[0].object.material.color.r==1){
-					camera.position.z = 200;
+
+				if (intersects[0].object.material.color.r == 1) {
+					camera.position.z = 300;
 					intersects[0].object.material.color.set(0xD7FFEE);
-				
+
 				}
 				else {
-					camera.position.z = 120;
+					camera.position.z = 150;
 					intersects[0].object.material.color.set(0xff0000);
 				}
 				// console.log(intersects[0].object.material.color.r);
-			
+
 
 			}
-	
+
 
 
 
