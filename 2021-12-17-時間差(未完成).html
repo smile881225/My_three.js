@@ -25,8 +25,6 @@
 <body>
 
     <script src="./js/three.js"></script>
-    <!-- <script type="module" src="./Loader/OBJLoader.js"></script>
-    <script type="module" src="./Loader/MTLLoader.js"></script> -->
     <script type="module">
 
         /*------------Java Script--------------*/
@@ -37,26 +35,37 @@
         import { OrbitControls } from './js/OrbitControls.js';
 
         /*--------創造初始元素--------*/
-
+        
+        var mtlLoader;
+        var PointLight, AmbientLight, SpotLight, helper;//light
+        var controls
         var scene = new THREE.Scene();
         var camera = new THREE.PerspectiveCamera(80, window.innerWidth / window.innerHeight, 0.1, 10000);
         var renderer = new THREE.WebGLRenderer();
         renderer.setSize(window.innerWidth, window.innerHeight);
         document.body.appendChild(renderer.domElement);
 
+
         /*-------調整camera位置---------*/
 
-        camera.position.set(0, 100, 200);
-        camera.lookAt(0, 0, 0);
+        camera.position.set(0, 320, 434);//初始的Camera位置
+
+        /*-------滑鼠控制---------*/
+
+        controls = new OrbitControls(camera, renderer.domElement);
+        controls.target.set(16, 90, 0);//初始的滑鼠控制中心點
+
+        controls.enablePan = false;
+        controls.maxPolarAngle = Math.PI / 2;
+        controls.enableDamping = true;
+        controls.autoRotate = true;//自動旋轉
+        controls.autoRotateSpeed = 2;//控制旋轉速度
 
         /*--------燈光選項--------*/
-        var PointLight;
-        var AmbientLight;
-        var SpotLight;
-        var helper;
+
         renderer.shadowMap.enabled = true;//把Renderer的陰影選項打開
         renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-        PointLight = new THREE.PointLight(0xffffff, 2);
+        PointLight = new THREE.PointLight(0xffffff, 1.3);
         PointLight.castShadow = true;
         PointLight.shadow.mapSize.width = 2048;
         PointLight.shadow.mapSize.height = 2048;
@@ -65,21 +74,10 @@
         PointLight.position.set(-500, 400, 0);
         scene.add(PointLight);
 
-        /*-------滑鼠Controls---------*/
-
-        var controls = new OrbitControls(camera, renderer.domElement);
-        controls.target.set(4.5, 5, 4.5);
-        controls.enablePan = false;
-        controls.maxPolarAngle = Math.PI / 2;
-        controls.enableDamping = true;
-        controls.autoRotate = true;//自動旋轉
-        controls.autoRotateSpeed = 5;//控制旋轉速度
-        controls.minDistance = 100;//controls縮放最小距離
-        controls.maxDistance = 400;//controls縮放最大距離
         /*--------開始載我的模型--------*/
 
         // var mtlLoader = new THREE.MTLLoader();
-        var mtlLoader = new MTLLoader();
+        mtlLoader = new MTLLoader();
 
         // mtlLoader.setBaseUrl('./3D_Object/');
         // mtlLoader.setPath('./3D_Object/');
@@ -87,14 +85,14 @@
         //記住！！！！！OBJ、MTL、PNG貼圖來源檔一定要放在同個資料夾才可以
 
         // var url = "/3D_Object/test1.mtl";
-        var url = "/3D_Object/teapot.mtl";
-        mtlLoader.load(url, function (materials) {
-            var teapot;
+
+
+        var Archer_mtl = "./3D_Object/東駿的模型/弓箭手.mtl";
+        mtlLoader.load(Archer_mtl, function (materials) {
             materials.preload();
             var objLoader = new OBJLoader();
             objLoader.setMaterials(materials);
-            // objLoader.load('./3D_Object/test1.obj', function (object) {
-            var teapot = objLoader.load('./3D_Object/teapot.obj', function (object) {
+            var teapot = objLoader.load('./3D_Object/東駿的模型/弓箭手.obj', function (object) {
 
                 object.traverse(function (node) {
                     if (node instanceof THREE.Mesh) {
@@ -103,24 +101,77 @@
                         node.receiveShadow = true; //default
                     }
                 })
-                object.position.y = -0.2;
+                object.position.set(350, 65, 150);
+                // object.position.x = 100;
+                // object.position.y = 65;
                 scene.add(object);
-                console.log(teapot);
+
             });
-            console.log(teapot);
+
         });
 
+        //加入戰士的模型
 
+        var Warrior_mtl = "./3D_Object/東駿的模型/戰士.mtl";
+        mtlLoader.load(Warrior_mtl, function (materials) {
+            materials.preload();
+            var objLoader = new OBJLoader();
+            objLoader.setMaterials(materials);
+            var teapot = objLoader.load('./3D_Object/東駿的模型/戰士.obj', function (object) {
 
+                object.traverse(function (node) {
+                    if (node instanceof THREE.Mesh) {
+                        node.castShadow = true; //default is false
+                        // node.receiveShadow = false; //default
+                        node.receiveShadow = true; //default
+                    }
+                })
+                object.position.set(300, 65, 150);
+                scene.add(object);
+
+            });
+
+        });
+
+        //加入騎兵的模型
+
+        var Cavalry_mtl = "./3D_Object/東駿的模型/騎兵.mtl";
+        mtlLoader.load(Cavalry_mtl, function (materials) {
+            materials.preload();
+            var objLoader = new OBJLoader();
+            objLoader.setMaterials(materials);
+            var teapot = objLoader.load('./3D_Object/東駿的模型/騎兵.obj', function (object) {
+
+                object.traverse(function (node) {
+                    if (node instanceof THREE.Mesh) {
+                        node.castShadow = true; //default is false
+                        // node.receiveShadow = false; //default
+                        node.receiveShadow = true; //default
+                    }
+                })
+                object.position.set(250, 110, 150);
+                // object.position.x = -100;
+                // object.position.y = 110;
+                scene.add(object);
+            });
+        });
 
         /*--------加入Palne--------*/
+
         const texture = new THREE.TextureLoader().load("./img/carpet-2.jpg");
         const planeGeometry = new THREE.PlaneGeometry(2000, 2000, 32, 32);
         const planeMaterial = new THREE.MeshStandardMaterial({ map: texture })
         const plane = new THREE.Mesh(planeGeometry, planeMaterial);
+
         plane.receiveShadow = true;
         plane.rotateX(-1.57);//旋轉平面 會寫負的是因為Plane的背面預設是不會顯示的，所以要翻對邊
+        plane.position.set(0, 0, 0);
         scene.add(plane);
+
+ 
+
+      
+    
 
         /*-------更改場景的背景顏色---------*/
 
@@ -128,10 +179,11 @@
 
         function animation() {
 
-            // scene.position.y+=4;
+   
             controls.update();
             requestAnimationFrame(animation);//創造一個循環
             renderer.render(scene, camera);//繪製場景
+           
         }
 
         animation();//呼叫動畫函數

@@ -36,7 +36,6 @@
         import { OrbitControls } from './js/OrbitControls.js';
         import { GUI } from './js/lil-gui.module.min.js';
         import Stats from './js/stats.module.js';
-        import { TWEEN } from './js/tween.module.min.js';
 
         //初始化
 
@@ -76,53 +75,6 @@
                 })
                 object.position.set(310, 110, 150);
                 scene.add(object);
-                //GUI
-
-                var gui = new GUI();
-
-                let datGUIControls = new (function () {
-                    this.startTracking = false
-                })()
-
-                //動畫播放
-
-                let offset;
-                let target;
-                let ooxx = 0;//有沒有在原點
-                gui.add(datGUIControls, 'startTracking').onChange(function (e) {
-                    if (ooxx == 0) {
-                        offset = { x: 0, z: 0, rotateY: 0 }//起點
-                        target = { x: 310, z: -200, rotateY: 1.57 } // 目標值
-                        var tween = new TWEEN.Tween(offset) // 建立新的 Tween 物件來改變 position
-                            .to(target, 3000) // 在 5000ms 內移動至target
-                            .easing(TWEEN.Easing.Cubic.Out) // 補間動畫效果曲線
-                            .onUpdate(onUpdate)//要做甚麼
-                            .onComplete(() => {//動畫結束之後要做甚麼
-                                tween.stop();
-                                ooxx = 1;
-                            })
-                            .start(); // 立即啟動 tween 動畫
-                    }
-                    if (ooxx == 1) {
-                        offset = { x: 310, z: -200, rotateY: 1.57 } // 目標值
-                        target = { x: 0, z: 0, rotateY: 0 }//起點
-                        var tween = new TWEEN.Tween(offset) // 建立新的 Tween 物件來改變 position
-                            .to(target, 3000) // 在 5000ms 內移動至target
-                            .easing(TWEEN.Easing.Cubic.Out) // 補間動畫效果曲線
-                            .onUpdate(onUpdate)//要做甚麼
-                            .onComplete(() => {//動畫結束之後要做甚麼
-                                tween.stop();
-                                ooxx = 0;
-                            })
-                            .start(); // 立即啟動 tween 動畫
-                    }
-                })
-                // Cube走動及轉身補間動畫
-                const onUpdate = () => {
-                    // 移動
-                    cube.position.x = offset.x;
-                    cube.position.z = offset.z;
-                }
             });
         });
 
@@ -152,20 +104,23 @@
         controls.minDistance = 100;//controls縮放最小距離
         controls.maxDistance = 400;//controls縮放最大距離
 
+        //GUI
 
-        /*-------Stats---------*/
+        let gui = new GUI();
+        const CameraPosition = gui.addFolder('Camera');
+        CameraPosition.add(controls.target, 'x', -1000, 1000);
+        CameraPosition.add(controls.target, 'y', -1000, 1000);
+        CameraPosition.add(controls.target, 'z', -1000, 1000);
+        CameraPosition.open();
+
+        //Stats
 
         const stats = Stats();
         stats.showPanel(0);
         document.body.appendChild(stats.dom);
 
-
-
-
-
-
         function animation() {
-
+        
             stats.update();
             controls.update();
             requestAnimationFrame(animation);//創造一個循環

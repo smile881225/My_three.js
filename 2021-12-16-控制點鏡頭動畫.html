@@ -248,7 +248,8 @@
 
         var raycaster = new THREE.Raycaster();//設定2D的射線(不懂請看觀念->滑鼠互動->58 Three.js.....)
         var mouse = new THREE.Vector2();
-        var ooxx,isnear;
+        var control_Name, isnear = false;
+
         var intersects;
         function onMouseClick(event) {
 
@@ -270,23 +271,15 @@
             //將所有的相交的模型的顏色設定為紅色，如果只需要將第一個觸發事件，那就陣列的第一個模型改變顏色即可
 
             if (intersects.length > 0 && intersects[0].object.geometry.type == "CircleGeometry") {
-                ooxx = intersects[0].object.name;
-                isnear=false;
-                console.log('逮到你瞜');
-                console.log(ooxx);
+                control_Name = intersects[0].object.name;
 
+                console.log('逮到你瞜');
+                console.log(control_Name);
 
                 // console.log(intersects[0].object.material.color.r);
             }
 
 
-
-
-
-
-
-
-            // intersects[0].object.material.color.set(0xff0000);
 
             // for (var i = 0; i < intersects.length; i++) {
 
@@ -301,140 +294,158 @@
         /*-------更改場景的背景顏色---------*/
 
         scene.background = new THREE.Color(0xffffff);
-        console.log(camera.position);
+
         function cameraZoomin() {
-            if (ooxx == 'control_Archer') {
-                if (isnear==true) {//如果鏡頭是近的
-                    intersects[0].object.material.color.set(0xD7FFEE);
-                    Math.floor(camera.position.x) == 0 ? camera.position.x = 0 : camera.position.x > 0 ? camera.position.x -= 1 : camera.position.x += 1;
-                    Math.floor(camera.position.y) == 320 ? camera.position.y = 320 : camera.position.y > 320 ? camera.position.y -= 1 : camera.position.y += 1;
-                    Math.floor(camera.position.z) == 434 ? camera.position.z = 434 : camera.position.z > 434 ? camera.position.z -= 1 : camera.position.z += 1;
+            if (control_Name == 'control_Archer') {
+
+                camera.position.x = Math.floor(camera.position.x);
+                camera.position.y = Math.floor(camera.position.y);
+                camera.position.z = Math.floor(camera.position.z);
+
+                if (isnear == true) {//如果鏡頭是近的
+
+                    camera.position.x == 0 ? camera.position.x = 0 : camera.position.x > 0 ? camera.position.x -= 1 : camera.position.x += 1;
+                    camera.position.y == 320 ? camera.position.y = 320 : camera.position.y > 320 ? camera.position.y -= 1 : camera.position.y += 1;
+                    camera.position.z == 434 ? camera.position.z = 434 : camera.position.z > 434 ? camera.position.z -= 1 : camera.position.z += 1;
 
                     controls.target.x == 16 ? controls.target.x = 16 : controls.target.x > 16 ? controls.target.x-- : controls.target.x++;
                     controls.target.y == 90 ? controls.target.y = 90 : controls.target.y > 90 ? controls.target.y-- : controls.target.y++;
                     controls.target.z == 0 ? controls.target.z = 0 : controls.target.z > 0 ? controls.target.z-- : controls.target.z++;
 
                     if (camera.position.x == 0 && camera.position.y == 320 && camera.position.z == 434 && controls.target.x == 16 && controls.target.y == 90 && controls.target.z == 0) {
-                        ooxx = '';
-                        isnear=false;
+                        control_Name = '';
+                        isnear = false;
                         console.log('拉遠');
-                    }
-                    console.log(isnear)
+                    } 
+                    console.log(control_Name)
+                    console.log(camera.position.x);
+                    console.log(camera.position.y);
+                    console.log(camera.position.z);
+                    console.log(controls.target.x);
+                    console.log(controls.target.y);
+                    console.log(controls.target.z);
+
                     // camera.position.set(0, 320, 434);//初始的Camera位置
                     // controls.target.set(16, 90, 0);//初始的滑鼠控制中心點
-                   
-                }
-                else if(isnear==false){//如果鏡頭不是近的
-                    intersects[0].object.material.color.set(0xff0000);
 
-                    Math.floor(camera.position.x) == 170 ? camera.position.x = 170 : camera.position.x > 170 ? camera.position.x -= 1 : camera.position.x += 1;
-                    Math.floor(camera.position.y) == 140 ? camera.position.y = 140 : camera.position.y > 140 ? camera.position.y -= 1 : camera.position.y += 1;
-                    Math.floor(camera.position.z) == 164 ? camera.position.z = 164 : camera.position.z > 164 ? camera.position.z -= 1 : camera.position.z += 1;
+                }
+                else if (isnear == false) {//如果鏡頭不是近的
+
+                    camera.position.x == 170 ? camera.position.x = 170 : camera.position.x > 170 ? camera.position.x -= 1 : camera.position.x += 1;
+                    camera.position.y == 140 ? camera.position.y = 140 : camera.position.y > 140 ? camera.position.y -= 1 : camera.position.y += 1;
+                    camera.position.z == 164 ? camera.position.z = 164 : camera.position.z > 164 ? camera.position.z -= 1 : camera.position.z += 1;
 
                     controls.target.x == 178 ? controls.target.x = 178 : controls.target.x > 178 ? controls.target.x-- : controls.target.x++;
                     controls.target.y == 110 ? controls.target.y = 110 : controls.target.y > 110 ? controls.target.y-- : controls.target.y++;
                     controls.target.z == 16 ? controls.target.z = 16 : controls.target.z > 16 ? controls.target.z-- : controls.target.z++;
 
                     if (camera.position.x == 170 && camera.position.y == 140 && camera.position.z == 164 && controls.target.x == 178 && controls.target.y == 110 && controls.target.z == 16) {
-                        ooxx = '';
-                        isnear=true;
+                        control_Name = '';
+                        isnear = true;
                         console.log(isnear)
                         console.log('拉近');
                     }
-                    
-                    // console.log(camera.position.x);
-                    // console.log(camera.position.y);
-                    // console.log(camera.position.z);
-                    // console.log(controls.target.x);
-                    // console.log(controls.target.y);
-                    // console.log(controls.target.z);
+
                     // camera.position.set(170, 140, 164);//弓箭手的Camera
                     // controls.target.set(178, 110, 16);//弓箭手的滑鼠控制中心點
-                   
                 }
-
+                console.log(control_Name);
             }
-            else if (ooxx == 'control_Warrior') {
+            else if (control_Name == 'control_Warrior') {
 
-                if (intersects[0].object.material.color.r == 1) {
-                    intersects[0].object.material.color.set(0xD7FFEE);
+                camera.position.x = Math.floor(camera.position.x);
+                camera.position.y = Math.floor(camera.position.y);
+                camera.position.z = Math.floor(camera.position.z);
 
-                    Math.floor(camera.position.x) == 0 ? camera.position.x = 0 : camera.position.x > 0 ? camera.position.x -= 1 : camera.position.x += 1;
-                    Math.floor(camera.position.y) == 320 ? camera.position.y = 320 : camera.position.y > 320 ? camera.position.y -= 1 : camera.position.y += 1;
-                    Math.floor(camera.position.z) == 434 ? camera.position.z = 434 : camera.position.z > 434 ? camera.position.z -= 1 : camera.position.z += 1;
+                if (isnear == true) {//如果鏡頭是近的
+
+                    camera.position.x == 0 ? camera.position.x = 0 : camera.position.x > 0 ? camera.position.x -= 1 : camera.position.x += 1;
+                    camera.position.y == 320 ? camera.position.y = 320 : camera.position.y > 320 ? camera.position.y -= 1 : camera.position.y += 1;
+                    camera.position.z == 434 ? camera.position.z = 434 : camera.position.z > 434 ? camera.position.z -= 1 : camera.position.z += 1;
 
                     controls.target.x == 16 ? controls.target.x = 16 : controls.target.x > 16 ? controls.target.x-- : controls.target.x++;
                     controls.target.y == 90 ? controls.target.y = 90 : controls.target.y > 90 ? controls.target.y-- : controls.target.y++;
                     controls.target.z == 0 ? controls.target.z = 0 : controls.target.z > 0 ? controls.target.z-- : controls.target.z++;
 
                     if (camera.position.x == 0 && camera.position.y == 320 && camera.position.z == 434 && controls.target.x == 16 && controls.target.y == 90 && controls.target.z == 0) {
-                        ooxx = '';
+                        control_Name = '';
+                        isnear = false;
+                        console.log('拉遠');
+                    }
+                    console.log(camera.position.x);
+                    console.log(camera.position.y);
+                    console.log(camera.position.z);
+                    console.log(controls.target.x);
+                    console.log(controls.target.y);
+                    console.log(controls.target.z);
+                    // camera.position.set(0, 320, 434);//初始的Camera位置
+                    // controls.target.set(16, 90, 0);//初始的滑鼠控制中心點
+                }
+                else if (isnear == false) {//如果鏡頭不是近的
+
+                    camera.position.x == 16 ? camera.position.x = 16 : camera.position.x > 16 ? camera.position.x -= 1 : camera.position.x += 1;
+                    camera.position.y == 116 ? camera.position.y = 116 : camera.position.y > 116 ? camera.position.y -= 1 : camera.position.y += 1;
+                    camera.position.z == 140 ? camera.position.z = 140 : camera.position.z > 140 ? camera.position.z -= 1 : camera.position.z += 1;
+
+                    controls.target.x == 16 ? controls.target.x = 16 : controls.target.x > 16 ? controls.target.x-- : controls.target.x++;
+                    controls.target.y == 90 ? controls.target.y = 90 : controls.target.y > 90 ? controls.target.y-- : controls.target.y++;
+                    controls.target.z == 0 ? controls.target.z = 0 : controls.target.z > 0 ? controls.target.z-- : controls.target.z++;
+
+                    if (camera.position.x == 16 && camera.position.y == 116 && camera.position.z == 140 && controls.target.x == 16 && controls.target.y == 90 && controls.target.z == 0) {
+                        control_Name = '';
+                        isnear = true;
+                        console.log('拉近');
+                    }
+                   
+                    // camera.position.set(16, 116, 140);//戰士的Camera
+                    // controls.target.set(16, 90, 0);//戰士的滑鼠控制中心點
+                }
+
+            }
+            else if (control_Name == 'control_Cavalry') {
+
+                camera.position.x = Math.floor(camera.position.x);
+                camera.position.y = Math.floor(camera.position.y);
+                camera.position.z = Math.floor(camera.position.z);
+
+                if (isnear == true) {//如果鏡頭是近的
+
+                    camera.position.x == 0 ? camera.position.x = 0 : camera.position.x > 0 ? camera.position.x -= 1 : camera.position.x += 1;
+                    camera.position.y == 320 ? camera.position.y = 320 : camera.position.y > 320 ? camera.position.y -= 1 : camera.position.y += 1;
+                    camera.position.z == 434 ? camera.position.z = 434 : camera.position.z > 434 ? camera.position.z -= 1 : camera.position.z += 1;
+
+                    controls.target.x == 16 ? controls.target.x = 16 : controls.target.x > 16 ? controls.target.x-- : controls.target.x++;
+                    controls.target.y == 90 ? controls.target.y = 90 : controls.target.y > 90 ? controls.target.y-- : controls.target.y++;
+                    controls.target.z == 0 ? controls.target.z = 0 : controls.target.z > 0 ? controls.target.z-- : controls.target.z++;
+
+                    if (camera.position.x == 0 && camera.position.y == 320 && camera.position.z == 434 && controls.target.x == 16 && controls.target.y == 90 && controls.target.z == 0) {
+                        control_Name = '';
+                        isnear = false;
+                        console.log('拉遠');
                     }
 
                     // camera.position.set(0, 320, 434);//初始的Camera位置
                     // controls.target.set(16, 90, 0);//初始的滑鼠控制中心點
-                    console.log('拉遠');
                 }
-                else {
-                    intersects[0].object.material.color.set(0xff0000);
+                else if (isnear == false) {//如果鏡頭不是近的
 
-                    Math.floor(camera.position.x) == 16 ? camera.position.x = 16 : camera.position.x > 16 ? camera.position.x -= 1 : camera.position.x += 1;
-                    Math.floor(camera.position.y) == 116 ? camera.position.y = 116 : camera.position.y > 116 ? camera.position.y -= 1 : camera.position.y += 1;
-                    Math.floor(camera.position.z) == 140 ? camera.position.z = 140 : camera.position.z > 140 ? camera.position.z -= 1 : camera.position.z += 1;
-
-                    controls.target.x == 16 ? controls.target.x = 16 : controls.target.x > 16 ? controls.target.x-- : controls.target.x++;
-                    controls.target.y == 90 ? controls.target.y = 90 : controls.target.y > 90 ? controls.target.y-- : controls.target.y++;
-                    controls.target.z == 0 ? controls.target.z = 0 : controls.target.z > 0 ? controls.target.z-- : controls.target.z++;
-
-                    if (camera.position.x == 16 && camera.position.y == 116 && camera.position.z == 140 && controls.target.x == 16 && controls.target.y == 90 && controls.target.z == 0) {
-                        ooxx = '';
-                    }
-
-                    // camera.position.set(16, 116, 140);//戰士的Camera
-                    // controls.target.set(16, 90, 0);//戰士的滑鼠控制中心點
-                    console.log('拉近');
-                }
-
-            }
-            else if (ooxx == 'control_Cavalry') {
-
-                if (intersects[0].object.material.color.r == 1) {
-                    intersects[0].object.material.color.set(0xD7FFEE);
-
-                    Math.floor(camera.position.x) == 0 ? camera.position.x = 0 : camera.position.x > 0 ? camera.position.x -= 1 : camera.position.x += 1;
-                    Math.floor(camera.position.y) == 320 ? camera.position.y = 320 : camera.position.y > 320 ? camera.position.y -= 1 : camera.position.y += 1;
-                    Math.floor(camera.position.z) == 434 ? camera.position.z = 434 : camera.position.z > 434 ? camera.position.z -= 1 : camera.position.z += 1;
-
-                    controls.target.x == 16 ? controls.target.x = 16 : controls.target.x > 16 ? controls.target.x-- : controls.target.x++;
-                    controls.target.y == 90 ? controls.target.y = 90 : controls.target.y > 90 ? controls.target.y-- : controls.target.y++;
-                    controls.target.z == 0 ? controls.target.z = 0 : controls.target.z > 0 ? controls.target.z-- : controls.target.z++;
-
-                    if (camera.position.x == 16 && camera.position.y == 116 && camera.position.z == 140 && controls.target.x == 16 && controls.target.y == 90 && controls.target.z == 0) {
-                        ooxx = '';
-                    }
-
-                    camera.position.set(0, 320, 434);//初始的Camera位置
-                    controls.target.set(16, 90, 0);//初始的滑鼠控制中心點
-                    console.log('拉遠');
-                }
-                else {
-                    intersects[0].object.material.color.set(0xff0000);
-
-                    Math.floor(camera.position.x) == -130 ? camera.position.x = -130 : camera.position.x > -130 ? camera.position.x -= 1 : camera.position.x += 1;
-                    Math.floor(camera.position.y) == 164 ? camera.position.y = 164 : camera.position.y > 164 ? camera.position.y -= 1 : camera.position.y += 1;
-                    Math.floor(camera.position.z) == 130 ? camera.position.z = 130 : camera.position.z > 130 ? camera.position.z -= 1 : camera.position.z += 1;
+                    camera.position.x == -130 ? camera.position.x = -130 : camera.position.x > -130 ? camera.position.x -= 1 : camera.position.x += 1;
+                    camera.position.y == 164 ? camera.position.y = 164 : camera.position.y > 164 ? camera.position.y -= 1 : camera.position.y += 1;
+                    camera.position.z == 130 ? camera.position.z = 130 : camera.position.z > 130 ? camera.position.z -= 1 : camera.position.z += 1;
 
                     controls.target.x == -156 ? controls.target.x = -156 : controls.target.x > -156 ? controls.target.x-- : controls.target.x++;
                     controls.target.y == 110 ? controls.target.y = 110 : controls.target.y > 110 ? controls.target.y-- : controls.target.y++;
                     controls.target.z == -58 ? controls.target.z = -58 : controls.target.z > -58 ? controls.target.z-- : controls.target.z++;
 
-                    if (camera.position.x == 16 && camera.position.y == 164 && camera.position.z == 130 && controls.target.x == -156 && controls.target.y ==  110 && controls.target.z == -58) {
-                        ooxx = '';
+                    if (camera.position.x == -130 && camera.position.y == 164 && camera.position.z == 130 && controls.target.x == -156 && controls.target.y == 110 && controls.target.z == -58) {
+                        control_Name = '';
+                        isnear = true;
+                        console.log(isnear)
+                        console.log('拉近');
                     }
 
                     // camera.position.set(-130, 164, 130);//騎兵的Camera
                     // controls.target.set(-156, 110, -58);//騎兵的滑鼠控制中心點
-                    console.log('拉近');
                 }
 
             }

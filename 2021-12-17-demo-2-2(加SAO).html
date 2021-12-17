@@ -49,7 +49,7 @@
         var renderer = new THREE.WebGLRenderer();
         renderer.setSize(window.innerWidth, window.innerHeight);
         document.body.appendChild(renderer.domElement);
-
+        var composer, renderPass, saoPass;//SAO
 
         /*-------調整camera位置---------*/
 
@@ -72,8 +72,8 @@
         controls.enablePan = false;
         controls.maxPolarAngle = Math.PI / 2;
         controls.enableDamping = true;
-        controls.autoRotate = true;//自動旋轉
-        controls.autoRotateSpeed = 2;//控制旋轉速度
+        // controls.autoRotate = true;//自動旋轉
+        // controls.autoRotateSpeed = 5;//控制旋轉速度
         // controls.minDistance = 100;//controls縮放最小距離
         // controls.maxDistance = 400;//controls縮放最大距離
 
@@ -89,6 +89,49 @@
         PointLight.shadow.camera.far = 5000;
         PointLight.position.set(-500, 400, 0);
         scene.add(PointLight);
+
+        //SAO
+
+        composer = new EffectComposer(renderer);
+        renderPass = new RenderPass(scene, camera);
+        composer.addPass(renderPass);
+        saoPass = new SAOPass(scene, camera, false, true);
+        composer.addPass(saoPass);
+
+        saoPass.params.output = 0;
+        saoPass.params.saoBias = -0.204;
+        saoPass.params.saoIntensity = 1;
+        saoPass.params.saoScale = 6.31;
+        saoPass.params.saoKernelRadius = 1.485;
+        saoPass.params.saoMinResolution = 0.0001;
+        saoPass.params.saoBlur = true;
+        saoPass.params.saoBlurRadius = 8;
+        saoPass.params.saoBlurStdDev = 4;
+        saoPass.params.saoBlurDepthCutoff = 0.01;
+
+        //GUI
+
+        let gui = new GUI();
+
+        gui.add(saoPass.params, 'output', {
+            'Beauty+SAO': SAOPass.OUTPUT.Default,
+            'Beauty': SAOPass.OUTPUT.Beauty,
+            'SAO': SAOPass.OUTPUT.SAO,
+            'Depth': SAOPass.OUTPUT.Depth,
+            'Normal': SAOPass.OUTPUT.Normal
+        }).onChange(function (value) {
+            saoPass.params.output = parseInt(value);
+        });
+
+        gui.add(saoPass.params, 'saoBias', - 1, 1);
+        gui.add(saoPass.params, 'saoIntensity', 0, 1);
+        gui.add(saoPass.params, 'saoScale', 0, 10);
+        gui.add(saoPass.params, 'saoKernelRadius', 1, 100);
+        gui.add(saoPass.params, 'saoMinResolution', 0, 1);
+        gui.add(saoPass.params, 'saoBlur');
+        gui.add(saoPass.params, 'saoBlurRadius', 0, 200);
+        gui.add(saoPass.params, 'saoBlurStdDev', 0.5, 150);
+        gui.add(saoPass.params, 'saoBlurDepthCutoff', 0.0, 0.1);
 
         /*--------開始載我的模型--------*/
 
@@ -128,7 +171,7 @@
 
         //加入弓箭手的控制點/
 
-        const circle_Archer = new THREE.CircleGeometry(5, 32);
+        const circle_Archer = new THREE.CircleGeometry(3, 32);
         const material_Archer = new THREE.MeshBasicMaterial({
             color: 0xBEBEBE,
             side: THREE.DoubleSide//雙面列印
@@ -165,7 +208,7 @@
 
         //加入戰士的控制點
 
-        const circle_Warrior = new THREE.CircleGeometry(5, 32);
+        const circle_Warrior = new THREE.CircleGeometry(3, 32);
         const material_Warrior = new THREE.MeshBasicMaterial({
             color: 0xBEBEBE,
             side: THREE.DoubleSide//雙面列印
@@ -201,7 +244,7 @@
 
         /*--------加入騎兵的控制點--------*/
 
-        const circle_Cavalry = new THREE.CircleGeometry(5, 32);
+        const circle_Cavalry = new THREE.CircleGeometry(3, 32);
         const material_Cavalry = new THREE.MeshBasicMaterial({
             color: 0xBEBEBE,
             side: THREE.DoubleSide//雙面列印
@@ -231,6 +274,12 @@
         const Cone = new THREE.Mesh(geometry, material);
         Cone.position.set(0, 0, 0);
         scene.add(Cone);
+
+        /*--------Stats--------*/
+
+        const stats = Stats();
+        stats.showPanel(0);
+        document.body.appendChild(stats.dom);
 
         /*--------控制點互動--------*/
 
@@ -267,6 +316,8 @@
 
                 // console.log(intersects[0].object.material.color.r);
             }
+
+
 
             // for (var i = 0; i < intersects.length; i++) {
 
@@ -313,8 +364,8 @@
                     }//終點
 
                     tween = new TWEEN.Tween(offset) // 建立新的 Tween 物件來改變 position
-                        .to(target, 1000) // 在 1000ms 內移動至target
-                        .easing(TWEEN.Easing.Quadratic.Out) // 補間動畫效果曲線
+                        .to(target, 3000) // 在 3000ms 內移動至target
+                        .easing(TWEEN.Easing.Cubic.Out) // 補間動畫效果曲線
                         .onUpdate(onUpdate)//要做甚麼
                         .onComplete(() => {//動畫結束之後要做甚麼
                             tween.stop();
@@ -346,8 +397,8 @@
                         controls_z: 0,
                     }//終點
                     var tween = new TWEEN.Tween(offset) // 建立新的 Tween 物件來改變 position
-                        .to(target, 1000) // 在 1000ms 內移動至target
-                        .easing(TWEEN.Easing.Quadratic.Out) // 補間動畫效果曲線
+                        .to(target, 3000) // 在 3000ms 內移動至target
+                        .easing(TWEEN.Easing.Cubic.Out) // 補間動畫效果曲線
                         .onUpdate(onUpdate)//要做甚麼
                         .onComplete(() => {//動畫結束之後要做甚麼
                             tween.stop();
@@ -387,8 +438,8 @@
                     }//終點
 
                     tween = new TWEEN.Tween(offset) // 建立新的 Tween 物件來改變 position
-                        .to(target, 1000) // 在 1000ms 內移動至target
-                        .easing(TWEEN.Easing.Quadratic.Out) // 補間動畫效果曲線
+                        .to(target, 3000) // 在 3000ms 內移動至target
+                        .easing(TWEEN.Easing.Cubic.Out) // 補間動畫效果曲線
                         .onUpdate(onUpdate)//要做甚麼
                         .onComplete(() => {//動畫結束之後要做甚麼
                             tween.stop();
@@ -416,8 +467,8 @@
                     }//終點
 
                     var tween = new TWEEN.Tween(offset) // 建立新的 Tween 物件來改變 position
-                        .to(target, 1000) // 在 1000ms 內移動至target
-                        .easing(TWEEN.Easing.Quadratic.Out) // 補間動畫效果曲線
+                        .to(target, 3000) // 在 3000ms 內移動至target
+                        .easing(TWEEN.Easing.Cubic.Out) // 補間動畫效果曲線
                         .onUpdate(onUpdate)//要做甚麼
                         .onComplete(() => {//動畫結束之後要做甚麼
                             tween.stop();
@@ -447,8 +498,8 @@
                     }//終點
 
                     tween = new TWEEN.Tween(offset) // 建立新的 Tween 物件來改變 position
-                        .to(target, 1000) // 在 1000ms 內移動至target
-                        .easing(TWEEN.Easing.Quadratic.Out) // 補間動畫效果曲線
+                        .to(target, 3000) // 在 3000ms 內移動至target
+                        .easing(TWEEN.Easing.Cubic.Out) // 補間動畫效果曲線
                         .onUpdate(onUpdate)//要做甚麼
                         .onComplete(() => {//動畫結束之後要做甚麼
                             tween.stop();
@@ -475,8 +526,8 @@
                     }//終點
 
                     var tween = new TWEEN.Tween(offset) // 建立新的 Tween 物件來改變 position
-                        .to(target, 1000) // 在 1000ms 內移動至target
-                        .easing(TWEEN.Easing.Quadratic.Out) // 補間動畫效果曲線
+                        .to(target, 3000) // 在 3000ms 內移動至target
+                        .easing(TWEEN.Easing.Cubic.Out) // 補間動畫效果曲線
                         .onUpdate(onUpdate)//要做甚麼
                         .onComplete(() => {//動畫結束之後要做甚麼
                             tween.stop();
@@ -505,54 +556,7 @@
             controls.target.z = offset.controls_z;
         }
 
-        /*--------Stats--------*/
 
-        const stats = Stats();
-        stats.showPanel(0);
-        document.body.appendChild(stats.dom);
-
-        //SAO
-        var composer, renderPass, saoPass;//SAO
-        composer = new EffectComposer(renderer);
-        renderPass = new RenderPass(scene, camera);
-        composer.addPass(renderPass);
-        saoPass = new SAOPass(scene, camera, false, true);
-        composer.addPass(saoPass);
-
-        saoPass.params.output = 0;
-        saoPass.params.saoBias = -0.204;
-        saoPass.params.saoIntensity = 0.004;
-        saoPass.params.saoScale = 6.31;
-        saoPass.params.saoKernelRadius = 2;
-        saoPass.params.saoMinResolution = 0.0001;
-        saoPass.params.saoBlur = true;
-        saoPass.params.saoBlurRadius = 8;
-        saoPass.params.saoBlurStdDev = 4;
-        saoPass.params.saoBlurDepthCutoff = 0.01;
-
-        //GUI
-
-        let gui = new GUI();
-
-        gui.add(saoPass.params, 'output', {
-            'Beauty+SAO': SAOPass.OUTPUT.Default,
-            'Beauty': SAOPass.OUTPUT.Beauty,
-            'SAO': SAOPass.OUTPUT.SAO,
-            'Depth': SAOPass.OUTPUT.Depth,
-            'Normal': SAOPass.OUTPUT.Normal
-        }).onChange(function (value) {
-            saoPass.params.output = parseInt(value);
-        });
-
-        gui.add(saoPass.params, 'saoBias', - 1, 1);
-        gui.add(saoPass.params, 'saoIntensity', 0, 1);
-        gui.add(saoPass.params, 'saoScale', 0, 10);
-        gui.add(saoPass.params, 'saoKernelRadius', 1, 100);
-        gui.add(saoPass.params, 'saoMinResolution', 0, 1);
-        gui.add(saoPass.params, 'saoBlur');
-        gui.add(saoPass.params, 'saoBlurRadius', 0, 200);
-        gui.add(saoPass.params, 'saoBlurStdDev', 0.5, 150);
-        gui.add(saoPass.params, 'saoBlurDepthCutoff', 0.0, 0.1);
 
         function animation() {
             stats.update();
