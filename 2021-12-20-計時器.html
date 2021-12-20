@@ -50,6 +50,10 @@
 
         camera.position.set(0, 320, 434);//初始的Camera位置
 
+        /*-------更改場景的背景顏色---------*/
+
+        scene.background = new THREE.Color(0xffffff);
+
         /*-------滑鼠控制---------*/
 
         controls = new OrbitControls(camera, renderer.domElement);
@@ -168,26 +172,26 @@
         plane.position.set(0, 0, 0);
         scene.add(plane);
 
-
+        /*--------時間計算--------*/
 
         var clock = new THREE.Clock();
+        let count = 0;
+
+        function time() {
+            count += clock.getDelta();
+            // console.log(count);
+            if (count > 1) {
+                console.log('hihi');
+                count=0;
+            }
+        }
 
 
-        /*-------更改場景的背景顏色---------*/
-
-        scene.background = new THREE.Color(0xffffff);
-  
         function animation() {
             controls.update();
             requestAnimationFrame(animation);//創造一個循環
             renderer.render(scene, camera);//繪製場景
-
-            var T = clock.getDelta();//返回时间单位：秒
-            // console.log('两帧渲染时间间隔', T * 1000 + '毫秒');
-            // console.log('查看每秒渲染频率', 1 / T);
-            clock.elapsedTime=clock.getDelta();
-           console.log(clock.elapsedTime);
-
+            time();
         }
 
         animation();//呼叫動畫函數

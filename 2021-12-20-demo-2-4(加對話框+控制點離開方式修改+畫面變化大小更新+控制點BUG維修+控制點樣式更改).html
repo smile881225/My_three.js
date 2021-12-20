@@ -180,7 +180,7 @@
         /*--------創造初始元素--------*/
         var mtlLoader;
         var PointLight, AmbientLight, SpotLight, helper;//light
-        var controls
+        var controls;
         var scene = new THREE.Scene();
         var camera = new THREE.PerspectiveCamera(80, window.innerWidth / window.innerHeight, 0.1, 10000);
         var renderer = new THREE.WebGLRenderer();
@@ -208,9 +208,6 @@
         });
 
         /*--------音樂控制--------*/
-
-
-
         var musicBtn;
 
         musicBtn = document.querySelector('.music');
@@ -219,12 +216,10 @@
         function isChange() {
             isBtn=true;
             if (sound.isPlaying) {
-                console.log(pause);
                 sound.pause();
                 musicBtn.src = "https://renaultespace.littleworkshop.fr/img/hud/sound-off.png";
             }
             else {
-                console.log(play);
                 sound.play();
                 musicBtn.src = "https://renaultespace.littleworkshop.fr/img/hud/sound-on.png";
             }
@@ -292,14 +287,12 @@
         changeLight = true;
         lightBtn = document.querySelector('.light');
         lightBtn.addEventListener('click', islight);
-
         function islight() {
-            isBtn
+            isBtn=true;
             if (changeLight) {
                 changeLight = false;
                 scene.remove(PointLight);
                 switchSpotLight();
-
             }
             else {
                 changeLight = true;
@@ -366,14 +359,6 @@
         plane.position.set(0, 0, 0);
         scene.add(plane);
 
-        /*--------加入圓錐--------*/
-
-        const geometry = new THREE.ConeGeometry(10, 30, 32);
-        const material = new THREE.MeshBasicMaterial({ color: 0xD7FFEE });
-        const Cone = new THREE.Mesh(geometry, material);
-        Cone.position.set(0, 0, 0);
-        scene.add(Cone);
-
         /*--------開始載我的模型--------*/
 
         // var mtlLoader = new THREE.MTLLoader();
@@ -412,14 +397,11 @@
 
         //加入弓箭手的控制點/
 
-        const circle_Archer = new THREE.CircleGeometry(5, 32);
-        const material_Archer = new THREE.MeshBasicMaterial({
-            color: 0xBEBEBE,
-            side: THREE.DoubleSide//雙面列印
-        });
+        const circle_Archer = new THREE.SphereGeometry(6, 26, 10);
+        const material_Archer = new THREE.MeshBasicMaterial({ color: 0xBEBEBE });
         const control_Archer = new THREE.Mesh(circle_Archer, material_Archer);
 
-        control_Archer.position.set(172, 120, 1.2);
+        control_Archer.position.set(172, 130, 1.2);
         control_Archer.name = 'control_Archer';
 
         scene.add(control_Archer);
@@ -449,16 +431,15 @@
 
         //加入戰士的控制點
 
-        const circle_Warrior = new THREE.CircleGeometry(5, 32);
-        const material_Warrior = new THREE.MeshBasicMaterial({
-            color: 0xBEBEBE,
-            side: THREE.DoubleSide//雙面列印
-        });
+        const circle_Warrior = new THREE.SphereGeometry(6, 26, 10);
+        const material_Warrior = new THREE.MeshBasicMaterial({ color: 0xBEBEBE });
         const control_Warrior = new THREE.Mesh(circle_Warrior, material_Warrior);
 
-        control_Warrior.position.set(17, 120, -5);
+        control_Warrior.position.set(17, 130, -5);
         control_Warrior.name = 'control_Warrior';
         scene.add(control_Warrior);
+
+
 
         //加入騎兵的模型
 
@@ -485,15 +466,16 @@
 
         /*--------加入騎兵的控制點--------*/
 
-        const circle_Cavalry = new THREE.CircleGeometry(5, 32);
-        const material_Cavalry = new THREE.MeshBasicMaterial({
-            color: 0xBEBEBE,
-            side: THREE.DoubleSide//雙面列印
-        });
+        const circle_Cavalry = new THREE.SphereGeometry(6, 26, 10);
+        const material_Cavalry = new THREE.MeshBasicMaterial({ color: 0xBEBEBE });
         const control_Cavalry = new THREE.Mesh(circle_Cavalry, material_Cavalry);
+
         control_Cavalry.name = 'control_Cavalry';
-        control_Cavalry.position.set(-132, 171, -27);
+        control_Cavalry.position.set(-132, 178, -30);
         scene.add(control_Cavalry);
+
+
+
 
         /*--------控制點互動--------*/
 
@@ -515,18 +497,19 @@
             raycaster.setFromCamera(mouse, camera);
 
             intersects = raycaster.intersectObjects(scene.children);
-
-            if (intersects.length > 0 && intersects[0].object.geometry.type == "CircleGeometry") {
+            console.log(control_Name != 'changePlaymusic');
+            if (intersects.length > 0 && intersects[0].object.geometry.type == "SphereGeometry") {
                 control_Name = intersects[0].object.name;
                 quit.style['display'] = 'block';
                 console.log('逮到你瞜');
                 console.log(control_Name);
                 console.log(count);
             }
-
-            else if (ooxx < 0.2 && (nearArcher || nearWarrior || nearCavalry)) {
+            else if (ooxx < 0.2 && (nearArcher || nearWarrior || nearCavalry) && isBtn==false) {
                 control_Name = 'leave';
             }
+            console.log(isBtn);
+            isBtn=false;
         }
 
         window.addEventListener('click', onMouseClick);
@@ -757,6 +740,9 @@
             'Normal': SAOPass.OUTPUT.Normal
         }).onChange(function (value) {
             saoPass.params.output = parseInt(value);
+            // if(value==3){
+            //     saoPass.params.output = parseInt(4);
+            // }
         });
 
         gui.add(saoPass.params, 'saoBias', - 1, 1);
@@ -785,7 +771,16 @@
             console.log(ooxx);
         }
 
+        window.addEventListener('resize', onWindowResize);
 
+        function onWindowResize() {
+
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+
+            renderer.setSize(window.innerWidth, window.innerHeight);
+
+        }
         function animation() {
             // stats.update();
             TWEEN.update();
