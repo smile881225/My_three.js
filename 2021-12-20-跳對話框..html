@@ -6,6 +6,10 @@
     <title>create my modle</title>
 
     <style>
+        * {
+            box-sizing: border-box;
+        }
+
         html {
             overflow: hidden;
         }
@@ -28,46 +32,82 @@
         }
 
         .music {
+            position: fixed;
             height: 43px;
             width: 43px;
             bottom: 1.75%;
             left: 1.13%;
-            position: fixed;
             /* background-color: aquamarine; */
             cursor: pointer;
         }
 
         .right {
+            position: fixed;
             height: 163px;
             width: 96px;
-            position: fixed;
             bottom: 1.75%;
             right: 1.3%;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-
         }
 
         .light {
-            /* position: fixed; */
             height: 43px;
             width: 43px;
-            /* bottom: 13.99%;
-            right: 2.64%; */
             cursor: pointer;
             margin: 0 auto;
         }
 
         .start {
-            /* position: fixed; */
             height: 96px;
             width: 96px;
-            /* bottom: 1.75%;
-            right: 1.3%; */
             cursor: pointer;
-
         }
+
+        .dialog {
+            position: fixed;
+            height: 200px;
+            /* width: 41.66%; */
+            width: 800px;
+            opacity: 0.5;
+            background-color: aliceblue;
+            border-radius: 10px;
+            left: calc(50% - 400px);
+            /* margin-left :10px; */
+            display: none;
+            bottom: 30px;
+            justify-content: center;
+            align-items: center;
+            animation-name: up;
+            animation-duration: 1s;
+        }
+
+        @keyframes up {
+            0% {
+                bottom: -400px;
+                opacity: 0;
+            }
+
+            100% {
+                bottom: 30px;
+                opacity: 0.5;
+            }
+        }
+
+        /* 
+        @keyframes down {
+            0% {
+                bottom: 30px;
+                opacity: 0.5;
+            }
+
+            100% {
+
+                bottom: -400px;
+                opacity: 0;
+            }
+        } */
     </style>
 </head>
 
@@ -78,6 +118,9 @@
         <div class="right">
             <img class="light" src="https://renaultespace.littleworkshop.fr/img/hud/light.png" alt="">
             <img class="start" src="https://renaultespace.littleworkshop.fr/img/hud/start-stop.png" alt="">
+        </div>
+        <div class="dialog">
+            <h1 class="dialog-content">弓箭手</h1>
         </div>
     </div>
 
@@ -167,8 +210,8 @@
         controls.enablePan = false;
         controls.maxPolarAngle = Math.PI / 2;
         controls.enableDamping = true;
-        controls.autoRotate = true;//自動旋轉
-        controls.autoRotateSpeed = 2;//控制旋轉速度
+        // controls.autoRotate = true;//自動旋轉
+        // controls.autoRotateSpeed = 2;//控制旋轉速度
         // controls.minDistance = 100;//controls縮放最小距離
         // controls.maxDistance = 400;//controls縮放最大距離
 
@@ -266,6 +309,26 @@
             // helper = new THREE.CameraHelper(SpotLight.shadow.camera);
             // scene.add(helper);
         }
+
+        /*--------加入Palne--------*/
+
+        const texture = new THREE.TextureLoader().load("./img/carpet-2.jpg");
+        const planeGeometry = new THREE.PlaneGeometry(2000, 2000, 32, 32);
+        const planeMaterial = new THREE.MeshStandardMaterial({ map: texture })
+        const plane = new THREE.Mesh(planeGeometry, planeMaterial);
+
+        plane.receiveShadow = true;
+        plane.rotateX(-1.57);//旋轉平面 會寫負的是因為Plane的背面預設是不會顯示的，所以要翻對邊
+        plane.position.set(0, 0, 0);
+        scene.add(plane);
+
+        /*--------加入圓錐--------*/
+
+        const geometry = new THREE.ConeGeometry(10, 30, 32);
+        const material = new THREE.MeshBasicMaterial({ color: 0xD7FFEE });
+        const Cone = new THREE.Mesh(geometry, material);
+        Cone.position.set(0, 0, 0);
+        scene.add(Cone);
 
         /*--------開始載我的模型--------*/
 
@@ -388,34 +451,15 @@
         control_Cavalry.position.set(-132, 171, -27);
         scene.add(control_Cavalry);
 
-
-        /*--------加入Palne--------*/
-
-        const texture = new THREE.TextureLoader().load("./img/carpet-2.jpg");
-        const planeGeometry = new THREE.PlaneGeometry(2000, 2000, 32, 32);
-        const planeMaterial = new THREE.MeshStandardMaterial({ map: texture })
-        const plane = new THREE.Mesh(planeGeometry, planeMaterial);
-
-        plane.receiveShadow = true;
-        plane.rotateX(-1.57);//旋轉平面 會寫負的是因為Plane的背面預設是不會顯示的，所以要翻對邊
-        plane.position.set(0, 0, 0);
-        scene.add(plane);
-
-        /*--------加入圓錐--------*/
-
-        const geometry = new THREE.ConeGeometry(10, 30, 32);
-        const material = new THREE.MeshBasicMaterial({ color: 0xD7FFEE });
-        const Cone = new THREE.Mesh(geometry, material);
-        Cone.position.set(0, 0, 0);
-        scene.add(Cone);
-
         /*--------控制點互動--------*/
 
         var raycaster = new THREE.Raycaster();//設定2D的射線(不懂請看觀念->滑鼠互動->58 Three.js.....)
         var mouse = new THREE.Vector2();
         var control_Name;
-
         var intersects;
+        let dialog = document.querySelector('.dialog');
+        let dialogContent = document.querySelector('.dialog-content');
+        let dialogText;
 
         function onMouseClick(event) {
 
@@ -428,28 +472,14 @@
             // 通過滑鼠點的位置和當前相機的矩陣計算出raycaster
             raycaster.setFromCamera(mouse, camera);
 
-            // 獲取raycaster直線和所有模型相交的陣列集合
             intersects = raycaster.intersectObjects(scene.children);
-
-            console.log(intersects);
-
-
-            //將所有的相交的模型的顏色設定為紅色，如果只需要將第一個觸發事件，那就陣列的第一個模型改變顏色即可
 
             if (intersects.length > 0 && intersects[0].object.geometry.type == "CircleGeometry") {
                 control_Name = intersects[0].object.name;
-
                 console.log('逮到你瞜');
                 console.log(control_Name);
 
-                // console.log(intersects[0].object.material.color.r);
             }
-
-            // for (var i = 0; i < intersects.length; i++) {
-
-            // 	intersects[i].object.material.color.set(0xff0000);
-
-            // }
 
         }
 
@@ -479,6 +509,7 @@
 
 
             if (control_Name == 'control_Archer') {
+
                 if (nearArcher == false) {//如果鏡頭是遠的
                     target = {
                         Camera_x: 170,
@@ -488,7 +519,6 @@
                         controls_y: 110,
                         controls_z: 16,
                     }//終點
-
                     tween = new TWEEN.Tween(offset) // 建立新的 Tween 物件來改變 position
                         .to(target, 1000) // 在 1000ms 內移動至target
                         .easing(TWEEN.Easing.Quadratic.Out) // 補間動畫效果曲線
@@ -502,15 +532,16 @@
                             console.log('拉近');
                         })
                         .start(); // 立即啟動 tween 動畫
+                    dialog.style['display'] = 'flex';
                     console.log(camera.position.x);
                     console.log(camera.position.y);
                     console.log(camera.position.z);
                     console.log(controls.target.x);
                     console.log(controls.target.y);
                     console.log(controls.target.z);
-
                     // camera.position.set(170, 140, 164);//弓箭手的Camera
                     // controls.target.set(178, 110, 16);//弓箭手的滑鼠控制中心點
+
                 }
 
                 else if (nearArcher == true) {//如果鏡頭是近的
@@ -535,7 +566,7 @@
                             console.log('拉遠');
                         })
                         .start(); // 立即啟動 tween 動畫
-
+                    dialog.style['display'] = 'none';
                     // console.log(control_Name)
                     // console.log(camera.position.x);
                     // console.log(camera.position.y);
@@ -543,15 +574,20 @@
                     // console.log(controls.target.x);
                     // console.log(controls.target.y);
                     // console.log(controls.target.z);
-
                     // camera.position.set(0, 320, 434);//初始的Camera位置
                     // controls.target.set(16, 90, 0);//初始的滑鼠控制中心點
-
                 }
-
+                dialogText = "弓箭手";
+                dialogContent.innerHTML = `
+                <h1 class="dialog-content">${dialogText}</h1>
+                `
             }
             else if (control_Name == 'control_Warrior') {
 
+                dialogText = "戰士";
+                dialogContent.innerHTML = `
+                <h1 class="dialog-content">${dialogText}</h1>
+                `
                 if (nearWarrior == false) {//如果鏡頭是遠的
 
                     target = {
@@ -576,6 +612,7 @@
                             console.log('拉近');
                         })
                         .start(); // 立即啟動 tween 動畫
+                    dialog.style['display'] = 'flex';
 
                     // camera.position.set(16, 116, 140);//戰士的Camera
                     // controls.target.set(16, 90, 0);//戰士的滑鼠控制中心點
@@ -602,17 +639,19 @@
                             nearArcher = false;
                             nearWarrior = false;
                             nearCavalry = false;
-
                             console.log('拉遠');
                         })
                         .start(); // 立即啟動 tween 動畫
-
+                    dialog.style['display'] = 'none';
                     // camera.position.set(0, 320, 434);//初始的Camera位置
                     // controls.target.set(16, 90, 0);//初始的滑鼠控制中心點
                 }
             }
             if (control_Name == 'control_Cavalry') {
-
+                dialogText = "騎兵";
+                dialogContent.innerHTML = `
+                <h1 class="dialog-content">${dialogText}</h1>
+                `
                 if (nearCavalry == false) {//如果鏡頭不是近的
                     target = {
                         Camera_x: -130,
@@ -636,8 +675,7 @@
                             console.log('拉近');
                         })
                         .start(); // 立即啟動 tween 動畫
-
-
+                    dialog.style['display'] = 'flex';
                     // camera.position.set(-130, 164, 130);//騎兵的Camera
                     // controls.target.set(-156, 110, -58);//騎兵的滑鼠控制中心點
                 }
@@ -664,7 +702,7 @@
                             console.log('拉遠');
                         })
                         .start(); // 立即啟動 tween 動畫
-
+                    dialog.style['display'] = 'none';
                     // camera.position.set(0, 320, 434);//初始的Camera位置
                     // controls.target.set(16, 90, 0);//初始的滑鼠控制中心點
                 }
