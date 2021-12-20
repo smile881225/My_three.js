@@ -35,7 +35,7 @@
         import { OrbitControls } from './js/OrbitControls.js';
 
         /*--------創造初始元素--------*/
-        
+
         var mtlLoader;
         var PointLight, AmbientLight, SpotLight, helper;//light
         var controls
@@ -168,22 +168,26 @@
         plane.position.set(0, 0, 0);
         scene.add(plane);
 
- 
 
-      
-    
+
+        var clock = new THREE.Clock();
+
 
         /*-------更改場景的背景顏色---------*/
 
         scene.background = new THREE.Color(0xffffff);
-
+  
         function animation() {
-
-   
             controls.update();
             requestAnimationFrame(animation);//創造一個循環
             renderer.render(scene, camera);//繪製場景
-           
+
+            var T = clock.getDelta();//返回时间单位：秒
+            // console.log('两帧渲染时间间隔', T * 1000 + '毫秒');
+            // console.log('查看每秒渲染频率', 1 / T);
+            clock.elapsedTime=clock.getDelta();
+           console.log(clock.elapsedTime);
+
         }
 
         animation();//呼叫動畫函數
