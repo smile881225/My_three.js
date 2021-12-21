@@ -250,8 +250,8 @@
         controls.enableDamping = true;
         controls.autoRotate = true;//自動旋轉
         controls.autoRotateSpeed = 2;//控制旋轉速度
-        controls.minDistance = 100;//controls縮放最小距離
-        controls.maxDistance = 1000;//controls縮放最大距離
+        // controls.minDistance = 100;//controls縮放最小距離
+        // controls.maxDistance = 400;//controls縮放最大距離
 
         /*--------載入燈光--------*/
         var lightBtn, changeLight;
@@ -353,8 +353,7 @@
         const planeGeometry = new THREE.PlaneGeometry(2000, 2000, 32, 32);
         const planeMaterial = new THREE.MeshStandardMaterial(
             {
-                map: texture,
-                transparent: true,
+                map: texture
             }
         )
 
@@ -370,9 +369,7 @@
         const geometry = new THREE.ConeGeometry(10, 30, 32);
         const material = new THREE.MeshBasicMaterial(
             {
-                color: 0xD7FFEE,
-                side: THREE.DoubleSide,
-                transparent: true,
+                color: 0xD7FFEE
             }
         );
         // 也可以寫成
@@ -415,24 +412,20 @@
                 // object.position.x = 100;
                 // object.position.y = 65;
 
-                scene.add(object);
                 object.name = 'Archer';
+                scene.add(object);
+                object.children[0].material.transparent=true;
+                object.children[0].material.opacity=0.5;
+                console.log(object.children[0].material.opacity);
             });
-
         });
-
 
         //加入弓箭手的控制點/
 
-        let circle_Archer = new THREE.SphereGeometry(1.5, 26, 10);
-        let material_Archer = new THREE.MeshBasicMaterial(
-            {
-                color: 0xBEBEBE,
-                side: THREE.DoubleSide,
-                transparent:true,
-            }
-        );
-        let control_Archer = new THREE.Mesh(circle_Archer, material_Archer);
+        const circle_Archer = new THREE.SphereGeometry(6, 26, 10);
+        const material_Archer = new THREE.MeshBasicMaterial({ color: 0xBEBEBE });
+        const control_Archer = new THREE.Mesh(circle_Archer, material_Archer);
+
         control_Archer.position.set(172, 130, 1.2);
         control_Archer.name = 'control_Archer';
 
@@ -456,28 +449,26 @@
                 })
 
                 object.position.set(300, 65, 150);
-                scene.add(object);
                 object.name = 'Warrior';
+                object.children[0].material.transparent=true;
+                object.children[0].material.opacity=0.5;
+                console.log(object.children[0].material.opacity);
+                scene.add(object);
             });
 
         });
         console.log(scene);
-
         //加入戰士的控制點
 
-        let circle_Warrior = new THREE.SphereGeometry(1.5, 26, 10);
-        let material_Warrior = new THREE.MeshBasicMaterial(
-            {
-                color: 0xBEBEBE,
-                side: THREE.DoubleSide,
-                transparent:true,
-            });
-        let control_Warrior = new THREE.Mesh(circle_Warrior, material_Warrior);
+        const circle_Warrior = new THREE.SphereGeometry(6, 26, 10);
+        const material_Warrior = new THREE.MeshBasicMaterial({ color: 0xBEBEBE });
+        const control_Warrior = new THREE.Mesh(circle_Warrior, material_Warrior);
+
         control_Warrior.position.set(17, 130, -5);
         control_Warrior.name = 'control_Warrior';
         scene.add(control_Warrior);
 
-        material_Warrior.transparent = true;//接受不透明度設成True
+
 
         //加入騎兵的模型
 
@@ -486,8 +477,6 @@
             materials.preload();
             var objLoader = new OBJLoader();
             objLoader.setMaterials(materials);
-            material.transparent = true;
-            material.opacity = 0.25;
             var teapot = objLoader.load('./3D_Object/東駿的模型/騎兵.obj', function (object) {
 
                 object.traverse(function (node) {
@@ -502,7 +491,9 @@
                 // object.position.y = 110;
                 scene.add(object);
                 object.name = 'Cavalry';
-
+                object.children[0].material.transparent=true;
+                object.children[0].material.opacity=0.5;
+                console.log(object.children[0].material.opacity);
 
                 // scene.getObjectByName("Cavalry").material.transparent = true;
                 // scene.getObjectByName("Cavalry").material.opacity = (1 - val/100.0);
@@ -512,18 +503,16 @@
 
         /*--------加入騎兵的控制點--------*/
 
-        let circle_Cavalry = new THREE.SphereGeometry(1.5, 26, 10);
-        let material_Cavalry = new THREE.MeshBasicMaterial(
-            {
-                color: 0xBEBEBE,
-                side: THREE.DoubleSide,
-                transparent:true,
-            });
-        let control_Cavalry = new THREE.Mesh(circle_Cavalry, material_Cavalry);
+        const circle_Cavalry = new THREE.SphereGeometry(6, 26, 10);
+        const material_Cavalry = new THREE.MeshBasicMaterial({ color: 0xBEBEBE });
+        const control_Cavalry = new THREE.Mesh(circle_Cavalry, material_Cavalry);
 
         control_Cavalry.name = 'control_Cavalry';
-        control_Cavalry.position.set(-132, 185, -30);
+        control_Cavalry.position.set(-132, 178, -30);
         scene.add(control_Cavalry);
+
+
+
 
         /*--------控制點互動--------*/
 
@@ -549,7 +538,6 @@
             if (intersects.length > 0 && intersects[0].object.geometry.type == "SphereGeometry") {
                 control_Name = intersects[0].object.name;
                 quit.style['display'] = 'block';
-
                 console.log('逮到你瞜');
                 console.log(control_Name);
                 console.log(count);
@@ -557,7 +545,7 @@
             else if (ooxx < 0.2 && (nearArcher || nearWarrior || nearCavalry) && isBtn == false) {
                 control_Name = 'leave';
             }
-
+            console.log(isBtn);
             isBtn = false;
         }
 
@@ -574,8 +562,7 @@
         var nearArcher = false;
         var nearWarrior = false;
         var nearCavalry = false;
-        let control_offset;
-        let control_target;
+
         function cameraZoomin() {
             offset = {
                 Camera_x: camera.position.x,
@@ -686,6 +673,7 @@
                         })
                         .start(); // 立即啟動 tween 動畫
                     dialog.style['display'] = 'flex';
+
                     // camera.position.set(16, 116, 140);//戰士的Camera
                     // controls.target.set(16, 90, 0);//戰士的滑鼠控制中心點
                 }
@@ -728,8 +716,6 @@
             }
         }
 
-        // camera.position.x = offset.Camera_x;
-        //要做甚麼
         const onUpdate = () => {
             // 移動時隨時更新offset
             camera.position.x = offset.Camera_x;
@@ -822,59 +808,6 @@
             console.log(ooxx);
         }
 
-        /*調整控制點大小*/
-
-        let Scale;
-        function control_Scale() {
-            Scale = ((controls.getDistance() - 1) / 100);
-            // console.log(Scale);
-            if (Scale < 3) {
-                Scale = 3;
-            }
-            else if (Scale > 7) {
-                Scale = 7;
-            }
-            control_Archer.scale.set(Scale, Scale, Scale);
-            control_Warrior.scale.set(Scale, Scale, Scale);
-            control_Cavalry.scale.set(Scale, Scale, Scale);
-        }
-
-
-        let isOpacity = false;
-
-        function control_Opacity() {
-            console.log(material_Archer.opacity);
-            // if (material_Archer.opacity == 0) {
-            //     isOpacity = false;
-            // }
-            // else if (material_Archer.opacity == 1) {
-            //     isOpacity = true;
-            // }
-            // if (isOpacity == false) {
-            if (material_Archer.opacity <= 0) {
-                material_Archer.opacity = 0;
-                material_Warrior.opacity = 0;
-                material_Cavalry.opacity = 0;
-            }
-            else {
-                material_Archer.opacity -= 0.01;
-                material_Warrior.opacity -= 0.01;
-                material_Cavalry.opacity -= 0.01;
-            }
-            // }
-
-            // else if (isOpacity == true) {
-
-            //     if (material_Archer.opacity >= 1) {
-            //         material_Archer.opacity = 1;
-            //     }
-            //     else {
-            //         material_Archer.opacity += 0.01;
-            //     }
-            // }
-
-
-        }
         window.addEventListener('resize', onWindowResize);
 
         function onWindowResize() {
@@ -893,9 +826,7 @@
             composer.render(scene, camera);//繪製場景
             cameraZoomin();
             time();
-            control_Scale();
-            control_Opacity();
-            // console.log(controls.getDistance()); 
+
         }
 
         animation();//呼叫動畫函數

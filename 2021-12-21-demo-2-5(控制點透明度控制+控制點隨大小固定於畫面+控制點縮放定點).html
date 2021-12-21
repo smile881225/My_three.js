@@ -429,7 +429,9 @@
             {
                 color: 0xBEBEBE,
                 side: THREE.DoubleSide,
-                transparent:true,
+                transparent: true,
+                depthWrite: false,//Renderer這個材質的時候會不會對深度緩衝區有任何影響
+                // depthTest:false
             }
         );
         let control_Archer = new THREE.Mesh(circle_Archer, material_Archer);
@@ -470,7 +472,8 @@
             {
                 color: 0xBEBEBE,
                 side: THREE.DoubleSide,
-                transparent:true,
+                transparent: true,
+                depthWrite: false,//Renderer這個材質的時候會不會對深度緩衝區有任何影響
             });
         let control_Warrior = new THREE.Mesh(circle_Warrior, material_Warrior);
         control_Warrior.position.set(17, 130, -5);
@@ -486,8 +489,6 @@
             materials.preload();
             var objLoader = new OBJLoader();
             objLoader.setMaterials(materials);
-            material.transparent = true;
-            material.opacity = 0.25;
             var teapot = objLoader.load('./3D_Object/東駿的模型/騎兵.obj', function (object) {
 
                 object.traverse(function (node) {
@@ -517,7 +518,8 @@
             {
                 color: 0xBEBEBE,
                 side: THREE.DoubleSide,
-                transparent:true,
+                transparent: true,
+                depthWrite: false,//Renderer這個材質的時候會不會對深度緩衝區有任何影響
             });
         let control_Cavalry = new THREE.Mesh(circle_Cavalry, material_Cavalry);
 
@@ -549,10 +551,10 @@
             if (intersects.length > 0 && intersects[0].object.geometry.type == "SphereGeometry") {
                 control_Name = intersects[0].object.name;
                 quit.style['display'] = 'block';
-
                 console.log('逮到你瞜');
                 console.log(control_Name);
                 console.log(count);
+                isOpacity = true;
             }
             else if (ooxx < 0.2 && (nearArcher || nearWarrior || nearCavalry) && isBtn == false) {
                 control_Name = 'leave';
@@ -844,24 +846,21 @@
 
         function control_Opacity() {
             console.log(material_Archer.opacity);
-            // if (material_Archer.opacity == 0) {
-            //     isOpacity = false;
-            // }
-            // else if (material_Archer.opacity == 1) {
-            //     isOpacity = true;
-            // }
-            // if (isOpacity == false) {
-            if (material_Archer.opacity <= 0) {
-                material_Archer.opacity = 0;
-                material_Warrior.opacity = 0;
-                material_Cavalry.opacity = 0;
+
+            if (isOpacity == true) {
+                if (material_Archer.opacity <= 0) {
+                    material_Archer.opacity = 0;
+                    material_Warrior.opacity = 0;
+                    material_Cavalry.opacity = 0;
+                    isOpacity = true;
+                }
+                else {
+                    material_Archer.opacity -= 0.01;
+                    material_Warrior.opacity -= 0.01;
+                    material_Cavalry.opacity -= 0.01;
+                }
+                console.log("123");
             }
-            else {
-                material_Archer.opacity -= 0.01;
-                material_Warrior.opacity -= 0.01;
-                material_Cavalry.opacity -= 0.01;
-            }
-            // }
 
             // else if (isOpacity == true) {
 

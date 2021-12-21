@@ -214,7 +214,7 @@
         musicBtn.addEventListener('click', isChange);
 
         function isChange() {
-            isBtn=true;
+            isBtn = true;
             if (sound.isPlaying) {
                 sound.pause();
                 musicBtn.src = "https://renaultespace.littleworkshop.fr/img/hud/sound-off.png";
@@ -288,7 +288,7 @@
         lightBtn = document.querySelector('.light');
         lightBtn.addEventListener('click', islight);
         function islight() {
-            isBtn=true;
+            isBtn = true;
             if (changeLight) {
                 changeLight = false;
                 scene.remove(PointLight);
@@ -505,11 +505,11 @@
                 console.log(control_Name);
                 console.log(count);
             }
-            else if (ooxx < 0.2 && (nearArcher || nearWarrior || nearCavalry) && isBtn==false) {
+            else if (ooxx < 0.2 && (nearArcher || nearWarrior || nearCavalry) && isBtn == false) {
                 control_Name = 'leave';
             }
             console.log(isBtn);
-            isBtn=false;
+            isBtn = false;
         }
 
         window.addEventListener('click', onMouseClick);
@@ -604,6 +604,9 @@
                     // camera.position.set(170, 140, 164);//弓箭手的Camera
                     // controls.target.set(178, 110, 16);//弓箭手的滑鼠控制中心點
                 }
+                // else if (nearArcher == true) {
+                //     control_Name = 'leave';
+                // }
                 dialogText = "弓箭手";
                 dialogContent.innerHTML = `
                 <h1 class="dialog-content">${dialogText}</h1>
@@ -611,8 +614,8 @@
             }
             else if (control_Name == 'control_Warrior') {
                 dialogText = "戰士";
-                if (nearWarrior == false) {//如果鏡頭是遠的
 
+                if (nearWarrior == false) {//如果鏡頭是遠的
                     target = {
                         Camera_x: 16,
                         Camera_y: 116,
@@ -640,10 +643,16 @@
                     // camera.position.set(16, 116, 140);//戰士的Camera
                     // controls.target.set(16, 90, 0);//戰士的滑鼠控制中心點
                 }
+                
+                else if (nearWarrior == true) {
+                    control_Name = 'leave';
+                }
+
                 dialogContent.innerHTML = `
                 <h1 class="dialog-content">${dialogText}</h1>
                 `
             }
+
             if (control_Name == 'control_Cavalry') {
                 dialogText = "騎兵";
                 if (nearCavalry == false) {//如果鏡頭不是近的
@@ -673,6 +682,11 @@
                     // camera.position.set(-130, 164, 130);//騎兵的Camera
                     // controls.target.set(-156, 110, -58);//騎兵的滑鼠控制中心點
                 }
+
+                else if (nearCavalry == true) {
+                    control_Name = 'leave';
+                }
+
                 dialogContent.innerHTML = `
                 <h1 class="dialog-content">${dialogText}</h1>
                 `
