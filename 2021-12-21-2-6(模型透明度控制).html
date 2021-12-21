@@ -402,7 +402,7 @@
             // mtlLoader.setMaterialOptions({
             //     invertTrProperty:true
             // })
-            var teapot = objLoader.load('./3D_Object/東駿的模型/弓箭手.obj', function (object) {
+            objLoader.load('./3D_Object/東駿的模型/弓箭手.obj', function (object) {
 
                 object.traverse(function (node) {
                     if (node instanceof THREE.Mesh) {
@@ -434,6 +434,7 @@
                 // depthTest:false
             }
         );
+
         let control_Archer = new THREE.Mesh(circle_Archer, material_Archer);
         control_Archer.position.set(172, 130, 1.2);
         control_Archer.name = 'control_Archer';
@@ -448,7 +449,7 @@
             var objLoader = new OBJLoader();
             objLoader.setMaterials(materials);
 
-            var teapot = objLoader.load('./3D_Object/東駿的模型/戰士.obj', function (object) {
+            objLoader.load('./3D_Object/東駿的模型/戰士.obj', function (object) {
                 object.traverse(function (node) {
                     if (node instanceof THREE.Mesh) {
                         node.castShadow = true; //default is false
@@ -488,7 +489,7 @@
             materials.preload();
             var objLoader = new OBJLoader();
             objLoader.setMaterials(materials);
-            var teapot = objLoader.load('./3D_Object/東駿的模型/騎兵.obj', function (object) {
+            objLoader.load('./3D_Object/東駿的模型/騎兵.obj', function (object) {
 
                 object.traverse(function (node) {
                     if (node instanceof THREE.Mesh) {
@@ -502,10 +503,14 @@
                 // object.position.y = 110;
                 scene.add(object);
                 object.name = 'Cavalry';
-
+                console.log(scene.children[9]);
 
                 // scene.getObjectByName("Cavalry").material.transparent = true;
                 // scene.getObjectByName("Cavalry").material.opacity = (1 - val/100.0);
+
+
+                onWindowResize();
+
             });
         });
 
@@ -554,15 +559,15 @@
                 console.log(control_Name);
                 console.log(count);
 
-                isOpacity = true;
-
+                isOpacity = "clickIn";
+                console.log(control_Name);
 
 
             }
             else if (ooxx < 0.2 && (nearArcher || nearWarrior || nearCavalry) && isBtn == false) {
                 control_Name = 'leave';
 
-                isOpacity = false;
+                isOpacity = "clickOut";
                 //設定3個材質都不會對深度緩衝區有任何影響
                 material_Archer.depthTest = true;
                 material_Warrior.depthTest = true;
@@ -585,8 +590,7 @@
         var nearArcher = false;
         var nearWarrior = false;
         var nearCavalry = false;
-        let control_offset;
-        let control_target;
+
         function cameraZoomin() {
             offset = {
                 Camera_x: camera.position.x,
@@ -656,12 +660,12 @@
                         })
                         .start(); // 立即啟動 tween 動畫
                     dialog.style['display'] = 'flex';
-                    console.log(camera.position.x);
-                    console.log(camera.position.y);
-                    console.log(camera.position.z);
-                    console.log(controls.target.x);
-                    console.log(controls.target.y);
-                    console.log(controls.target.z);
+                    // console.log(camera.position.x);
+                    // console.log(camera.position.y);
+                    // console.log(camera.position.z);
+                    // console.log(controls.target.x);
+                    // console.log(controls.target.y);
+                    // console.log(controls.target.z);
                     // camera.position.set(170, 140, 164);//弓箭手的Camera
                     // controls.target.set(178, 110, 16);//弓箭手的滑鼠控制中心點
                 }
@@ -671,9 +675,8 @@
                 `
             }
             else if (control_Name == 'control_Warrior') {
-                dialogText = "戰士";
-                if (nearWarrior == false) {//如果鏡頭是遠的
 
+                if (nearWarrior == false) {//如果鏡頭是遠的
                     target = {
                         Camera_x: 16,
                         Camera_y: 116,
@@ -700,12 +703,12 @@
                     // camera.position.set(16, 116, 140);//戰士的Camera
                     // controls.target.set(16, 90, 0);//戰士的滑鼠控制中心點
                 }
+                dialogText = "戰士";
                 dialogContent.innerHTML = `
                 <h1 class="dialog-content">${dialogText}</h1>
                 `
             }
             if (control_Name == 'control_Cavalry') {
-                dialogText = "騎兵";
                 if (nearCavalry == false) {//如果鏡頭不是近的
                     target = {
                         Camera_x: -130,
@@ -733,6 +736,7 @@
                     // camera.position.set(-130, 164, 130);//騎兵的Camera
                     // controls.target.set(-156, 110, -58);//騎兵的滑鼠控制中心點
                 }
+                dialogText = "騎兵";
                 dialogContent.innerHTML = `
                 <h1 class="dialog-content">${dialogText}</h1>
                 `
@@ -824,13 +828,13 @@
         let ooxx;
         function down() {
             count = 0;
-            console.log('egeg');
+            // console.log('egeg');
         }
 
         function up() {
             ooxx = count;
             count = 0;
-            console.log(ooxx);
+            // console.log(ooxx);
         }
 
         /*調整控制點大小*/
@@ -851,26 +855,69 @@
         }
 
 
-        let isOpacity = false;
+        let isOpacity = "";
+        let Archer_Material;
+        let Warrior_Material;
+        let Cavalry_Material;
+
 
         function control_Opacity() {
-            console.log(material_Archer.opacity);
 
-            if (isOpacity == true) {
+            // console.log(material_Archer.opacity);
+            if (isOpacity == "clickIn") {
+
                 if (material_Archer.opacity <= 0) {
 
-                    //透明度維持0
+                    //模型透明度維持0
+                    if (control_Name = "control_Archer") {
+                        Warrior_Material.opacity = 0;
+                        Cavalry_Material.opacity = 0;
+                        Warrior_Material.visible = false;
+                        Cavalry_Material.visible = false;
+                    }
+                    else if (control_Name = "control_Warrior") {
+                        Archer_Material.opacity = 0;
+                        Cavalry_Material.opacity = 0;
+                        Archer_Material.visible = false;
+                        Cavalry_Material.visible = false;
+                    }
+                    else if (control_Name = "control_Cavalry") {
+                        Archer_Material.opacity = 0;
+                        Warrior_Material.opacity = 0;
+                        Archer_Material.visible = false;
+                        Warrior_Material.visible = false;
+                    }
+
+                    //控制點透明度維持0
+
                     material_Archer.opacity = 0;
                     material_Warrior.opacity = 0;
                     material_Cavalry.opacity = 0;
 
-                    //不顯示
+                    //模型不顯示
+
                     material_Archer.visible = false;
                     material_Warrior.visible = false;
                     material_Cavalry.visible = false;
-                    isOpacity = true;
+
+                    isOpacity = "";
+
                 }
-                else {//漸淡
+                else {
+                    if (control_Name = "control_Archer") {
+                        Warrior_Material.opacity -= 0.05;
+                        Cavalry_Material.opacity -= 0.05;
+                    }
+                    else if (control_Name = "control_Warrior") {
+                        Archer_Material.opacity -= 0.05;
+                        Cavalry_Material.opacity -= 0.05;
+                    }
+                    else if (control_Name = "control_Cavalry") {
+                        Archer_Material.opacity -= 0.05;
+                        Warrior_Material.opacity -= 0.05;
+                    }
+
+                    //控制點漸淡
                     material_Archer.opacity -= 0.05;
                     material_Warrior.opacity -= 0.05;
                     material_Cavalry.opacity -= 0.05;
@@ -878,7 +925,7 @@
 
             }
 
-            else if (isOpacity == false) {
+            else if (isOpacity == "clickOut") {
                 //不顯示
                 material_Archer.visible = true;
                 material_Warrior.visible = true;
@@ -903,17 +950,22 @@
             }
 
         }
-        window.addEventListener('resize', onWindowResize);
 
+        window.addEventListener('resize', onWindowResize);
         function onWindowResize() {
 
             camera.aspect = window.innerWidth / window.innerHeight;
             camera.updateProjectionMatrix();
-
             renderer.setSize(window.innerWidth, window.innerHeight);
+            
+           
 
+            
         }
         function animation() {
+            Archer_Material = scene.getObjectByName('Archer').children[0].material;
+            Warrior_Material = scene.getObjectByName('Warrior').children[0].material;
+            Cavalry_Material = scene.getObjectByName('Cavalry').children[0].material;
             // stats.update();
             TWEEN.update();
             controls.update();
@@ -925,8 +977,7 @@
             control_Opacity();
             // console.log(controls.getDistance()); 
         }
-
-        animation();//呼叫動畫函數
+        animation();//呼叫動畫函數，為了要抓到Load物件裡面東西
     </script>
 
 

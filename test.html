@@ -6,10 +6,6 @@
     <title>create my modle</title>
 
     <style>
-        * {
-            box-sizing: border-box;
-        }
-
         html {
             overflow: hidden;
         }
@@ -23,882 +19,148 @@
             width: 100%;
             height: 100%;
         }
-
-        .container {
-            width: 100%;
-            height: 100%;
-            /* background-color: white; */
-            position: relative;
-        }
-
-        .music {
-            position: fixed;
-            height: 43px;
-            width: 43px;
-            bottom: 1.75%;
-            left: 1.13%;
-            /* background-color: aquamarine; */
-            cursor: pointer;
-        }
-
-        .right {
-            position: fixed;
-            height: 163px;
-            width: 96px;
-            bottom: 1.75%;
-            right: 1.3%;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-        }
-
-        .light {
-            height: 43px;
-            width: 43px;
-            cursor: pointer;
-            margin: 0 auto;
-        }
-
-        .start {
-            height: 96px;
-            width: 96px;
-            cursor: pointer;
-        }
-
-        .dialog {
-            position: fixed;
-            height: 200px;
-            /* width: 41.66%; */
-            width: 800px;
-            opacity: 0.5;
-            background-color: aliceblue;
-            border-radius: 10px;
-            left: calc(50% - 400px);
-            /* margin-left :10px; */
-            display: none;
-            bottom: 30px;
-            justify-content: center;
-            align-items: center;
-            animation-name: up;
-            animation-duration: 1s;
-        }
-
-        @keyframes up {
-            0% {
-                bottom: -400px;
-                opacity: 0;
-            }
-
-            100% {
-                bottom: 30px;
-                opacity: 0.5;
-            }
-        }
-
-        /* 
-        @keyframes down {
-            0% {
-                bottom: 30px;
-                opacity: 0.5;
-            }
-
-            100% {
-
-                bottom: -400px;
-                opacity: 0;
-            }
-        } */
-
-        .quit {
-            position: fixed;
-            width: 85px;
-            height: 85px;
-            margin-left: 1.56%;
-            margin-top: 30.79px;
-            display: none;
-            animation-name: quit-show;
-            animation-duration: 1s;
-            display: none;
-            cursor: pointer;
-        }
-
-        @keyframes quit-show {
-            0% {
-                opacity: 0;
-            }
-
-            100% {
-                opacity: 1;
-            }
-        }
-
-        /* 
-        @keyframes quit-unshow {
-            0% {
-                opacity: 1;
-            }
-
-            100% {
-                opacity: 0;
-            }
-        } */
     </style>
 </head>
 
 <body>
 
-    <div class="container">
-        <img class="quit" src="https://renaultespace.littleworkshop.fr/img/config/quit-interior.png" alt="">
-        <img class="music" src="https://renaultespace.littleworkshop.fr/img/hud/sound-on.png" alt="">
-        <div class="dialog">
-            <h1 class="dialog-content"></h1>
-        </div>
-        <div class="right">
-            <img class="light" src="https://renaultespace.littleworkshop.fr/img/hud/light.png" alt="">
-            <img class="start" src="https://renaultespace.littleworkshop.fr/img/hud/start-stop.png" alt="">
-        </div>
-
-
-    </div>
 
     <script src="./js/three.js"></script>
+    <!-- <script type="module" src="./Loader/OBJLoader.js"></script>
+    <script type="module" src="./Loader/MTLLoader.js"></script> -->
     <script type="module">
-
-        /*------------Java Script--------------*/
-
+        //導入外掛
         import * as THREE from './js/three.module.js';
         import { OBJLoader } from './Loader/OBJLoader.js';
         import { MTLLoader } from './Loader/MTLLoader.js'
         import { OrbitControls } from './js/OrbitControls.js';
         import { GUI } from './js/lil-gui.module.min.js';
         import { TWEEN } from './js/tween.module.min.js';
-        // import Stats from './js/stats.module.js';
-        import { EffectComposer } from './postprocessing/EffectComposer/EffectComposer.js';
-        import { RenderPass } from './postprocessing/SAO/RenderPass.js';
-        import { SAOPass } from './postprocessing/SAO/SAOPass.js';
+        import Stats from './js/stats.module.js';
+        //初始化
 
-        /*--------創造初始元素--------*/
-        var mtlLoader;
-        var PointLight, AmbientLight, SpotLight, helper;//light
-        var controls;
         var scene = new THREE.Scene();
         var camera = new THREE.PerspectiveCamera(80, window.innerWidth / window.innerHeight, 0.1, 10000);
         var renderer = new THREE.WebGLRenderer();
-        var isBtn;
         renderer.setSize(window.innerWidth, window.innerHeight);
         document.body.appendChild(renderer.domElement);
 
-        /*--------載入音樂--------*/
-
-        var sound, listener, audioLoader;
-
-        listener = new THREE.AudioListener();
-        camera.add(listener);
-
-        // 增加一個global端的audio source
-        sound = new THREE.Audio(listener);
-
-        // load a sound and set it as the Audio object's buffer
-        audioLoader = new THREE.AudioLoader();
-        audioLoader.load('./audio/Play-1.mp3', function (buffer) {
-            sound.setBuffer(buffer);
-            sound.setLoop(true);
-            sound.setVolume(0.5);
-            sound.play();
-        });
-
-        /*--------音樂控制--------*/
-        var musicBtn;
-
-        musicBtn = document.querySelector('.music');
-        musicBtn.addEventListener('click', isChange);
-
-        function isChange() {
-            isBtn = true;
-            if (sound.isPlaying) {
-                sound.pause();
-                musicBtn.src = "https://renaultespace.littleworkshop.fr/img/hud/sound-off.png";
-            }
-            else {
-                sound.play();
-                musicBtn.src = "https://renaultespace.littleworkshop.fr/img/hud/sound-on.png";
-            }
-        }
-
-
-
-        /*-------調整camera位置---------*/
-
-        camera.position.set(0, 320, 434);//初始的Camera位置
-        // camera.lookAt(0, 0, 0);
-
-        // camera.position.set(170, 140, 164);//弓箭手的Camera
-        // camera.position.set(16, 116, 140);//戰士的Camera
-        // camera.position.set(-156, 164, 130);//騎兵的Camera
-
-        /*-------滑鼠控制---------*/
-
-        controls = new OrbitControls(camera, renderer.domElement);
-        controls.target.set(16, 90, 0);//初始的滑鼠控制中心點
-
-        // controls.target.set(178, 110, 16);//弓箭手的滑鼠控制中心點
-        // controls.target.set(16, 90, 0);//戰士的滑鼠控制中心點
-        // controls.target.set(-156, 110, -58);//騎兵的滑鼠控制中心點
-
-        controls.enablePan = false;
-        controls.maxPolarAngle = Math.PI / 2;
-        controls.enableDamping = true;
-        controls.autoRotate = true;//自動旋轉
-        controls.autoRotateSpeed = 2;//控制旋轉速度
-        controls.minDistance = 100;//controls縮放最小距離
-        controls.maxDistance = 1000;//controls縮放最大距離
-
-        /*--------載入燈光--------*/
-        var lightBtn, changeLight;
-        renderer.shadowMap.enabled = true;//把Renderer的陰影選項打開
-        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-        PointLight = new THREE.PointLight(0xffffff, 0.7);
-        PointLight.castShadow = true;
-        PointLight.shadow.mapSize.width = 2048;
-        PointLight.shadow.mapSize.height = 2048;
-        PointLight.shadow.camera.near = 0.5;
-        PointLight.shadow.camera.far = 5000;
-        PointLight.position.set(-500, 800, 0);
-        scene.add(PointLight);
-
-        //燈光
-        const light1 = new THREE.PointLight(0xddffdd, 0.3);
-        light1.position.z = 0;
-        light1.position.y = 300;
-        light1.position.x = 200;
-        scene.add(light1);
-
-        const light2 = new THREE.PointLight(0xddffdd, 0.3);
-        light2.position.z = -200;
-        light2.position.y = 300;
-        light2.position.x = 0;
-        scene.add(light2);
-
-        AmbientLight = new THREE.AmbientLight(0xffffff, 0.05);
-        scene.add(AmbientLight);
-
-        /*--------燈光切換控制--------*/
-
-        changeLight = true;
-        lightBtn = document.querySelector('.light');
-        lightBtn.addEventListener('click', islight);
-        function islight() {
-            isBtn = true;
-            if (changeLight) {
-                changeLight = false;
-                scene.remove(PointLight);
-                switchSpotLight();
-            }
-            else {
-                changeLight = true;
-                scene.remove(SpotLight);
-                switchPointLight();
-            }
-            console.log(scene);
-        }
-
-        //燈光切換至AmbientLight
-
-        function switchAmbientLight() {
-            console.log('switchAmbientLight');
-            AmbientLight = new THREE.AmbientLight(0xffffff, 0.05);
-            scene.add(AmbientLight);
-        }
-
-        //切換燈光至PointLight
-
-        function switchPointLight() {
-            console.log('switchPointLighta');
-            renderer.shadowMap.enabled = true;
-            renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-            PointLight = new THREE.PointLight(0xffffff, 0.6);
-            PointLight.castShadow = true;
-            PointLight.shadow.mapSize.width = 512;
-            PointLight.shadow.mapSize.height = 512;
-            PointLight.shadow.camera.near = 0.5;
-            PointLight.shadow.camera.far = 5000;
-            PointLight.position.set(-500, 800, 0);
-            scene.add(PointLight);
-            // helper = new THREE.CameraHelper(PointLight.shadow.camera);
-            // scene.add(helper);
-        }
-
-        //切換燈光至SpotLight
-
-        function switchSpotLight() {
-            console.log('switchSpotLight');
-            renderer.shadowMap.enabled = true;
-            renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-            SpotLight = new THREE.SpotLight(0xffffff, 1);
-            SpotLight.shadow.mapSize.width = 2048;
-            SpotLight.shadow.mapSize.height = 2048;
-            SpotLight.castShadow = true;
-            SpotLight.shadow.camera.near = 0.5;
-            SpotLight.shadow.camera.far = 5000;
-            SpotLight.shadow.focus = 1;
-            SpotLight.position.set(300, 400, 200);
-            scene.add(SpotLight);
-            // helper = new THREE.CameraHelper(SpotLight.shadow.camera);
-            // scene.add(helper);
-        }
-
-        /*--------加入Palne--------*/
+        //Palne
 
         const texture = new THREE.TextureLoader().load("./img/carpet-2.jpg");
         const planeGeometry = new THREE.PlaneGeometry(2000, 2000, 32, 32);
-        const planeMaterial = new THREE.MeshStandardMaterial(
-            {
-                map: texture,
-                transparent: true,
-            }
-        )
-
+        const planeMaterial = new THREE.MeshStandardMaterial({ map: texture })
         const plane = new THREE.Mesh(planeGeometry, planeMaterial);
-
         plane.receiveShadow = true;
         plane.rotateX(-1.57);//旋轉平面 會寫負的是因為Plane的背面預設是不會顯示的，所以要翻對邊
-        plane.position.set(0, 0, 0);
         scene.add(plane);
 
-        /*--------加入圓錐--------*/
+        //模型
 
-        const geometry = new THREE.ConeGeometry(10, 30, 32);
-        const material = new THREE.MeshBasicMaterial(
-            {
-                color: 0xD7FFEE,
-                side: THREE.DoubleSide,
-                transparent: true,
-            }
-        );
-        // 也可以寫成
-        // material.transparent=true;
-        // material.opacity=0.25;
-        const Cone = new THREE.Mesh(geometry, material);
-        Cone.position.set(0, 0, 0);
-        scene.add(Cone);
+        var mtlLoader = new MTLLoader();
 
-        /*--------開始載我的模型--------*/
+        /*--------創造正方形--------*/
+        const box = new THREE.TextureLoader().load("./img/box.jpg");
+        const geometry = new THREE.BoxGeometry(100, 100, 100);//創造一個預設的正方體
+        const material = new THREE.MeshBasicMaterial({ map: box });//上材質
+        const cube = new THREE.Mesh(geometry, material);//Mesh是一個object，裡面可以放(一個幾何體,一個材質)
+        cube.position.set(0, 50, 0);
+        scene.add(cube);
 
-        // var mtlLoader = new THREE.MTLLoader();
-        mtlLoader = new MTLLoader();
+        //camera設定
 
-        // mtlLoader.setBaseUrl('./3D_Object/');
-        // mtlLoader.setPath('./3D_Object/');
+        camera.position.set(0, 300, 400);
+        camera.lookAt(0, 0, 0);
 
-        //記住！！！！！OBJ、MTL、PNG貼圖來源檔一定要放在同個資料夾才可以
-
-        // var url = "/3D_Object/test1.mtl";
-
-        var Archer_mtl = "./3D_Object/東駿的模型/弓箭手.mtl";
-        mtlLoader.load(Archer_mtl, function (materials) {
-            materials.preload();
-            var objLoader = new OBJLoader();
-            objLoader.setMaterials(materials);
-            // mtlLoader.setMaterialOptions({
-            //     invertTrProperty:true
-            // })
-            var teapot = objLoader.load('./3D_Object/東駿的模型/弓箭手.obj', function (object) {
-
-                object.traverse(function (node) {
-                    if (node instanceof THREE.Mesh) {
-                        node.castShadow = true; //default is false
-                        // node.receiveShadow = false; //default
-                        node.receiveShadow = true; //default
-                    }
-                })
-                object.position.set(350, 65, 150);
-                // object.position.x = 100;
-                // object.position.y = 65;
-
-                scene.add(object);
-                object.name = 'Archer';
-            });
-
-        });
-
-
-        //加入弓箭手的控制點/
-
-        let circle_Archer = new THREE.SphereGeometry(1.5, 26, 10);
-        let material_Archer = new THREE.MeshBasicMaterial(
-            {
-                color: 0xBEBEBE,
-                side: THREE.DoubleSide,
-                transparent:true,
-            }
-        );
-        let control_Archer = new THREE.Mesh(circle_Archer, material_Archer);
-        control_Archer.position.set(172, 130, 1.2);
-        control_Archer.name = 'control_Archer';
-
-        scene.add(control_Archer);
-
-        //加入戰士的模型
-
-        var Warrior_mtl = "./3D_Object/東駿的模型/戰士.mtl";
-        mtlLoader.load(Warrior_mtl, function (materials) {
-            materials.preload();
-            var objLoader = new OBJLoader();
-            objLoader.setMaterials(materials);
-
-            var teapot = objLoader.load('./3D_Object/東駿的模型/戰士.obj', function (object) {
-                object.traverse(function (node) {
-                    if (node instanceof THREE.Mesh) {
-                        node.castShadow = true; //default is false
-                        // node.receiveShadow = false; //default
-                        node.receiveShadow = true; //default
-                    }
-                })
-
-                object.position.set(300, 65, 150);
-                scene.add(object);
-                object.name = 'Warrior';
-            });
-
-        });
-        console.log(scene);
-
-        //加入戰士的控制點
-
-        let circle_Warrior = new THREE.SphereGeometry(1.5, 26, 10);
-        let material_Warrior = new THREE.MeshBasicMaterial(
-            {
-                color: 0xBEBEBE,
-                side: THREE.DoubleSide,
-                transparent:true,
-            });
-        let control_Warrior = new THREE.Mesh(circle_Warrior, material_Warrior);
-        control_Warrior.position.set(17, 130, -5);
-        control_Warrior.name = 'control_Warrior';
-        scene.add(control_Warrior);
-
-        material_Warrior.transparent = true;//接受不透明度設成True
-
-        //加入騎兵的模型
-
-        var Cavalry_mtl = "./3D_Object/東駿的模型/騎兵.mtl";
-        mtlLoader.load(Cavalry_mtl, function (materials) {
-            materials.preload();
-            var objLoader = new OBJLoader();
-            objLoader.setMaterials(materials);
-            material.transparent = true;
-            material.opacity = 0.25;
-            var teapot = objLoader.load('./3D_Object/東駿的模型/騎兵.obj', function (object) {
-
-                object.traverse(function (node) {
-                    if (node instanceof THREE.Mesh) {
-                        node.castShadow = true; //default is false
-                        // node.receiveShadow = false; //default
-                        node.receiveShadow = true; //default
-                    }
-                })
-                object.position.set(250, 110, 150);
-                // object.position.x = -100;
-                // object.position.y = 110;
-                scene.add(object);
-                object.name = 'Cavalry';
-
-
-                // scene.getObjectByName("Cavalry").material.transparent = true;
-                // scene.getObjectByName("Cavalry").material.opacity = (1 - val/100.0);
-            });
-        });
-
-
-        /*--------加入騎兵的控制點--------*/
-
-        let circle_Cavalry = new THREE.SphereGeometry(1.5, 26, 10);
-        let material_Cavalry = new THREE.MeshBasicMaterial(
-            {
-                color: 0xBEBEBE,
-                side: THREE.DoubleSide,
-                transparent:true,
-            });
-        let control_Cavalry = new THREE.Mesh(circle_Cavalry, material_Cavalry);
-
-        control_Cavalry.name = 'control_Cavalry';
-        control_Cavalry.position.set(-132, 185, -30);
-        scene.add(control_Cavalry);
-
-        /*--------控制點互動--------*/
-
-        var raycaster = new THREE.Raycaster();//設定2D的射線(不懂請看觀念->滑鼠互動->58 Three.js.....)
-        var mouse = new THREE.Vector2();
-        var control_Name;
-        var intersects;
-        let dialog = document.querySelector('.dialog');
-        let dialogContent = document.querySelector('.dialog-content');
-        let dialogText;
-        let quit = document.querySelector('.quit');
-
-        function onMouseClick(event) {
-            //通過滑鼠點選的位置計算出raycaster所需要的點的位置，以螢幕中心為原點，值的範圍為-1到1.
-
-            mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-            mouse.y = - (event.clientY / window.innerHeight) * 2 + 1;
-            // 通過滑鼠點的位置和當前相機的矩陣計算出raycaster
-            raycaster.setFromCamera(mouse, camera);
-
-            intersects = raycaster.intersectObjects(scene.children);
-            console.log(control_Name != 'changePlaymusic');
-            if (intersects.length > 0 && intersects[0].object.geometry.type == "SphereGeometry") {
-                control_Name = intersects[0].object.name;
-                quit.style['display'] = 'block';
-
-                console.log('逮到你瞜');
-                console.log(control_Name);
-                console.log(count);
-            }
-            else if (ooxx < 0.2 && (nearArcher || nearWarrior || nearCavalry) && isBtn == false) {
-                control_Name = 'leave';
-            }
-
-            isBtn = false;
-        }
-
-        window.addEventListener('click', onMouseClick);
-
-        /*-------更改場景的背景顏色---------*/
+        //sence 背景顏色
 
         scene.background = new THREE.Color(0xffffff);
 
-        //動畫播放
-        var tween;//補間動畫名稱
-        let offset;//原點
-        let target;//終點
-        var nearArcher = false;
-        var nearWarrior = false;
-        var nearCavalry = false;
-        let control_offset;
-        let control_target;
-        function cameraZoomin() {
-            offset = {
-                Camera_x: camera.position.x,
-                Camera_y: camera.position.y,
-                Camera_z: camera.position.z,
-                controls_x: controls.target.x,
-                controls_y: controls.target.y,
-                controls_z: controls.target.z,
-            }//起點
+        /*--------添加燈光--------*/
 
-            if (control_Name == 'leave') {//如果鏡頭是近的
-                target = {
-                    Camera_x: 0,
-                    Camera_y: 320,
-                    Camera_z: 434,
-                    controls_x: 16,
-                    controls_y: 90,
-                    controls_z: 0,
-                }//終點
-                var tween = new TWEEN.Tween(offset) // 建立新的 Tween 物件來改變 position
-                    .to(target, 1000) // 在 1000ms 內移動至target
-                    .easing(TWEEN.Easing.Quadratic.Out) // 補間動畫效果曲線
-                    .onUpdate(onUpdate)//要做甚麼
-                    .onComplete(() => {//動畫結束之後要做甚麼
-                        tween.stop();
-                        control_Name = '';
-                        nearArcher = false;
-                        nearWarrior = false;
-                        nearCavalry = false;
-                        console.log('拉遠');
-                    })
-                    .start(); // 立即啟動 tween 動畫
-                quit.style['display'] = 'none';
-                dialog.style['display'] = 'none';
-                // console.log(control_Name)
-                // console.log(camera.position.x);
-                // console.log(camera.position.y);
-                // console.log(camera.position.z);
-                // console.log(controls.target.x);
-                // console.log(controls.target.y);
-                // console.log(controls.target.z);
-                // camera.position.set(0, 320, 434);//初始的Camera位置
-                // controls.target.set(16, 90, 0);//初始的滑鼠控制中心點
-            }
+        var light = new THREE.HemisphereLight(0xffffff, 0x000000, 1);
+        scene.add(light);
 
-            else if (control_Name == 'control_Archer') {
-                if (nearArcher == false) {//如果鏡頭是遠的
-                    target = {
-                        Camera_x: 170,
-                        Camera_y: 140,
-                        Camera_z: 164,
-                        controls_x: 178,
-                        controls_y: 110,
-                        controls_z: 16,
-                    }//終點
-                    tween = new TWEEN.Tween(offset) // 建立新的 Tween 物件來改變 position
-                        .to(target, 1000) // 在 1000ms 內移動至target
-                        .easing(TWEEN.Easing.Quadratic.Out) // 補間動畫效果曲線
-                        .onUpdate(onUpdate)//要做甚麼
-                        .onComplete(() => {//動畫結束之後要做甚麼
-                            tween.stop();
-                            control_Name = '';
-                            nearArcher = true;
-                            nearWarrior = false;
-                            nearCavalry = false;
-                            console.log('拉近');
-                        })
-                        .start(); // 立即啟動 tween 動畫
-                    dialog.style['display'] = 'flex';
-                    console.log(camera.position.x);
-                    console.log(camera.position.y);
-                    console.log(camera.position.z);
-                    console.log(controls.target.x);
-                    console.log(controls.target.y);
-                    console.log(controls.target.z);
-                    // camera.position.set(170, 140, 164);//弓箭手的Camera
-                    // controls.target.set(178, 110, 16);//弓箭手的滑鼠控制中心點
-                }
-                dialogText = "弓箭手";
-                dialogContent.innerHTML = `
-                <h1 class="dialog-content">${dialogText}</h1>
-                `
-            }
-            else if (control_Name == 'control_Warrior') {
-                dialogText = "戰士";
-                if (nearWarrior == false) {//如果鏡頭是遠的
+        //滑鼠控制camera
 
-                    target = {
-                        Camera_x: 16,
-                        Camera_y: 116,
-                        Camera_z: 140,
-                        controls_x: 16,
-                        controls_y: 90,
-                        controls_z: 0,
-                    }//終點
+        var controls = new OrbitControls(camera, renderer.domElement);
+        controls.target.set(-70, 5, -20);
+        controls.enablePan = false;
+        controls.maxPolarAngle = Math.PI / 2;
+        controls.enableDamping = true;
+        // controls.autoRotate = true;//自動旋轉
+        // controls.autoRotaeSpeed = 5;//控制旋轉速度
+        // controls.minDistance = 100;//controls縮放最小距離
+        // controls.maxDistance = 400;//controls縮放最大距離
 
-                    tween = new TWEEN.Tween(offset) // 建立新的 Tween 物件來改變 position
-                        .to(target, 1000) // 在 1000ms 內移動至target
-                        .easing(TWEEN.Easing.Quadratic.Out) // 補間動畫效果曲線
-                        .onUpdate(onUpdate)//要做甚麼
-                        .onComplete(() => {//動畫結束之後要做甚麼
-                            tween.stop();
-                            control_Name = '';
-                            nearArcher = false;
-                            nearWarrior = true;
-                            nearCavalry = false;
-                            console.log('拉近');
-                        })
-                        .start(); // 立即啟動 tween 動畫
-                    dialog.style['display'] = 'flex';
-                    // camera.position.set(16, 116, 140);//戰士的Camera
-                    // controls.target.set(16, 90, 0);//戰士的滑鼠控制中心點
-                }
-                dialogContent.innerHTML = `
-                <h1 class="dialog-content">${dialogText}</h1>
-                `
-            }
-            if (control_Name == 'control_Cavalry') {
-                dialogText = "騎兵";
-                if (nearCavalry == false) {//如果鏡頭不是近的
-                    target = {
-                        Camera_x: -130,
-                        Camera_y: 164,
-                        Camera_z: 130,
-                        controls_x: -156,
-                        controls_y: 110,
-                        controls_z: -58,
-                    }//終點
 
-                    tween = new TWEEN.Tween(offset) // 建立新的 Tween 物件來改變 position
-                        .to(target, 1000) // 在 1000ms 內移動至target
-                        .easing(TWEEN.Easing.Quadratic.Out) // 補間動畫效果曲線
-                        .onUpdate(onUpdate)//要做甚麼
-                        .onComplete(() => {//動畫結束之後要做甚麼
-                            tween.stop();
-                            control_Name = '';
-                            nearArcher = false;
-                            nearWarrior = false;
-                            nearCavalry = true;
-                            console.log('拉近');
-                        })
-                        .start(); // 立即啟動 tween 動畫
-                    dialog.style['display'] = 'flex';
-                    // camera.position.set(-130, 164, 130);//騎兵的Camera
-                    // controls.target.set(-156, 110, -58);//騎兵的滑鼠控制中心點
-                }
-                dialogContent.innerHTML = `
-                <h1 class="dialog-content">${dialogText}</h1>
-                `
-            }
-        }
+        //Stats
 
-        // camera.position.x = offset.Camera_x;
-        //要做甚麼
-        const onUpdate = () => {
-            // 移動時隨時更新offset
-            camera.position.x = offset.Camera_x;
-            camera.position.y = offset.Camera_y;
-            camera.position.z = offset.Camera_z;
-            controls.target.x = offset.controls_x;
-            controls.target.y = offset.controls_y;
-            controls.target.z = offset.controls_z;
-        }
-
-        /*--------Stats--------*/
-
-        // const stats = Stats();
-        // stats.showPanel(0);
-        // document.body.appendChild(stats.dom);
-
-        //SAO
-        var composer, renderPass, saoPass;//SAO
-        composer = new EffectComposer(renderer);
-        renderPass = new RenderPass(scene, camera);
-        composer.addPass(renderPass);
-        saoPass = new SAOPass(scene, camera, false, true);
-        composer.addPass(saoPass);
-
-        saoPass.params.output = 0;
-        saoPass.params.saoBias = -0.204;
-        saoPass.params.saoIntensity = 0.004;
-        saoPass.params.saoScale = 6.31;
-        saoPass.params.saoKernelRadius = 2;
-        saoPass.params.saoMinResolution = 0.0001;
-        saoPass.params.saoBlur = true;
-        saoPass.params.saoBlurRadius = 8;
-        saoPass.params.saoBlurStdDev = 4;
-        saoPass.params.saoBlurDepthCutoff = 0.01;
-
-        /*--------時間計算--------*/
-
-        var clock = new THREE.Clock();
-        let count = 0;
-
-        function time() {
-            count += clock.getDelta();
-            // console.log(count);
-            // if (count > 1) {
-            // console.log('hihi');
-            //     count = 0;
-            // }
-        }
+        const stats = Stats();
+        stats.showPanel(0);
+        document.body.appendChild(stats.dom);
 
         //GUI
 
         let gui = new GUI();
 
-        gui.add(saoPass.params, 'output', {
-            'Beauty+SAO': SAOPass.OUTPUT.Default,
-            'Beauty': SAOPass.OUTPUT.Beauty,
-            'SAO': SAOPass.OUTPUT.SAO,
-            'Depth': SAOPass.OUTPUT.Depth,
-            'Normal': SAOPass.OUTPUT.Normal
-        }).onChange(function (value) {
-            saoPass.params.output = parseInt(value);
-            // if(value==3){
-            //     saoPass.params.output = parseInt(4);
-            // }
-        });
+        let datGUIControls = new (function () {
+            this.startTracking = false
+        })()
 
-        gui.add(saoPass.params, 'saoBias', - 1, 1);
-        gui.add(saoPass.params, 'saoIntensity', 0, 1);
-        gui.add(saoPass.params, 'saoScale', 0, 10);
-        gui.add(saoPass.params, 'saoKernelRadius', 1, 100);
-        gui.add(saoPass.params, 'saoMinResolution', 0, 1);
-        gui.add(saoPass.params, 'saoBlur');
-        gui.add(saoPass.params, 'saoBlurRadius', 0, 200);
-        gui.add(saoPass.params, 'saoBlurStdDev', 0.5, 150);
-        gui.add(saoPass.params, 'saoBlurDepthCutoff', 0.0, 0.1);
+        //動畫播放
 
-        var body = document.querySelector("body");
-
-        body.addEventListener('mousedown', down);
-        body.addEventListener('mouseup', up)
-        let ooxx;
-        function down() {
-            count = 0;
-            console.log('egeg');
-        }
-
-        function up() {
-            ooxx = count;
-            count = 0;
-            console.log(ooxx);
-        }
-
-        /*調整控制點大小*/
-
-        let Scale;
-        function control_Scale() {
-            Scale = ((controls.getDistance() - 1) / 100);
-            // console.log(Scale);
-            if (Scale < 3) {
-                Scale = 3;
+        let offset;
+        let target;
+        let ooxx = 0;//有沒有在原點
+        gui.add(datGUIControls, 'startTracking').onChange(function (e) {
+            if (ooxx == 0) {
+                offset = { x: 0, z: 0, rotateY: 0 }//起點
+                target = { x: 310, z: -200, rotateY: 1.57 } // 目標值
+                var tween = new TWEEN.Tween(offset) // 建立新的 Tween 物件來改變 position
+                    .to(target, 3000) // 在 5000ms 內移動至target
+                    .easing(TWEEN.Easing.Cubic.Out) // 補間動畫效果曲線
+                    .onUpdate(onUpdate)//要做甚麼
+                    .onComplete(() => {//動畫結束之後要做甚麼
+                        tween.stop();
+                        ooxx = 1;
+                    })
+                    .start(); // 立即啟動 tween 動畫
             }
-            else if (Scale > 7) {
-                Scale = 7;
+            if (ooxx == 1) {
+                offset = { x: 310, z: -200, rotateY: 1.57 } // 目標值
+                target = { x: 0, z: 0, rotateY: 0 }//起點
+                var tween = new TWEEN.Tween(offset) // 建立新的 Tween 物件來改變 position
+                    .to(target, 3000) // 在 5000ms 內移動至target
+                    .easing(TWEEN.Easing.Cubic.Out) // 補間動畫效果曲線
+                    .onUpdate(onUpdate)//要做甚麼
+                    .onComplete(() => {//動畫結束之後要做甚麼
+                        tween.stop();
+                        ooxx = 0;
+                    })
+                    .start(); // 立即啟動 tween 動畫
             }
-            control_Archer.scale.set(Scale, Scale, Scale);
-            control_Warrior.scale.set(Scale, Scale, Scale);
-            control_Cavalry.scale.set(Scale, Scale, Scale);
+
+
+        })
+        // Cube走動及轉身補間動畫
+        const onUpdate = () => {
+            // 移動
+            cube.position.x = offset.x;
+            cube.position.z = offset.z;
         }
 
-
-        let isOpacity = false;
-
-        function control_Opacity() {
-            console.log(material_Archer.opacity);
-            // if (material_Archer.opacity == 0) {
-            //     isOpacity = false;
-            // }
-            // else if (material_Archer.opacity == 1) {
-            //     isOpacity = true;
-            // }
-            // if (isOpacity == false) {
-            if (material_Archer.opacity <= 0) {
-                material_Archer.opacity = 0;
-                material_Warrior.opacity = 0;
-                material_Cavalry.opacity = 0;
-            }
-            else {
-                material_Archer.opacity -= 0.01;
-                material_Warrior.opacity -= 0.01;
-                material_Cavalry.opacity -= 0.01;
-            }
-            // }
-
-            // else if (isOpacity == true) {
-
-            //     if (material_Archer.opacity >= 1) {
-            //         material_Archer.opacity = 1;
-            //     }
-            //     else {
-            //         material_Archer.opacity += 0.01;
-            //     }
-            // }
-
-
-        }
-        window.addEventListener('resize', onWindowResize);
-
-        function onWindowResize() {
-
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
-
-            renderer.setSize(window.innerWidth, window.innerHeight);
-
-        }
         function animation() {
-            // stats.update();
+
+            stats.update();
             TWEEN.update();
             controls.update();
             requestAnimationFrame(animation);//創造一個循環
-            composer.render(scene, camera);//繪製場景
-            cameraZoomin();
-            time();
-            control_Scale();
-            control_Opacity();
-            // console.log(controls.getDistance()); 
+            renderer.render(scene, camera);//繪製場景
+
         }
 
-        animation();//呼叫動畫函數
+        animation();
     </script>
 
 
