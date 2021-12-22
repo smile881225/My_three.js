@@ -61,7 +61,7 @@
         let mixer;
         let mixers = [];
         fbxLoader.load(
-            './3D_Object/FBX/maria_j_j_ong.fbx', (fbx) => {
+            './3D_Object/FBX/動畫分開版/maria_j_j_ong.fbx', (fbx) => {
                 // fbx.traverse(function (child) {
                 //     if ((child as THREE.Mesh).isMesh) {
                 //         // (child as THREE.Mesh).material = material
@@ -71,7 +71,7 @@
                 //     }
                 // })
            
-                anim.load('./3D_Object/FBX/Capoeira.fbx', (anim) => {
+                anim.load('./3D_Object/FBX/動畫分開版/Capoeira.fbx', (anim) => {
                     mixer = new THREE.AnimationMixer(fbx);
                     mixers.push(mixer);
                     const idle = mixer.clipAction(anim.animations[0]);

@@ -45,10 +45,8 @@
             renderer,
             rayCaster,//射線
             control,
-            flow,//跟隨
+            flow,
             action = ACTION_NONE;//預設沒有選到Cube
-
-        const curveHandles = [];//創造一個放Cube的陣列
 
         init();
         animate();
@@ -68,6 +66,8 @@
             camera.lookAt(scene.position);
 
             /*----------初始化------------*/
+
+            const curveHandles = [];//創造一個放Cube的陣列
 
             const initialPoints = [//創造一個陣列，裡面放物件，設定在線上方塊的位置
                 { x: 1, y: 0, z: - 1 },
@@ -89,39 +89,37 @@
 
             }
 
-            const curve = new THREE.CatmullRomCurve3(//建立平滑的曲線
-                curveHandles.map((handle) => handle.position)//Map curveHandles陣列 每個handle的位置
+            const curve = new THREE.CatmullRomCurve3(
+                curveHandles.map((handle) => handle.position)
             );
+            
+            curve.curveType = 'centripetal';
+            curve.closed = true;
 
-            curve.curveType = 'centripetal';//曲線的類型。默認為向心
-            curve.closed = true;//封閉曲線
-
-            const points = curve.getPoints(50);//切割成50段
-
-            const line = new THREE.LineLoop(//畫線
+            const points = curve.getPoints(50);
+            const line = new THREE.LineLoop(
                 new THREE.BufferGeometry().setFromPoints(points),
-                new THREE.LineBasicMaterial({ color: 0x00ff00 })//顏色
+                new THREE.LineBasicMaterial({ color: 0x00ff00 })
             );
 
             scene.add(line);
 
-            //新增平行光
+            //
+
             const light = new THREE.DirectionalLight(0xffaa33);
             light.position.set(- 10, 10, 10);
             light.intensity = 1.0;
             scene.add(light);
 
-            //新增AmbientLight
             const light2 = new THREE.AmbientLight(0x003973);
             light2.intensity = 1.0;
             scene.add(light2);
 
-            //設定文字
+            //
 
             const loader = new FontLoader();
             loader.load('./json/helvetiker_regular.typeface.json', function (font) {
 
-                //設定文字參數
                 const geometry = new TextGeometry('Hello three.js!', {
                     font: font,
                     size: 0.2,
@@ -134,17 +132,16 @@
                     bevelSegments: 5,
                 });
 
-                geometry.rotateX(Math.PI);//文字翻轉
+                geometry.rotateX(Math.PI);
 
-                const material = new THREE.MeshStandardMaterial({//文字顏色
+                const material = new THREE.MeshStandardMaterial({
                     color: 0x99ffff
                 });
 
                 const objectToCurve = new THREE.Mesh(geometry, material);
 
-                //跟隨線條移動
                 flow = new Flow(objectToCurve);
-                flow.updateCurve(0, curve);//跟隨曲線
+                flow.updateCurve(0, curve);
                 scene.add(flow.object3D);
 
             });
@@ -160,12 +157,11 @@
 
             rayCaster = new THREE.Raycaster();
             control = new TransformControls(camera, renderer.domElement);
-			
             control.addEventListener('dragging-changed', function (event) {
 
                 if (!event.value) {
 
-                    const points = curve.getPoints(20);
+                    const points = curve.getPoints(50);
                     line.geometry.setFromPoints(points);
                     flow.updateCurve(0, curve);
 
@@ -186,9 +182,9 @@
 
         }
 
-        function onPointerDown(event) {//當點被按下的時候
+        function onPointerDown(event) {
 
-            action = ACTION_SELECT;//選擇到
+            action = ACTION_SELECT;
             mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
             mouse.y = - (event.clientY / window.innerHeight) * 2 + 1;
 
