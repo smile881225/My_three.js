@@ -59,12 +59,12 @@
 
         var mtlLoader = new MTLLoader();
 
-        var Cavalry_mtl = "./3D_Object/東駿的模型/騎兵.mtl";
+        var Cavalry_mtl = "./3D_Object/東駿的模型OBJ/騎兵.mtl";
         mtlLoader.load(Cavalry_mtl, function (materials) {
             materials.preload();
             var objLoader = new OBJLoader();
             objLoader.setMaterials(materials);
-            var teapot = objLoader.load('./3D_Object/東駿的模型/騎兵.obj', function (object) {
+            var teapot = objLoader.load('./3D_Object/東駿的模型OBJ/騎兵.obj', function (object) {
 
                 object.traverse(function (node) {
                     if (node instanceof THREE.Mesh) {
@@ -102,7 +102,7 @@
         controls.autoRotate = true;//自動旋轉
         controls.autoRotaeSpeed = 5;//控制旋轉速度
         controls.minDistance = 100;//controls縮放最小距離
-        controls.maxDistance = 400;//controls縮放最大距離
+        // controls.maxDistance = 800;//controls縮放最大距離
 
         //GUI
 

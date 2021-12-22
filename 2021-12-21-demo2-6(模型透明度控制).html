@@ -512,6 +512,10 @@
                 Warrior_Material = scene.getObjectByName('Warrior').children[0].material;
                 Cavalry_Material = scene.getObjectByName('Cavalry').children[0].material;
 
+                Archer_Material.transparent = true;
+                Warrior_Material.transparent = true;
+                Cavalry_Material.transparent = true;
+
             });
         });
 
@@ -552,8 +556,8 @@
             raycaster.setFromCamera(mouse, camera);
 
             intersects = raycaster.intersectObjects(scene.children);
-            console.log(control_Name != 'changePlaymusic');
-            
+            // console.log(control_Name != 'changePlaymusic');
+
             if (intersects.length > 0 && intersects[0].object.geometry.type == "SphereGeometry") {
                 control_Name = intersects[0].object.name;
                 quit.style['display'] = 'block';
@@ -570,9 +574,16 @@
 
                 isOpacity = "clickOut";
                 //設定3個材質都不會對深度緩衝區有任何影響
-                material_Archer.depthTest = true;
-                material_Warrior.depthTest = true;
-                material_Cavalry.depthTest = true;
+
+
+                Archer_Material.visible = true;
+                Warrior_Material.visible = true;
+                Cavalry_Material.visible = true;
+
+                Archer_Material.depthWrite = false;
+                Warrior_Material.depthWrite = false;
+                Cavalry_Material.depthWrite = false;
+
 
             }
 
@@ -744,7 +755,7 @@
                 <h1 class="dialog-content">${dialogText}</h1>
                 `
             }
-            console.log('a');
+            // console.log('a');
         }
 
         // camera.position.x = offset.Camera_x;
@@ -890,6 +901,7 @@
                         Warrior_Material.opacity = 0;
                         Archer_Material.visible = false;
                         Warrior_Material.visible = false;
+
                     }
 
                     //控制點透明度維持0
@@ -926,30 +938,44 @@
                     material_Archer.opacity -= 0.05;
                     material_Warrior.opacity -= 0.05;
                     material_Cavalry.opacity -= 0.05;
-              
+
                 }
 
             }
 
             else if (isOpacity == "clickOut") {
+            //   console.log(Warrior_Material.depthWrite);
+              console.log(material_Archer.opacity);
 
                 if (material_Archer.opacity >= 1) {
+
+                    //模型透明度=1
+
+                    Archer_Material.opacity = 1;
+                    Warrior_Material.opacity = 1;
+                    Cavalry_Material.opacity = 1;
 
                     //控制點透明度=1
 
                     material_Archer.opacity = 1;
                     material_Warrior.opacity = 1;
                     material_Cavalry.opacity = 1;
+
+                    Archer_Material.depthWrite = true;
+                    Warrior_Material.depthWrite = true;
+                    Cavalry_Material.depthWrite = true;
+
+                    // material_Archer.depthTest = true;
+                    // material_Warrior.depthTest = true;
+                    // material_Cavalry.depthTest = true;
+
                     isOpacity = "";
-                    
+
                 }
                 else {
-
+                    // console.log(Archer_Material.opacity);
+                    console.log(Warrior_Material.opacity);
                     //顯示模型
-
-                    Archer_Material.visible = true;
-                    Warrior_Material.visible = true;
-                    Cavalry_Material.visible = true;
 
                     //顯示控制點
 
@@ -965,9 +991,9 @@
 
                     //控制點變不透明
 
-                    material_Archer.opacity += 0.01;
-                    material_Warrior.opacity += 0.01;
-                    material_Cavalry.opacity += 0.01;
+                    material_Archer.opacity += 0.008;
+                    material_Warrior.opacity += 0.008;
+                    material_Cavalry.opacity += 0.008;
                 }
 
             }

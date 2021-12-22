@@ -122,6 +122,7 @@
                     .easing(TWEEN.Easing.Cubic.Out) // 補間動畫效果曲線
                     .onUpdate(onUpdate)//要做甚麼
                     .onComplete(() => {//動畫結束之後要做甚麼
+                        console.log('s');
                         tween.stop();
                         ooxx = 1;
                     })
@@ -135,6 +136,7 @@
                     .easing(TWEEN.Easing.Cubic.Out) // 補間動畫效果曲線
                     .onUpdate(onUpdate)//要做甚麼
                     .onComplete(() => {//動畫結束之後要做甚麼
+                        console.log('s');
                         tween.stop();
                         ooxx = 0;
                     })

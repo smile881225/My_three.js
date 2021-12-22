@@ -28,7 +28,7 @@
         /*--------創造初始元素--------*/
 
         var scene = new THREE.Scene();
-        var camera = new THREE.PerspectiveCamera(80, (window.innerWidth / window.innerHeight , 0.1, 10));
+        var camera = new THREE.PerspectiveCamera(80, (window.innerWidth / window.innerHeight),0.1,1000);
         var renderer = new THREE.WebGLRenderer();
         renderer.setSize(window.innerWidth, window.innerHeight);
         document.body.appendChild(renderer.domElement);//把renderer設定添加到HTML裡面

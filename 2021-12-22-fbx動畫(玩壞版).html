@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>create my modle</title>
+
+    <style>
+        html {
+            overflow: hidden;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+        }
+
+        canvas {
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+</head>
+
+<body>
+
+
+    <script src="./js/three.js"></script>
+    <!-- <script type="module" src="./Loader/OBJLoader.js"></script>
+    <script type="module" src="./Loader/MTLLoader.js"></script> -->
+    <script type="module">
+        //導入外掛
+        import * as THREE from './js/three.module.js';
+        import { FBXLoader } from './Loader/FBXLoader/FBXLoader.js'
+        import { OrbitControls } from './js/OrbitControls.js';
+        import { GUI } from './js/lil-gui.module.min.js';
+
+        //初始化
+
+        var scene = new THREE.Scene();
+        var camera = new THREE.PerspectiveCamera(80, window.innerWidth / window.innerHeight, 0.1, 10000);
+        var renderer = new THREE.WebGLRenderer();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
+
+        //Palne
+
+        const texture = new THREE.TextureLoader().load("./img/carpet-2.jpg");
+        const planeGeometry = new THREE.PlaneGeometry(2000, 2000, 32, 32);
+        const planeMaterial = new THREE.MeshStandardMaterial({ map: texture })
+        const plane = new THREE.Mesh(planeGeometry, planeMaterial);
+        plane.receiveShadow = true;
+        plane.rotateX(-1.57);//旋轉平面 會寫負的是因為Plane的背面預設是不會顯示的，所以要翻對邊
+        scene.add(plane);
+
+        //const material = new THREE.MeshNormalMaterial()
+
+        const clock = new THREE.Clock();
+        let fbxLoader = new FBXLoader();
+        let anim = new FBXLoader();
+        let mixer;
+        let mixers = [];
+        fbxLoader.load(
+            './3D_Object/FBX/maria_j_j_ong.fbx', (fbx) => {
+                // fbx.traverse(function (child) {
+                //     if ((child as THREE.Mesh).isMesh) {
+                //         // (child as THREE.Mesh).material = material
+                //         if ((child as THREE.Mesh).material) {
+                //             ((child as THREE.Mesh).material as THREE.MeshBasicMaterial).transparent = false
+                //         }
+                //     }
+                // })
+           
+                anim.load('./3D_Object/FBX/Capoeira.fbx', (anim) => {
+                    mixer = new THREE.AnimationMixer(fbx);
+                    mixers.push(mixer);
+                    const idle = mixer.clipAction(anim.animations[0]);
+                    idle.play();
+                })
+
+                fbx.scale.set(0.3, 0.3, 0.3)
+                scene.add(fbx)
+            }
+
+
+        )
+
+
+        //camera設定
+
+        camera.position.set(0, 300, 400);
+        camera.lookAt(0, 0, 0);
+
+        //sence 背景顏色
+
+        scene.background = new THREE.Color(0xffffff);
+
+        /*--------添加燈光--------*/
+
+        var light = new THREE.HemisphereLight(0xffffff, 0x000000, 1);
+        scene.add(light);
+
+        //滑鼠控制camera
+
+        var controls = new OrbitControls(camera, renderer.domElement);
+        controls.target.set(-70, 5, -20);
+        controls.enablePan = false;
+        controls.maxPolarAngle = Math.PI / 2;
+        controls.enableDamping = true;
+        controls.autoRotate = true;//自動旋轉
+        controls.autoRotaeSpeed = 5;//控制旋轉速度
+        controls.minDistance = 100;//controls縮放最小距離
+        controls.maxDistance = 400;//controls縮放最大距離
+
+        //GUI
+
+        let gui = new GUI();
+        const CameraPosition = gui.addFolder('Camera');
+        CameraPosition.add(controls.target, 'x', -1000, 1000);
+        CameraPosition.add(controls.target, 'y', -1000, 1000);
+        CameraPosition.add(controls.target, 'z', -1000, 1000);
+        CameraPosition.open();
+
+        function animation() {
+            const delta = clock.getDelta();
+            if (mixer) mixer.update(delta);
+
+
+            controls.update();
+            requestAnimationFrame(animation);//創造一個循環
+            renderer.render(scene, camera);//繪製場景
+
+        }
+
+        animation();
+    </script>
+
+
+</body>
+
+</html>

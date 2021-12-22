@@ -157,8 +157,6 @@
             <img class="light" src="https://renaultespace.littleworkshop.fr/img/hud/light.png" alt="">
             <img class="start" src="https://renaultespace.littleworkshop.fr/img/hud/start-stop.png" alt="">
         </div>
-
-
     </div>
 
     <script src="./js/three.js"></script>
@@ -367,20 +365,20 @@
 
         /*--------加入圓錐--------*/
 
-        const geometry = new THREE.ConeGeometry(10, 30, 32);
-        const material = new THREE.MeshBasicMaterial(
-            {
-                color: 0xD7FFEE,
-                side: THREE.DoubleSide,
-                transparent: true,
-            }
-        );
+        // const geometry = new THREE.ConeGeometry(10, 30, 32);
+        // const material = new THREE.MeshBasicMaterial(
+        //     {
+        //         color: 0xD7FFEE,
+        //         side: THREE.DoubleSide,
+        //         transparent: true,
+        //     }
+        // );
         // 也可以寫成
         // material.transparent=true;
         // material.opacity=0.25;
-        const Cone = new THREE.Mesh(geometry, material);
-        Cone.position.set(0, 0, 0);
-        scene.add(Cone);
+        // const Cone = new THREE.Mesh(geometry, material);
+        // Cone.position.set(0, 0, 0);
+        // scene.add(Cone);
 
         /*--------開始載我的模型--------*/
 
@@ -394,7 +392,7 @@
 
         // var url = "/3D_Object/test1.mtl";
 
-        var Archer_mtl = "./3D_Object/東駿的模型/弓箭手.mtl";
+        var Archer_mtl = "./3D_Object/東駿的模型OBJ/弓箭手.mtl";
         mtlLoader.load(Archer_mtl, function (materials) {
             materials.preload();
             var objLoader = new OBJLoader();
@@ -402,7 +400,7 @@
             // mtlLoader.setMaterialOptions({
             //     invertTrProperty:true
             // })
-            objLoader.load('./3D_Object/東駿的模型/弓箭手.obj', function (object) {
+            objLoader.load('./3D_Object/東駿的模型OBJ/弓箭手.obj', function (object) {
 
                 object.traverse(function (node) {
                     if (node instanceof THREE.Mesh) {
@@ -443,13 +441,13 @@
 
         //加入戰士的模型
 
-        var Warrior_mtl = "./3D_Object/東駿的模型/戰士.mtl";
+        var Warrior_mtl = "./3D_Object/東駿的模型OBJ/戰士.mtl";
         mtlLoader.load(Warrior_mtl, function (materials) {
             materials.preload();
             var objLoader = new OBJLoader();
             objLoader.setMaterials(materials);
 
-            objLoader.load('./3D_Object/東駿的模型/戰士.obj', function (object) {
+            objLoader.load('./3D_Object/東駿的模型OBJ/戰士.obj', function (object) {
                 object.traverse(function (node) {
                     if (node instanceof THREE.Mesh) {
                         node.castShadow = true; //default is false
@@ -484,12 +482,12 @@
 
         //加入騎兵的模型
 
-        var Cavalry_mtl = "./3D_Object/東駿的模型/騎兵.mtl";
+        var Cavalry_mtl = "./3D_Object/東駿的模型OBJ/騎兵.mtl";
         mtlLoader.load(Cavalry_mtl, function (materials) {
             materials.preload();
             var objLoader = new OBJLoader();
             objLoader.setMaterials(materials);
-            objLoader.load('./3D_Object/東駿的模型/騎兵.obj', function (object) {
+            objLoader.load('./3D_Object/東駿的模型OBJ/騎兵.obj', function (object) {
 
                 object.traverse(function (node) {
                     if (node instanceof THREE.Mesh) {
@@ -511,6 +509,10 @@
                 Archer_Material = scene.getObjectByName('Archer').children[0].material;
                 Warrior_Material = scene.getObjectByName('Warrior').children[0].material;
                 Cavalry_Material = scene.getObjectByName('Cavalry').children[0].material;
+
+                Archer_Material.transparent = true;
+                Warrior_Material.transparent = true;
+                Cavalry_Material.transparent = true;
 
             });
         });
@@ -544,38 +546,58 @@
         let quit = document.querySelector('.quit');
 
         function onMouseClick(event) {
-            //通過滑鼠點選的位置計算出raycaster所需要的點的位置，以螢幕中心為原點，值的範圍為-1到1.
-
-            mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-            mouse.y = - (event.clientY / window.innerHeight) * 2 + 1;
-            // 通過滑鼠點的位置和當前相機的矩陣計算出raycaster
-            raycaster.setFromCamera(mouse, camera);
-
-            intersects = raycaster.intersectObjects(scene.children);
-            console.log(control_Name != 'changePlaymusic');
-            if (intersects.length > 0 && intersects[0].object.geometry.type == "SphereGeometry") {
-                control_Name = intersects[0].object.name;
-                quit.style['display'] = 'block';
-                console.log('逮到你瞜');
-                console.log(control_Name);
-                console.log(count);
-                isOpacity = "clickIn";
-                console.log(control_Name);
-
-
-            }
-            else if (ooxx < 0.2 && (nearArcher || nearWarrior || nearCavalry) && isBtn == false) {
-                control_Name = 'leave';
-
-                isOpacity = "clickOut";
-                //設定3個材質都不會對深度緩衝區有任何影響
-                material_Archer.depthTest = true;
-                material_Warrior.depthTest = true;
-                material_Cavalry.depthTest = true;
-
+            if (isAnimationPlay) {
+                // console.log(123);
             }
 
-            isBtn = false;
+            if (isAnimationPlay == false) {
+
+                //通過滑鼠點選的位置計算出raycaster所需要的點的位置，以螢幕中心為原點，值的範圍為-1到1.
+
+                mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+                mouse.y = - (event.clientY / window.innerHeight) * 2 + 1;
+
+                // 通過滑鼠點的位置和當前相機的矩陣計算出raycaster
+                raycaster.setFromCamera(mouse, camera);
+
+                intersects = raycaster.intersectObjects(scene.children);
+                // console.log(control_Name != 'changePlaymusic');
+
+                if (intersects.length > 0 && intersects[0].object.geometry.type == "SphereGeometry") {
+                    control_Name = intersects[0].object.name;
+                    quit.style['display'] = 'block';
+                    console.log('逮到你瞜');
+                    console.log(control_Name);
+                    console.log(count);
+                    isOpacity = "clickIn";
+                    console.log(control_Name);
+
+
+                }
+                else if (ooxx < 0.2 && (nearArcher || nearWarrior || nearCavalry) && isBtn == false) {
+                    control_Name = 'leave';
+
+                    isOpacity = "clickOut";
+                    //設定3個材質都不會對深度緩衝區有任何影響
+
+
+                    Archer_Material.visible = true;
+                    Warrior_Material.visible = true;
+                    Cavalry_Material.visible = true;
+
+                    Archer_Material.depthWrite = false;
+                    Warrior_Material.depthWrite = false;
+                    Cavalry_Material.depthWrite = false;
+
+
+                }
+
+                isBtn = false;
+
+            }
+
+
+
         }
 
         window.addEventListener('click', onMouseClick);
@@ -593,7 +615,9 @@
         var nearCavalry = false;
         let control_offset;
         let control_target;
+        let isAnimationPlay = false;
         function cameraZoomin() {
+
             offset = {
                 Camera_x: camera.position.x,
                 Camera_y: camera.position.y,
@@ -617,12 +641,14 @@
                     .easing(TWEEN.Easing.Quadratic.Out) // 補間動畫效果曲線
                     .onUpdate(onUpdate)//要做甚麼
                     .onComplete(() => {//動畫結束之後要做甚麼
-                        tween.stop();
                         control_Name = '';
                         nearArcher = false;
                         nearWarrior = false;
                         nearCavalry = false;
-                        // console.log('拉遠');
+                        console.log('拉遠');
+                        tween.stop();
+                        isAnimationPlay = false;
+
                     })
                     .start(); // 立即啟動 tween 動畫
                 quit.style['display'] = 'none';
@@ -653,12 +679,13 @@
                         .easing(TWEEN.Easing.Quadratic.Out) // 補間動畫效果曲線
                         .onUpdate(onUpdate)//要做甚麼
                         .onComplete(() => {//動畫結束之後要做甚麼
-                            tween.stop();
                             control_Name = '';
                             nearArcher = true;
                             nearWarrior = false;
                             nearCavalry = false;
-                            // console.log('拉近');
+                            console.log('拉近');
+                            tween.stop();
+                            isAnimationPlay = false;
                         })
                         .start(); // 立即啟動 tween 動畫
                     dialog.style['display'] = 'flex';
@@ -694,12 +721,13 @@
                         .easing(TWEEN.Easing.Quadratic.Out) // 補間動畫效果曲線
                         .onUpdate(onUpdate)//要做甚麼
                         .onComplete(() => {//動畫結束之後要做甚麼
-                            tween.stop();
                             control_Name = '';
                             nearArcher = false;
                             nearWarrior = true;
                             nearCavalry = false;
-                            // console.log('拉近');
+                            console.log('拉近');
+                            tween.stop();
+                            isAnimationPlay = false;
                         })
                         .start(); // 立即啟動 tween 動畫
                     dialog.style['display'] = 'flex';
@@ -727,12 +755,13 @@
                         .easing(TWEEN.Easing.Quadratic.Out) // 補間動畫效果曲線
                         .onUpdate(onUpdate)//要做甚麼
                         .onComplete(() => {//動畫結束之後要做甚麼
-                            tween.stop();
                             control_Name = '';
                             nearArcher = false;
                             nearWarrior = false;
                             nearCavalry = true;
-                            // console.log('拉近');
+                            console.log('拉近');
+                            tween.stop();
+                            isAnimationPlay = false;
                         })
                         .start(); // 立即啟動 tween 動畫
                     dialog.style['display'] = 'flex';
@@ -743,13 +772,14 @@
                 <h1 class="dialog-content">${dialogText}</h1>
                 `
             }
-            console.log('a');
+            // console.log('a');
         }
 
         // camera.position.x = offset.Camera_x;
         //要做甚麼
         const onUpdate = () => {
             // 移動時隨時更新offset
+            isAnimationPlay = true;
             camera.position.x = offset.Camera_x;
             camera.position.y = offset.Camera_y;
             camera.position.z = offset.Camera_z;
@@ -831,13 +861,23 @@
         let ooxx;
         function down() {
             count = 0;
-            console.log('egeg');
+            // console.log('egeg');
         }
 
         function up() {
             ooxx = count;
             count = 0;
-            console.log(ooxx);
+            // console.log(ooxx);
+        }
+
+        /*--------動畫切換控制--------*/
+        let rightBtn = document.querySelector('.right');
+        
+        let startBtn = document.querySelector('.start');
+
+        startBtn.addEventListener('click', isstart);
+        function isstart() {
+            console.log('123');
         }
 
         /*調整控制點大小*/
@@ -889,6 +929,7 @@
                         Warrior_Material.opacity = 0;
                         Archer_Material.visible = false;
                         Warrior_Material.visible = false;
+
                     }
 
                     //控制點透明度維持0
@@ -925,30 +966,46 @@
                     material_Archer.opacity -= 0.05;
                     material_Warrior.opacity -= 0.05;
                     material_Cavalry.opacity -= 0.05;
-                    console.log('b');
+
+                    rightBtn.style['opacity'] = material_Archer.opacity;
+
                 }
 
             }
 
             else if (isOpacity == "clickOut") {
+                //   console.log(Warrior_Material.depthWrite);
+                //   console.log(material_Archer.opacity);
 
                 if (material_Archer.opacity >= 1) {
+
+                    //模型透明度=1
+
+                    Archer_Material.opacity = 1;
+                    Warrior_Material.opacity = 1;
+                    Cavalry_Material.opacity = 1;
 
                     //控制點透明度=1
 
                     material_Archer.opacity = 1;
                     material_Warrior.opacity = 1;
                     material_Cavalry.opacity = 1;
+
+                    Archer_Material.depthWrite = true;
+                    Warrior_Material.depthWrite = true;
+                    Cavalry_Material.depthWrite = true;
+
+                    // material_Archer.depthTest = true;
+                    // material_Warrior.depthTest = true;
+                    // material_Cavalry.depthTest = true;
+
                     isOpacity = "";
-                    
+
                 }
                 else {
-
+                    // console.log(Archer_Material.opacity);
+                    // console.log(Warrior_Material.opacity);
                     //顯示模型
-
-                    Archer_Material.visible = true;
-                    Warrior_Material.visible = true;
-                    Cavalry_Material.visible = true;
 
                     //顯示控制點
 
@@ -964,13 +1021,14 @@
 
                     //控制點變不透明
 
-                    material_Archer.opacity += 0.01;
-                    material_Warrior.opacity += 0.01;
-                    material_Cavalry.opacity += 0.01;
+                    material_Archer.opacity += 0.008;
+                    material_Warrior.opacity += 0.008;
+                    material_Cavalry.opacity += 0.008;
+
                 }
 
             }
-
+            rightBtn.style['opacity'] = material_Archer.opacity;
         }
 
         window.addEventListener('resize', onWindowResize);
