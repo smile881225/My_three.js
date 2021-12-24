@@ -434,10 +434,10 @@
 
             mixer_Archer = new THREE.AnimationMixer(object);
 
-            const action = mixer_Archer.clipAction(object.animations[0]);
+            // const action = mixer_Archer.clipAction(object.animations[0]);
 
             // action.stop();//停止
-            action.play();//撥放
+            // action.play();//撥放
 
             object.traverse(function (child) {
 
@@ -508,10 +508,10 @@
 
             mixer_Warrior = new THREE.AnimationMixer(object);
 
-            const action = mixer_Warrior.clipAction(object.animations[0]);
+            // let action = mixer_Warrior.clipAction(object.animations[0]);
 
             // action.stop();//停止
-            action.play();//撥放
+            // action.play();//撥放
 
             object.traverse(function (child) {
 
@@ -591,10 +591,10 @@
 
             mixer_Cavalry = new THREE.AnimationMixer(object);
 
-            const action = mixer_Cavalry.clipAction(object.animations[0]);
+            // const action = mixer_Cavalry.clipAction(object.animations[0]);
 
             // action.stop();//停止
-            action.play();//撥放
+            // action.play();//撥放
 
             object.traverse(function (child) {
 
@@ -635,6 +635,7 @@
 
         scene.add(control_Cavalry);
 
+
         //新增第二台相機
 
         var camera_Two = new THREE.PerspectiveCamera(80, window.innerWidth / window.innerHeight, 0.1, 10000);
@@ -672,25 +673,50 @@
 
         tube = new THREE.Mesh(geometry, material);
 
-
-
         scene.add(tube);
 
         /*運鏡*/
+        let clock_Animation = new THREE.Clock();
 
+        clock_Animation.autoStart=false;
+        
+        clock_Animation.play();
+        let time_Animation;
 
         function updateCamera() {
+      
 
-            const time = clock.getElapsedTime();
-            const looptime = 10;//20秒的循環
-            const t1 = (time % looptime) / looptime;
-            const t2 = ((time + 0.1) % looptime) / looptime;
+            if (isPlayAnimation == false) {
+                // clock_Animation.stop;
 
-            const pos1 = tube.geometry.parameters.path.getPointAt(t1);
-            const pos2 = tube.geometry.parameters.path.getPointAt(t2);
+                time_Animation = clock_Animation.getElapsedTime();
 
-            camera_Two.position.copy(pos1);
-            camera_Two.lookAt(0, 0, 0);
+                console.log(clock_Animation);
+                const looptime = 10;//20秒的循環
+                const t1 = (time_Animation % looptime) / looptime;
+                const t2 = ((time_Animation + 0.1) % looptime) / looptime;
+
+                console.log(time_Animation);
+
+                const pos1 = tube.geometry.parameters.path.getPointAt(t1);
+                const pos2 = tube.geometry.parameters.path.getPointAt(t2);
+
+                const camera_position = camera.position;
+
+                // console.log(camera_position);
+
+                camera.position.copy(pos1);
+                camera.lookAt(0, 0, 0);
+
+            }
+
+            else if (isPlayAnimation) {
+                clock_Animation.stop();
+                // camera_Two.position.copy(pos1);
+                // camera_Two.lookAt(0, 0, 0);
+
+            }
+
             // camera.position.copy(pos1);
             // camera.lookAt(0, 0, 0);
         }
@@ -1040,10 +1066,16 @@
 
         startBtn.addEventListener('click', isstart);
 
+
+
         function isstart() {
 
-            if (isPlayAnimation == false) {
+            const Archer_FBX_action = mixer_Archer.clipAction(Archer_FBX.animations[0]);
+            const Warrior_FBX_action = mixer_Warrior.clipAction(Warrior_FBX.animations[0]);
+            const Cavalry_FBX_action = mixer_Cavalry.clipAction(Cavalry_FBX.animations[0]);
 
+            if (isPlayAnimation == false) {
+                time_Animation = clock.getElapsedTime();
                 Archer_FBX.visible = false;
                 Warrior_FBX.visible = false;
                 Cavalry_FBX.visible = false;
@@ -1053,6 +1085,11 @@
                 Cavalry_Material.visible = true;
 
                 isPlayAnimation = true;
+
+                Archer_FBX_action.stop();//動畫停止
+                Warrior_FBX_action.stop();//動畫停止
+                Cavalry_FBX_action.stop();//動畫停止
+
             }
 
             else if (isPlayAnimation) {
@@ -1066,11 +1103,12 @@
                 Cavalry_Material.visible = false;
 
                 isPlayAnimation = false;
+
+                Archer_FBX_action.play();//動畫播放
+                Warrior_FBX_action.play();//動畫播放
+                Cavalry_FBX_action.play();//動畫播放
+
             }
-
-            console.log('123');
-
-
 
         }
 
@@ -1099,8 +1137,6 @@
         let Archer_FBX;
         let Warrior_FBX;
         let Cavalry_FBX;
-
-
 
         function control_Opacity() {
 

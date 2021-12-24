@@ -35,6 +35,7 @@
         import { Flow } from './js/CurveModifier.js';
         import { FontLoader } from './js/FontLoader.js';
         import { TextGeometry } from './js/TextGeometry.js';
+        import { OrbitControls } from './js/OrbitControls.js';
 
         const ACTION_SELECT = 1, ACTION_NONE = 0;//滑鼠是否選到Cube
 
@@ -47,13 +48,15 @@
             control,
             flow,//跟隨
             action = ACTION_NONE;//預設沒有選到Cube
-
+            
+        var zzz;
         const curveHandles = [];//創造一個放Cube的陣列
 
         init();
         animate();
 
         function init() {
+
             /*----------初始化------------*/
 
             scene = new THREE.Scene();
@@ -67,6 +70,8 @@
             camera.position.set(2, 2, 4);
             camera.lookAt(scene.position);
 
+            zzz = new OrbitControls(camera, renderer.domElement);
+            zzz.target.set(16, 90, 0);//初始的滑鼠控制中心點
             /*----------初始化------------*/
 
             const initialPoints = [//創造一個陣列，裡面放物件，設定在線上方塊的位置
@@ -136,18 +141,19 @@
 
                 geometry.rotateX(Math.PI);//文字翻轉
 
+
                 const material = new THREE.MeshStandardMaterial({//文字顏色
                     color: 0x99ffff
                 });
 
                 const objectToCurve = new THREE.Mesh(geometry, material);
-
                 //跟隨線條移動
                 flow = new Flow(objectToCurve);
                 flow.updateCurve(0, curve);//跟隨曲線
                 scene.add(flow.object3D);
 
             });
+
 
             //
 
@@ -160,7 +166,7 @@
 
             rayCaster = new THREE.Raycaster();
             control = new TransformControls(camera, renderer.domElement);
-			
+
             control.addEventListener('dragging-changed', function (event) {
 
                 if (!event.value) {

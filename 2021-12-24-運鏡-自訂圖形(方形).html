@@ -174,7 +174,11 @@
         import { EffectComposer } from './postprocessing/EffectComposer/EffectComposer.js';
         import { RenderPass } from './postprocessing/SAO/RenderPass.js';
         import { SAOPass } from './postprocessing/SAO/SAOPass.js';
+        import { TransformControls } from './js/TransformControls.js';
         import { Flow } from './js/CurveModifier.js';
+        import { FontLoader } from './js/FontLoader.js';
+        import { TextGeometry } from './js/TextGeometry.js';
+        import { Curves } from './js/CurveExtras.js';
 
         /*--------創造初始元素--------*/
         var mtlLoader;
@@ -534,31 +538,7 @@
         control_Cavalry.position.set(-132, 185, -30);
         scene.add(control_Cavalry);
 
-        /*--------加入圓錐--------*/
 
-        const geometry = new THREE.ConeGeometry(10, 30, 32);
-        const material = new THREE.MeshBasicMaterial(
-            {
-                color: 0xD7FFEE,
-                side: THREE.DoubleSide,
-                transparent: true,
-            }
-        );
-
-        const Cone = new THREE.Mesh(geometry, material);
-        Cone.position.set(0, 0, 0);
-        Cone.scale.set(8, 8, 8);
-
-        const objectToCurve = new THREE.Mesh(geometry, material);
-
-        //跟隨線條移動
-        flow = new Flow(objectToCurve);
-        flow.updateCurve(0, curve);//跟隨曲線
-        scene.add(flow.object3D);
-
-
-
-        scene.add(Cone);
 
         /*--------控制點互動--------*/
 
@@ -1057,47 +1037,65 @@
             rightBtn.style['opacity'] = material_Archer.opacity;
         }
 
-        //路徑線條
+        //新增第二台相機
 
-        let flow;
+        var camera_Two = new THREE.PerspectiveCamera(80, window.innerWidth / window.innerHeight, 0.1, 10000);
 
-        const curveHandles = [];//創造一個放Cube的陣列
+        let cameraHelper = new THREE.CameraHelper(camera_Two);
 
-        const initialPoints = [//創造一個陣列，裡面放物件，設定在線上方塊的位置
-            { x: 200, y: 0, z: - 200 },
-            { x: 200, y: 0, z: 200 },
-            { x: - 200, y: 0, z: 200 },
-            { x: - 200, y: 0, z: - 200 },
-        ];
+        scene.add(cameraHelper);
 
-        //設定BOX的形狀跟Material
-        const boxGeometry = new THREE.BoxGeometry(20, 20, 20);
-        const boxMaterial = new THREE.MeshBasicMaterial();
+        //Add mesh here
 
-        for (const handlePos of initialPoints) {//for迴圈 設置變數 handlePos 跑完 initialPoints 陣列 handlePos會從陣列[0]~[4]
+        let tube;
 
-            const handle = new THREE.Mesh(boxGeometry, boxMaterial);//renderer出幾何圖形
-            handle.position.copy(handlePos);//.copy -> copy handlePos的X,Y,Z 到handle 目的是設定handle的Position
-            curveHandles.push(handle);//新增一個Cube
-            scene.add(handle);
+        const sampleClosedSpline = new THREE.CatmullRomCurve3([
+            new THREE.Vector3(-300, 200, -300),
+            new THREE.Vector3(300, 200, -300),
+            new THREE.Vector3(300, 200, 300),
+            new THREE.Vector3(-300, 200, 300),
+          
+        ]);
 
+        sampleClosedSpline.curveType = 'catmullrom';
+        sampleClosedSpline.closed = true;
+
+        const splines = { SampleClosedSpline: sampleClosedSpline };//設定圖案形狀
+
+        const extrudePath = splines['SampleClosedSpline'];
+
+        const geometry = new THREE.TubeBufferGeometry(extrudePath, 100, 2, 8, true);//(曲線,橫的線段數,沿著曲線創造出來的半徑,直的線段數,管子是否封閉)
+
+        const material = new THREE.MeshBasicMaterial({ 
+            color: 0xFF7878, 
+            // wireframe: true, 
+            // side: THREE.Doubleside 
+        });
+
+        tube = new THREE.Mesh(geometry, material);
+
+
+
+        scene.add(tube);
+
+
+
+        /*運鏡*/
+
+
+        function updateCamera() {
+
+            const time = clock.getElapsedTime();
+            const looptime = 10;//20秒的循環
+            const t1 = (time % looptime) / looptime;
+            const t2 = ((time + 0.1) % looptime) / looptime;
+
+            const pos1 = tube.geometry.parameters.path.getPointAt(t1);
+            const pos2 = tube.geometry.parameters.path.getPointAt(t2);
+         
+            camera_Two.position.copy(pos1);
+            camera_Two.lookAt(0,0,0);
         }
-
-        const curve = new THREE.CatmullRomCurve3(//建立平滑的曲線
-            curveHandles.map((handle) => handle.position)//Map curveHandles陣列 每個handle的位置
-        );
-
-        curve.curveType = 'centripetal';//曲線的類型。默認為向心
-        curve.closed = true;//封閉曲線
-
-        const points = curve.getPoints(100);//切割成50段
-
-        const line = new THREE.LineLoop(//畫線
-            new THREE.BufferGeometry().setFromPoints(points),
-            new THREE.LineBasicMaterial({ color: 0x00ff00 })//顏色
-        );
-
-        scene.add(line);
 
         window.addEventListener('resize', onWindowResize);
 
@@ -1110,7 +1108,7 @@
         }
 
         function animation() {
-
+            updateCamera();
             // stats.update();
             TWEEN.update();
             controls.update();
@@ -1120,10 +1118,6 @@
             time();
             control_Scale();
             control_Opacity();
-            // console.log(controls.getDistance()); 
-            if (flow) {
-                flow.moveAlongCurve(0.005);
-            }
         }
 
         animation();//呼叫動畫函數，為了要抓到Load物件裡面東西

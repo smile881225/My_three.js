@@ -167,7 +167,6 @@
         import * as THREE from './js/three.module.js';
         import { OBJLoader } from './Loader/OBJLoader.js';
         import { MTLLoader } from './Loader/MTLLoader.js'
-        import { FBXLoader } from './Loader/FBXLoader/FBXLoader.js'
         import { OrbitControls } from './js/OrbitControls.js';
         import { GUI } from './js/lil-gui.module.min.js';
         import { TWEEN } from './js/tween.module.min.js';
@@ -175,6 +174,11 @@
         import { EffectComposer } from './postprocessing/EffectComposer/EffectComposer.js';
         import { RenderPass } from './postprocessing/SAO/RenderPass.js';
         import { SAOPass } from './postprocessing/SAO/SAOPass.js';
+        import { TransformControls } from './js/TransformControls.js';
+        import { Flow } from './js/CurveModifier.js';
+        import { FontLoader } from './js/FontLoader.js';
+        import { TextGeometry } from './js/TextGeometry.js';
+        import { Curves } from './js/CurveExtras.js';
 
         /*--------創造初始元素--------*/
         var mtlLoader;
@@ -186,10 +190,6 @@
         var isBtn;
         renderer.setSize(window.innerWidth, window.innerHeight);
         document.body.appendChild(renderer.domElement);
-
-        /*--------載入時鐘--------*/
-
-        var clock = new THREE.Clock();
 
         /*--------載入音樂--------*/
 
@@ -251,8 +251,8 @@
         controls.enablePan = false;
         controls.maxPolarAngle = Math.PI / 2;
         controls.enableDamping = true;
-        // controls.autoRotate = true;//自動旋轉
-        // controls.autoRotateSpeed = 2;//控制旋轉速度
+        controls.autoRotate = true;//自動旋轉
+        controls.autoRotateSpeed = 2;//控制旋轉速度
         controls.minDistance = 100;//controls縮放最小距離
         controls.maxDistance = 1000;//controls縮放最大距離
 
@@ -424,39 +424,8 @@
 
         });
 
-        //加入弓箭手FBX的模型
 
-        let mixer_Archer;
-
-        let loader = new FBXLoader();
-
-        loader.load('./3D_Object/東駿的模型FBX/弓箭手-攻擊.fbx', function (object) {
-
-            mixer_Archer = new THREE.AnimationMixer(object);
-
-            const action = mixer_Archer.clipAction(object.animations[0]);
-
-            // action.stop();//停止
-            action.play();//撥放
-
-            object.traverse(function (child) {
-
-                if (child.isMesh) {
-
-                    child.castShadow = true;
-                    child.receiveShadow = true;
-
-                }
-
-            });
-            object.position.set(350, 65, 62);
-            object.name = 'Archer_FBX';
-            object.visible = false;
-            scene.add(object);
-
-        });
-
-        //加入弓箭手OBJ的控制點/
+        //加入弓箭手的控制點/
 
         let circle_Archer = new THREE.SphereGeometry(1.5, 26, 10);
         let material_Archer = new THREE.MeshBasicMaterial(
@@ -475,7 +444,7 @@
 
         scene.add(control_Archer);
 
-        //加入戰士OBJ的模型
+        //加入戰士的模型
 
         var Warrior_mtl = "./3D_Object/東駿的模型OBJ/戰士.mtl";
         mtlLoader.load(Warrior_mtl, function (materials) {
@@ -500,37 +469,7 @@
         });
         console.log(scene);
 
-        //加入戰士FBX的模型
-
-        let mixer_Warrior;
-
-        loader.load('./3D_Object/東駿的模型FBX/戰士-攻擊.fbx', function (object) {
-
-            mixer_Warrior = new THREE.AnimationMixer(object);
-
-            const action = mixer_Warrior.clipAction(object.animations[0]);
-
-            // action.stop();//停止
-            action.play();//撥放
-
-            object.traverse(function (child) {
-
-                if (child.isMesh) {
-
-                    child.castShadow = true;
-                    child.receiveShadow = true;
-
-                }
-
-            });
-            object.position.set(300, 65, 49);//300 65 49
-            object.name = 'Warrior_FBX';
-            object.visible = false;
-            scene.add(object);
-
-        });
-
-        //加入戰士OBJ的控制點
+        //加入戰士的控制點
 
         let circle_Warrior = new THREE.SphereGeometry(1.5, 26, 10);
         let material_Warrior = new THREE.MeshBasicMaterial(
@@ -546,7 +485,7 @@
         scene.add(control_Warrior);
 
 
-        //加入騎兵OBJ的模型
+        //加入騎兵的模型
 
         var Cavalry_mtl = "./3D_Object/東駿的模型OBJ/騎兵.mtl";
         mtlLoader.load(Cavalry_mtl, function (materials) {
@@ -583,41 +522,6 @@
             });
         });
 
-        //加入騎兵FBX的模型
-
-        let mixer_Cavalry;
-
-        loader.load('./3D_Object/東駿的模型FBX/騎兵-攻擊.fbx', function (object) {
-
-            mixer_Cavalry = new THREE.AnimationMixer(object);
-
-            const action = mixer_Cavalry.clipAction(object.animations[0]);
-
-            // action.stop();//停止
-            action.play();//撥放
-
-            object.traverse(function (child) {
-
-                if (child.isMesh) {
-
-                    child.castShadow = true;
-                    child.receiveShadow = true;
-
-                }
-
-            });
-
-            object.position.set(250, 110, 18);//250 110 18
-            object.name = 'Cavalry_FBX';
-            object.visible = false;
-            scene.add(object);
-
-            Archer_FBX = scene.getObjectByName('Archer_FBX');
-            Warrior_FBX = scene.getObjectByName('Warrior_FBX');
-            Cavalry_FBX = scene.getObjectByName('Cavalry_FBX');
-
-        });
-
         /*--------加入騎兵的控制點--------*/
 
         let circle_Cavalry = new THREE.SphereGeometry(1.5, 26, 10);
@@ -632,68 +536,9 @@
 
         control_Cavalry.name = 'control_Cavalry';
         control_Cavalry.position.set(-132, 185, -30);
-
         scene.add(control_Cavalry);
 
-        //新增第二台相機
 
-        var camera_Two = new THREE.PerspectiveCamera(80, window.innerWidth / window.innerHeight, 0.1, 10000);
-
-        let cameraHelper = new THREE.CameraHelper(camera_Two);
-
-        scene.add(cameraHelper);
-
-        //Add mesh here
-
-        let tube;
-
-        const sampleClosedSpline = new THREE.CatmullRomCurve3([
-            new THREE.Vector3(-300, 200, -300),
-            new THREE.Vector3(300, 200, -300),
-            new THREE.Vector3(300, 200, 300),
-            new THREE.Vector3(-300, 200, 300),
-
-        ]);
-        sampleClosedSpline.tension = 1;
-        sampleClosedSpline.curveType = 'catmullrom';
-        sampleClosedSpline.closed = true;
-
-        const splines = { SampleClosedSpline: sampleClosedSpline };//設定圖案形狀
-
-        const extrudePath = splines['SampleClosedSpline'];
-
-        const geometry = new THREE.TubeBufferGeometry(extrudePath, 100, 2, 8, true);//(曲線,橫的線段數,沿著曲線創造出來的半徑,直的線段數,管子是否封閉)
-
-        const material = new THREE.MeshBasicMaterial({
-            color: 0xFF7878,
-            // wireframe: true, 
-            // side: THREE.Doubleside 
-        });
-
-        tube = new THREE.Mesh(geometry, material);
-
-
-
-        scene.add(tube);
-
-        /*運鏡*/
-
-
-        function updateCamera() {
-
-            const time = clock.getElapsedTime();
-            const looptime = 10;//20秒的循環
-            const t1 = (time % looptime) / looptime;
-            const t2 = ((time + 0.1) % looptime) / looptime;
-
-            const pos1 = tube.geometry.parameters.path.getPointAt(t1);
-            const pos2 = tube.geometry.parameters.path.getPointAt(t2);
-
-            camera_Two.position.copy(pos1);
-            camera_Two.lookAt(0, 0, 0);
-            // camera.position.copy(pos1);
-            // camera.lookAt(0, 0, 0);
-        }
 
         /*--------控制點互動--------*/
 
@@ -976,7 +821,7 @@
 
         /*--------時間計算--------*/
 
-
+        var clock = new THREE.Clock();
         let count = 0;
 
         function time() {
@@ -1036,42 +881,9 @@
 
         let startBtn = document.querySelector('.start');
 
-        let isPlayAnimation = true;
-
         startBtn.addEventListener('click', isstart);
-
         function isstart() {
-
-            if (isPlayAnimation == false) {
-
-                Archer_FBX.visible = false;
-                Warrior_FBX.visible = false;
-                Cavalry_FBX.visible = false;
-
-                Archer_Material.visible = true;
-                Warrior_Material.visible = true;
-                Cavalry_Material.visible = true;
-
-                isPlayAnimation = true;
-            }
-
-            else if (isPlayAnimation) {
-
-                Archer_FBX.visible = true;
-                Warrior_FBX.visible = true;
-                Cavalry_FBX.visible = true;
-
-                Archer_Material.visible = false;
-                Warrior_Material.visible = false;
-                Cavalry_Material.visible = false;
-
-                isPlayAnimation = false;
-            }
-
             console.log('123');
-
-
-
         }
 
         /*調整控制點大小*/
@@ -1091,15 +903,11 @@
             control_Cavalry.scale.set(Scale, Scale, Scale);
         }
 
+
         let isOpacity = "";
         let Archer_Material;
         let Warrior_Material;
         let Cavalry_Material;
-
-        let Archer_FBX;
-        let Warrior_FBX;
-        let Cavalry_FBX;
-
 
 
         function control_Opacity() {
@@ -1229,7 +1037,53 @@
             rightBtn.style['opacity'] = material_Archer.opacity;
         }
 
+        //新增第二台相機
+
+        var camera_Two = new THREE.PerspectiveCamera(80, window.innerWidth / window.innerHeight, 0.1, 10000);
+
+        let cameraHelper = new THREE.CameraHelper(camera_Two);
+        
+        scene.add(cameraHelper);
+
+        //Add mesh here
+
+        let tube;
+
+        const splines = { GrannyKnot: new Curves.GrannyKnot(), };//設定圖案形狀
+
+        const extrudePath = splines['GrannyKnot'];
+
+        const geometry = new THREE.TubeBufferGeometry(extrudePath, 100, 2, 8, true);//(曲線,橫的線段數,沿著曲線創造出來的半徑,直的線段數,管子是否封閉)
+      
+        const material = new THREE.MeshBasicMaterial({ color: 0xffffff, wireframe: true, side: THREE.Doubleside });
+
+        tube = new THREE.Mesh(geometry, material);
+
+      
+
+        scene.add(tube);
+
+
+
+        /*運鏡*/
+
+
+        function updateCamera() {
+
+            const time = clock.getElapsedTime();
+            const looptime = 20;//20秒的循環
+            const t1 = (time % looptime) / looptime;
+            const t2 = ((time + 0.1) % looptime) / looptime;
+
+            const pos1 = tube.geometry.parameters.path.getPointAt(t1);
+            const pos2 = tube.geometry.parameters.path.getPointAt(t2);
+
+            camera_Two.position.copy(pos1);
+            camera_Two.lookAt(pos2);
+        }
+
         window.addEventListener('resize', onWindowResize);
+
         function onWindowResize() {
 
             camera.aspect = window.innerWidth / window.innerHeight;
@@ -1239,21 +1093,7 @@
         }
 
         function animation() {
-
-            const delta = clock.getDelta();
-
-            if (mixer_Archer) {
-                mixer_Archer.update(delta);
-            }
-
-            if (mixer_Warrior) {
-                mixer_Warrior.update(delta);
-            }
-
-            if (mixer_Cavalry) {
-                mixer_Cavalry.update(delta);
-            }
-
+            updateCamera();
             // stats.update();
             TWEEN.update();
             controls.update();
@@ -1263,9 +1103,6 @@
             time();
             control_Scale();
             control_Opacity();
-            // console.log(controls.getDistance()); 
-
-            updateCamera();//運鏡
         }
 
         animation();//呼叫動畫函數，為了要抓到Load物件裡面東西
