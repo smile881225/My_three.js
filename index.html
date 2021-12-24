@@ -635,6 +635,81 @@
 
         scene.add(control_Cavalry);
 
+
+        //新增第二台相機
+
+        var camera_Two = new THREE.PerspectiveCamera(80, window.innerWidth / window.innerHeight, 0.1, 10000);
+
+        // let cameraHelper = new THREE.CameraHelper(camera_Two);
+
+        // scene.add(cameraHelper);
+
+        //Add mesh here
+
+        let tube;
+
+        const sampleClosedSpline = new THREE.CatmullRomCurve3([
+            new THREE.Vector3(-300, 200, -300),
+            new THREE.Vector3(300, 200, -300),
+            new THREE.Vector3(300, 200, 300),
+            new THREE.Vector3(-300, 200, 300),
+
+        ]);
+        sampleClosedSpline.tension = 1;
+        sampleClosedSpline.curveType = 'catmullrom';
+        sampleClosedSpline.closed = true;
+
+        const splines = { SampleClosedSpline: sampleClosedSpline };//設定圖案形狀
+
+        const extrudePath = splines['SampleClosedSpline'];
+
+        const geometry = new THREE.TubeBufferGeometry(extrudePath, 100, 2, 8, true);//(曲線,橫的線段數,沿著曲線創造出來的半徑,直的線段數,管子是否封閉)
+
+        const material = new THREE.MeshBasicMaterial({
+            color: 0xFF7878,
+            // wireframe: true, 
+            // side: THREE.Doubleside 
+        });
+
+        tube = new THREE.Mesh(geometry, material);
+
+        scene.add(tube);
+
+        /*運鏡*/
+
+        function updateCamera() {
+
+            let time;
+
+            if (isPlayAnimation == false) {
+                // clock.start();
+                time = clock.getElapsedTime();
+                const looptime = 10;//20秒的循環
+                const t1 = (time % looptime) / looptime;
+                const t2 = ((time + 0.1) % looptime) / looptime;
+
+                const pos1 = tube.geometry.parameters.path.getPointAt(t1);
+                const pos2 = tube.geometry.parameters.path.getPointAt(t2);
+
+                const camera_position = camera.position;
+
+                console.log(camera_position);
+
+                camera.position.copy(pos1);
+                camera.lookAt(0, 0, 0);
+
+            }
+
+            // else if (isPlayAnimation) {
+            //     // camera_Two.position.copy(pos1);
+            //     // camera_Two.lookAt(0, 0, 0);
+            //     // clock.stop();
+            // }
+
+            // camera.position.copy(pos1);
+            // camera.lookAt(0, 0, 0);
+        }
+
         /*--------控制點互動--------*/
 
         var raycaster = new THREE.Raycaster();//設定2D的射線(不懂請看觀念->滑鼠互動->58 Three.js.....)
@@ -989,7 +1064,7 @@
             const Cavalry_FBX_action = mixer_Cavalry.clipAction(Cavalry_FBX.animations[0]);
 
             if (isPlayAnimation == false) {
-          
+
                 Archer_FBX.visible = false;
                 Warrior_FBX.visible = false;
                 Cavalry_FBX.visible = false;
@@ -1000,10 +1075,10 @@
 
                 isPlayAnimation = true;
 
-                Archer_FBX_action.stop();//動畫播放
-                Warrior_FBX_action.stop();//動畫播放
-                Cavalry_FBX_action.stop();//動畫播放
-            
+                Archer_FBX_action.stop();//動畫停止
+                Warrior_FBX_action.stop();//動畫停止
+                Cavalry_FBX_action.stop();//動畫停止
+
             }
 
             else if (isPlayAnimation) {
@@ -1023,10 +1098,6 @@
                 Cavalry_FBX_action.play();//動畫播放
 
             }
-
-            console.log('123');
-
-
 
         }
 
@@ -1055,8 +1126,6 @@
         let Archer_FBX;
         let Warrior_FBX;
         let Cavalry_FBX;
-
-
 
         function control_Opacity() {
 
@@ -1221,6 +1290,7 @@
             control_Opacity();
             // console.log(controls.getDistance()); 
 
+            updateCamera();//運鏡
         }
 
         animation();//呼叫動畫函數，為了要抓到Load物件裡面東西

@@ -640,9 +640,9 @@
 
         var camera_Two = new THREE.PerspectiveCamera(80, window.innerWidth / window.innerHeight, 0.1, 10000);
 
-        let cameraHelper = new THREE.CameraHelper(camera_Two);
+        // let cameraHelper = new THREE.CameraHelper(camera_Two);
 
-        scene.add(cameraHelper);
+        // scene.add(cameraHelper);
 
         //Add mesh here
 
@@ -676,46 +676,35 @@
         scene.add(tube);
 
         /*運鏡*/
-        let clock_Animation = new THREE.Clock();
-
-        clock_Animation.autoStart=false;
-        
-        clock_Animation.play();
-        let time_Animation;
 
         function updateCamera() {
-      
+
+            let time;
 
             if (isPlayAnimation == false) {
-                // clock_Animation.stop;
-
-                time_Animation = clock_Animation.getElapsedTime();
-
-                console.log(clock_Animation);
+                // clock.start();
+                time = clock.getElapsedTime();
                 const looptime = 10;//20秒的循環
-                const t1 = (time_Animation % looptime) / looptime;
-                const t2 = ((time_Animation + 0.1) % looptime) / looptime;
-
-                console.log(time_Animation);
+                const t1 = (time % looptime) / looptime;
+                const t2 = ((time + 0.1) % looptime) / looptime;
 
                 const pos1 = tube.geometry.parameters.path.getPointAt(t1);
                 const pos2 = tube.geometry.parameters.path.getPointAt(t2);
 
                 const camera_position = camera.position;
 
-                // console.log(camera_position);
+                console.log(camera_position);
 
                 camera.position.copy(pos1);
                 camera.lookAt(0, 0, 0);
 
             }
 
-            else if (isPlayAnimation) {
-                clock_Animation.stop();
-                // camera_Two.position.copy(pos1);
-                // camera_Two.lookAt(0, 0, 0);
-
-            }
+            // else if (isPlayAnimation) {
+            //     // camera_Two.position.copy(pos1);
+            //     // camera_Two.lookAt(0, 0, 0);
+            //     // clock.stop();
+            // }
 
             // camera.position.copy(pos1);
             // camera.lookAt(0, 0, 0);
@@ -1075,7 +1064,7 @@
             const Cavalry_FBX_action = mixer_Cavalry.clipAction(Cavalry_FBX.animations[0]);
 
             if (isPlayAnimation == false) {
-                time_Animation = clock.getElapsedTime();
+
                 Archer_FBX.visible = false;
                 Warrior_FBX.visible = false;
                 Cavalry_FBX.visible = false;
