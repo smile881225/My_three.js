@@ -679,31 +679,22 @@
 
         function updateCamera() {
 
-
+           
 
             if (isPlayAnimation == false) {
                 // clock.start();
                 const time = clock.getElapsedTime();
 
                 const looptime = 10;//20秒的循環
+                const t1 = (time % looptime) / looptime;
+                const t2 = ((time + 0.1) % looptime) / looptime;
 
-                const t1 = time % looptime / looptime;//曲線的位置 0~1
-                const t2 = ((time % looptime) / looptime) + 0.3;
-                const t3 = ((time % looptime) / looptime) + 0.5;
-         
                 const pos1 = tube.geometry.parameters.path.getPointAt(t1);
+                const pos2 = tube.geometry.parameters.path.getPointAt(t2);
 
                 const camera_position = camera.position;
 
-                t1 = t2;
-
-                if(t1==t3){
-
-                }
-
-
-
-
+                console.log(time);
 
                 camera.position.copy(pos1);
                 camera.lookAt(0, 0, 0);
