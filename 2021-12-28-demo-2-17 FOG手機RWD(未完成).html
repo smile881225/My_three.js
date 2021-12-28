@@ -33,7 +33,7 @@
 
         .music {
             position: fixed;
-            height: 43px;
+            /* height: 43px; */
             width: 43px;
             bottom: 1.75%;
             left: 1.13%;
@@ -60,7 +60,7 @@
         }
 
         .start {
-            height: 96px;
+            /* height: 96px; */
             width: 96px;
             cursor: pointer;
         }
@@ -142,6 +142,9 @@
                 opacity: 0;
             }
         } */
+        @media (max-width:1080px){
+            
+        }
     </style>
 </head>
 
@@ -182,7 +185,7 @@
         var controls;
         var scene = new THREE.Scene();
         var camera = new THREE.PerspectiveCamera(80, window.innerWidth / window.innerHeight, 0.1, 10000);
-        var renderer = new THREE.WebGLRenderer();
+        var renderer = new THREE.WebGLRenderer({ antialias: true, });
         var isBtn;
         renderer.setSize(window.innerWidth, window.innerHeight);
         document.body.appendChild(renderer.domElement);
@@ -190,6 +193,8 @@
         /*--------載入時鐘--------*/
 
         var clock = new THREE.Clock();
+
+        scene.fog = new THREE.FogExp2( 0xffffff, 0.0015 );
 
         /*--------載入音樂--------*/
 
@@ -942,9 +947,9 @@
                     Warrior_Material.visible = true;
                     Cavalry_Material.visible = true;
 
-                    Archer_Material.depthWrite = false;
-                    Warrior_Material.depthWrite = false;
-                    Cavalry_Material.depthWrite = false;
+                    // Archer_Material.depthWrite = false;
+                    // Warrior_Material.depthWrite = false;
+                    // Cavalry_Material.depthWrite = false;
 
 
                 }
@@ -985,14 +990,27 @@
             }//起點
 
             if (control_Name == 'leave') {//如果鏡頭是近的
-                target = {
-                    Camera_x: 0,
-                    Camera_y: 320,
-                    Camera_z: 434,
-                    controls_x: 16,
-                    controls_y: 90,
-                    controls_z: 0,
-                }//終點
+                if (camera.position.z >= 0) {
+                    target = {
+                        Camera_x: 0,
+                        Camera_y: 320,
+                        Camera_z: 434,
+                        controls_x: 16,
+                        controls_y: 90,
+                        controls_z: 0,
+                    }//終點
+                }
+
+                else if (camera.position.z < 0) {
+                    target = {
+                        Camera_x: 0,
+                        Camera_y: 320,
+                        Camera_z: -434,
+                        controls_x: 16,
+                        controls_y: 90,
+                        controls_z: 0,
+                    }//終點
+                }
                 var tween = new TWEEN.Tween(offset) // 建立新的 Tween 物件來改變 position
                     .to(target, 1000) // 在 1000ms 內移動至target
                     .easing(TWEEN.Easing.Quadratic.Out) // 補間動畫效果曲線
@@ -1076,15 +1094,26 @@
             else if (control_Name == 'control_Warrior') {
                 dialogText = "戰士";
                 if (nearWarrior == false) {//如果鏡頭是遠的
-
-                    target = {
-                        Camera_x: 16,
-                        Camera_y: 116,
-                        Camera_z: 140,
-                        controls_x: 16,
-                        controls_y: 90,
-                        controls_z: 0,
-                    }//終點
+                    if (camera.position.z >= 0) {
+                        target = {
+                            Camera_x: 16,
+                            Camera_y: 116,
+                            Camera_z: 140,
+                            controls_x: 16,
+                            controls_y: 90,
+                            controls_z: 0,
+                        }//終點
+                    }
+                    else if (camera.position.z < 0) {
+                        target = {
+                            Camera_x: 16,
+                            Camera_y: 116,
+                            Camera_z: -140,
+                            controls_x: 16,
+                            controls_y: 90,
+                            controls_z: 0,
+                        }//終點}
+                    }
 
                     tween = new TWEEN.Tween(offset) // 建立新的 Tween 物件來改變 position
                         .to(target, 1000) // 在 1000ms 內移動至target
@@ -1111,14 +1140,28 @@
             if (control_Name == 'control_Cavalry') {
                 dialogText = "騎兵";
                 if (nearCavalry == false) {//如果鏡頭不是近的
-                    target = {
-                        Camera_x: -130,
-                        Camera_y: 164,
-                        Camera_z: 130,
-                        controls_x: -156,
-                        controls_y: 110,
-                        controls_z: -58,
-                    }//終點
+                    if (camera.position.z >= 0) {
+                        target = {
+                            Camera_x: -130,
+                            Camera_y: 164,
+                            Camera_z: 130,
+                            controls_x: -156,
+                            controls_y: 110,
+                            controls_z: -58,
+                        }//終點
+                    }
+                    else if (camera.position.z < 0) {
+                        target = {
+                            Camera_x: -130,
+                            Camera_y: 164,
+                            Camera_z: -130,
+                            controls_x: -156,
+                            controls_y: 110,
+                            controls_z: -58,
+                        }//終點}
+                    }
+
+
 
                     tween = new TWEEN.Tween(offset) // 建立新的 Tween 物件來改變 position
                         .to(target, 1000) // 在 1000ms 內移動至target
@@ -1174,7 +1217,7 @@
 
         saoPass.params.output = 0;
         saoPass.params.saoBias = -0.204;
-        saoPass.params.saoIntensity = 0.004;
+        saoPass.params.saoIntensity = 0.001;
         saoPass.params.saoScale = 6.31;
         saoPass.params.saoKernelRadius = 2;
         saoPass.params.saoMinResolution = 0.0001;

@@ -40,12 +40,17 @@
 
         var scene = new THREE.Scene();
         var camera = new THREE.PerspectiveCamera(80, window.innerWidth / window.innerHeight, 0.1, 10000);
-        var renderer = new THREE.WebGLRenderer();
+        var renderer = new THREE.WebGLRenderer({ antialias: true, });
         renderer.setSize(window.innerWidth, window.innerHeight);
         document.body.appendChild(renderer.domElement);
 
         //Palne
-       
+        // renderer.physicallyCorrectLights = true;
+        // renderer.outputEncoding = THREE.sRGBEncoding;
+
+        // renderer.gammaOutput = true;
+        // renderer.gammaFactor =0.1;
+
         const texture = new THREE.TextureLoader().load("./img/carpet-2.jpg");
         const planeGeometry = new THREE.PlaneGeometry(2000, 2000, 32, 32);
         const planeMaterial = new THREE.MeshStandardMaterial({ map: texture })
@@ -85,13 +90,13 @@
 
         });
 
-        
+
         let fbxLoader = new FBXLoader();
         let anim = new FBXLoader();
         let mixer = new THREE.AnimationMixer
 
         fbxLoader.load(
-            './3D_Object/測試用/弓箭手-攻擊-v2.fbx',
+            './3D_Object/東駿的模型FBX(沒有預設燈光)/弓箭手-攻擊-藍色.fbx',
             (object) => {
                 // object.traverse(function (child) {
                 //     if ((child as THREE.Mesh).isMesh) {
@@ -101,18 +106,23 @@
                 //         }
                 //     }
                 // })
+                console.log(object);
                 mixer = new THREE.AnimationMixer(object)
 
+                /*調RGB*/
+                // object.children[0].material.color.b=0.8;
+                // object.children[0].material.color.g=0.8;
+                // object.children[0].material.color.r=0.8;
                 // object.scale.set(0.3, 0.3, 0.3)
+                object.position.set(0, 65, 30);
+                // object.children[0].material.color.setHSL(0,0,0);
+
+                // object.setHSL(0,0,0);
+
                 scene.add(object)
-                object.position.set(100, 65, 150);
             }
 
-
         )
-
-
-
 
         //camera設定
 
@@ -121,12 +131,14 @@
 
         //sence 背景顏色
 
-        scene.background = new THREE.Color(0xffffff);
+        // scene.background = new THREE.Color(0xffffff);
 
         /*--------添加燈光--------*/
 
-        var light = new THREE.HemisphereLight(0xffffff, 0x000000,0.5);
+        var light = new THREE.HemisphereLight(0xffffff, 0x000000, 2);
         scene.add(light);
+
+
 
         //滑鼠控制camera
 
@@ -135,8 +147,8 @@
         controls.enablePan = false;
         controls.maxPolarAngle = Math.PI / 2;
         controls.enableDamping = true;
-        controls.autoRotate = true;//自動旋轉
-        controls.autoRotaeSpeed = 5;//控制旋轉速度
+        // controls.autoRotate = true;//自動旋轉
+        // controls.autoRotaeSpeed = 5;//控制旋轉速度
         controls.minDistance = 100;//controls縮放最小距離
         controls.maxDistance = 400;//controls縮放最大距離
 
@@ -149,6 +161,7 @@
         CameraPosition.add(controls.target, 'z', -1000, 1000);
         CameraPosition.open();
 
+        renderer.gammaOutput = true;
 
 
         function animation() {
