@@ -260,7 +260,7 @@
         var lightBtn, changeLight;
         renderer.shadowMap.enabled = true;//把Renderer的陰影選項打開
         renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-        PointLight = new THREE.PointLight(0xffffff, 0.7);
+        PointLight = new THREE.PointLight(0xffffff, 0.9);
         PointLight.castShadow = true;
         PointLight.shadow.mapSize.width = 2048;
         PointLight.shadow.mapSize.height = 2048;
@@ -319,7 +319,7 @@
             console.log('switchPointLighta');
             renderer.shadowMap.enabled = true;
             renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-            PointLight = new THREE.PointLight(0xffffff, 0.6);
+            PointLight = new THREE.PointLight(0xffffff, 0.9);
             PointLight.castShadow = true;
             PointLight.shadow.mapSize.width = 512;
             PointLight.shadow.mapSize.height = 512;
@@ -609,12 +609,15 @@
 
             object.position.set(250, 110, 18);//250 110 18
             object.name = 'Cavalry_FBX';
+            // object.material.opacity.transparent=true;
             object.visible = false;
             scene.add(object);
-
+            console.log(object);
             Archer_FBX = scene.getObjectByName('Archer_FBX');
             Warrior_FBX = scene.getObjectByName('Warrior_FBX');
             Cavalry_FBX = scene.getObjectByName('Cavalry_FBX');
+
+
 
         });
 
@@ -640,21 +643,21 @@
 
         var camera_Two = new THREE.PerspectiveCamera(80, window.innerWidth / window.innerHeight, 0.1, 10000);
 
-        let cameraHelper = new THREE.CameraHelper(camera_Two);
+        // let cameraHelper = new THREE.CameraHelper(camera_Two);
 
-        scene.add(cameraHelper);
+        // scene.add(cameraHelper);
 
-        //增加第一條曲線curve
+        // 增加第一條曲線curve
 
         let curve;
 
         function creatCurve() {
 
             const sampleClosedSpline = new THREE.CatmullRomCurve3([
-                new THREE.Vector3(-300, 200, -300),
-                new THREE.Vector3(300, 200, -300),
-                new THREE.Vector3(300, 200, 300),
-                new THREE.Vector3(-300, 200, 300),
+                new THREE.Vector3(-300, 300, -300),
+                new THREE.Vector3(300, 300, -300),
+                new THREE.Vector3(300, 300, 300),
+                new THREE.Vector3(-300, 300, 300),
 
             ]);
             sampleClosedSpline.tension = 1;
@@ -669,6 +672,7 @@
 
             const material = new THREE.MeshBasicMaterial({
                 color: 0xFF7878,
+                // transparent: true,
                 // wireframe: true, 
                 // side: THREE.Doubleside 
             });
@@ -677,6 +681,7 @@
 
             scene.add(curve);
 
+            curve.visible = false;
         }
 
         creatCurve();
@@ -688,10 +693,10 @@
         function creatCurve2() {
 
             const sampleClosedSpline = new THREE.CatmullRomCurve3([
-                new THREE.Vector3(50, 150, -100),
-                new THREE.Vector3(250, 150, -100),
-                new THREE.Vector3(250, 150, 100),
-                new THREE.Vector3(50, 150, 100),
+                new THREE.Vector3(20, 150, -80),
+                new THREE.Vector3(270, 150, -80),
+                new THREE.Vector3(270, 150, 150),
+                new THREE.Vector3(20, 150, 150),
 
             ]);
             sampleClosedSpline.tension = 1;
@@ -714,52 +719,176 @@
 
             scene.add(curve2);
 
+            curve2.visible = false;
         }
 
         creatCurve2();
 
+        //增加第三條曲線curve
+
+        let curve3;
+
+        function creatCurve3() {
+
+            const sampleClosedSpline = new THREE.CatmullRomCurve3([
+                new THREE.Vector3(-120, 150, -80),
+                new THREE.Vector3(130, 150, -80),
+                new THREE.Vector3(130, 150, 120),
+                new THREE.Vector3(-120, 150, 120),
+
+            ]);
+            sampleClosedSpline.tension = 1;
+            sampleClosedSpline.curveType = 'catmullrom';
+            sampleClosedSpline.closed = true;
+
+            const splines = { SampleClosedSpline: sampleClosedSpline };//設定圖案形狀
+
+            const extrudePath = splines['SampleClosedSpline'];
+
+            const geometry = new THREE.TubeBufferGeometry(extrudePath, 100, 2, 8, true);//(曲線,橫的線段數,沿著曲線創造出來的半徑,直的線段數,管子是否封閉)
+
+            const material = new THREE.MeshBasicMaterial({
+                color: 0xFF7878,
+                // wireframe: true, 
+                // side: THREE.Doubleside 
+            });
+
+            curve3 = new THREE.Mesh(geometry, material);
+
+            scene.add(curve3);
+
+            curve3.visible = false;
+
+        }
+
+        creatCurve3();
+
+        //增加第四條曲線curve
+
+        let curve4;
+
+        function creatCurve4() {
+
+            const sampleClosedSpline = new THREE.CatmullRomCurve3([
+
+                new THREE.Vector3(-220, 150, -130),
+                new THREE.Vector3(-20, 150, -130),
+                new THREE.Vector3(-20, 150, 70),
+                new THREE.Vector3(-220, 150, 70),
+
+            ]);
+            sampleClosedSpline.tension = 1;
+            sampleClosedSpline.curveType = 'catmullrom';
+            sampleClosedSpline.closed = true;
+
+            const splines = { SampleClosedSpline: sampleClosedSpline };//設定圖案形狀
+
+            const extrudePath = splines['SampleClosedSpline'];
+
+            const geometry = new THREE.TubeBufferGeometry(extrudePath, 100, 2, 8, true);//(曲線,橫的線段數,沿著曲線創造出來的半徑,直的線段數,管子是否封閉)
+
+            const material = new THREE.MeshBasicMaterial({
+                color: 0xFF7878,
+                // wireframe: true, 
+                // side: THREE.Doubleside 
+            });
+
+            curve4 = new THREE.Mesh(geometry, material);
+
+            scene.add(curve4);
+
+            curve4.visible = false;
+
+        }
+
+        creatCurve4();
+
         /*運鏡*/
 
         let cameratime = 0;
-        let pos1;
+        let pos;
         function updateCamera() {
-
-
-            console.log(cameratime);
 
             if (isPlayAnimation == true) {
 
                 cameratime = 0;
 
-
             }
 
             else if (isPlayAnimation == false) {
-
 
                 cameratime += 0.02;
 
                 const looptime = 10;//10秒的循環
 
-                const t1 = ((cameratime % looptime) / looptime) + 0.5;//起始點
-                const t2 = (0 / looptime) + 0.8;//第二個斷點
 
-                if (t1 >= t2) {
-                    pos1 = curve2.geometry.parameters.path.getPointAt(t1);
+                const t1 = (((cameratime % looptime) / looptime) +0.45) % 1;//弓箭手
+                const t2 = (((cameratime % looptime) / looptime) +0.1) % 1;//戰士
+                const t3 = (((cameratime % looptime) / looptime) +0.8) % 1;//騎兵
+                const t4 = (((cameratime % looptime) / looptime) +0.4) % 1;//起始點
+
+                const b1 = 0;//0秒的時候 斷點10*(0.8-0.45)
+                const b2 = 3;//3秒的時候 斷點10*(0.8-0.5)
+                const b3 = 6.5;//7秒的時候 斷點3+10*(0.4-0.1)
+                const b4 = 10;//10秒的時候 斷點7+10*(0.75-0.45)
+                const b5 = 14;//8秒的時候 斷點10+10*(0.75-0.45)
+
+                // const test = (((cameratime % looptime) / looptime) +0.7) % 1;//起始點
+                // pos = curve2.geometry.parameters.path.getPointAt(test);
+
+                if (cameratime >= b5) {//回到原點
+
+                    cameratime = 0;
                 }
-                else if(t1 < t2){
-                    pos1 = curve.geometry.parameters.path.getPointAt(t1);
+
+                if (cameratime >= b4) {//全部人的曲線
+                    pos = curve.geometry.parameters.path.getPointAt(t4);
+                    controls.target.set(16, 90, 0);//初始的滑鼠控制中心點
+                    camera.lookAt(0, 0, 0);
+
+                    Archer_FBX.visible = true;
+                    Warrior_FBX.visible = true;
+                    Cavalry_FBX.visible = true;
                 }
 
+                else if (cameratime >= b3) {//騎兵的曲線
+                    pos = curve4.geometry.parameters.path.getPointAt(t3);
+                    controls.target.set(-156, 110, -58);
+                    camera.lookAt(-156, 110, -58);
 
-                camera_Two.position.copy(pos1);
+                    Archer_FBX.visible = false;
+                    Warrior_FBX.visible = false;
+                    Cavalry_FBX.visible = true;
 
-                camera_Two.lookAt(0, 0, 0);
+                }
+
+                else if (cameratime >= b2) {//戰士的曲線
+                    pos = curve3.geometry.parameters.path.getPointAt(t2);
+                    controls.target.set(16, 90, 0);
+                    camera.lookAt(16, 90, 0);
+
+                    Archer_FBX.visible = false;
+                    Warrior_FBX.visible = true;
+                    Cavalry_FBX.visible = false;
+                }
+
+                else if (cameratime >= b1) {//弓箭手的曲線
+                    pos = curve2.geometry.parameters.path.getPointAt(t1);
+                    controls.target.set(178, 110, 16);
+                    camera.lookAt(178, 110, 16);
+
+                    Archer_FBX.visible = true;
+                    Warrior_FBX.visible = false;
+                    Cavalry_FBX.visible = false;
+                }
+
+                // camera_Two.position.copy(pos);
+                // camera_Two.lookAt(0, 0, 0);
+                camera.position.copy(pos);
+                camera.lookAt(0, 0, 0);
 
             }
 
-            // camera.position.copy(pos1);
-            // camera.lookAt(0, 0, 0);
         }
 
         /*--------控制點互動--------*/
@@ -802,7 +931,7 @@
 
 
                 }
-                else if (ooxx < 0.2 && (nearArcher || nearWarrior || nearCavalry) && isBtn == false) {
+                else if (downTime < 0.2 && (nearArcher || nearWarrior || nearCavalry) && isBtn == false) {
                     control_Name = 'leave';
 
                     isOpacity = "clickOut";
@@ -1086,16 +1215,16 @@
 
         body.addEventListener('mousedown', down);
         body.addEventListener('mouseup', up)
-        let ooxx;
+        let downTime;
         function down() {
             count = 0;
             // console.log('egeg');
         }
 
         function up() {
-            ooxx = count;
+            downTime = count;
             count = 0;
-            // console.log(ooxx);
+            // console.log(downTime);
         }
 
         /*--------動畫切換控制--------*/
@@ -1131,6 +1260,15 @@
                 Warrior_FBX_action.stop();//動畫停止
                 Cavalry_FBX_action.stop();//動畫停止
                 camera.position.set(0, 320, 434);//初始的Camera位置
+                controls.target.set(16, 90, 0);//初始的滑鼠控制中心點
+
+                //控制點顯示
+
+                material_Archer.visible = true;
+                material_Warrior.visible = true;
+                material_Cavalry.visible = true;
+
+                controls.enabled = true;//滑鼠控制啟用
             }
 
             else if (isPlayAnimation) {
@@ -1149,6 +1287,13 @@
                 Warrior_FBX_action.play();//動畫播放
                 Cavalry_FBX_action.play();//動畫播放
 
+                //控制點不顯示
+
+                material_Archer.visible = false;
+                material_Warrior.visible = false;
+                material_Cavalry.visible = false;
+
+                controls.enabled = false;//滑鼠控制不啟用
             }
 
         }
@@ -1213,7 +1358,7 @@
                     material_Warrior.opacity = 0;
                     material_Cavalry.opacity = 0;
 
-                    //模型不顯示
+                    //控制點不顯示
 
                     material_Archer.visible = false;
                     material_Warrior.visible = false;

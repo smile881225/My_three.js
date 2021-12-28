@@ -240,7 +240,7 @@
         // camera.position.set(-156, 164, 130);//騎兵的Camera
 
         /*-------滑鼠控制---------*/
-
+    
         controls = new OrbitControls(camera, renderer.domElement);
         controls.target.set(16, 90, 0);//初始的滑鼠控制中心點
 
@@ -260,7 +260,7 @@
         var lightBtn, changeLight;
         renderer.shadowMap.enabled = true;//把Renderer的陰影選項打開
         renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-        PointLight = new THREE.PointLight(0xffffff, 0.9);
+        PointLight = new THREE.PointLight(0xffffff, 0.7);
         PointLight.castShadow = true;
         PointLight.shadow.mapSize.width = 2048;
         PointLight.shadow.mapSize.height = 2048;
@@ -319,7 +319,7 @@
             console.log('switchPointLighta');
             renderer.shadowMap.enabled = true;
             renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-            PointLight = new THREE.PointLight(0xffffff, 0.9);
+            PointLight = new THREE.PointLight(0xffffff, 0.6);
             PointLight.castShadow = true;
             PointLight.shadow.mapSize.width = 512;
             PointLight.shadow.mapSize.height = 512;
@@ -430,7 +430,7 @@
 
         let loader = new FBXLoader();
 
-        loader.load('./3D_Object/測試用/弓箭手-攻擊-v2.fbx', function (object) {
+        loader.load('./3D_Object/東駿的模型FBX(有預設燈光)/弓箭手-攻擊.fbx', function (object) {
 
             mixer_Archer = new THREE.AnimationMixer(object);
 
@@ -618,7 +618,7 @@
             Cavalry_FBX = scene.getObjectByName('Cavalry_FBX');
 
 
-
+            
         });
 
         /*--------加入騎兵的控制點--------*/
@@ -647,7 +647,7 @@
 
         // scene.add(cameraHelper);
 
-        // 增加第一條曲線curve
+        //增加第一條曲線curve
 
         let curve;
 
@@ -812,82 +812,79 @@
             if (isPlayAnimation == true) {
 
                 cameratime = 0;
-
+         
             }
 
             else if (isPlayAnimation == false) {
 
-                // cameratime += 0.02;
+                cameratime += 0.02;
 
-                // const looptime = 10;//10秒的循環
+                const looptime = 10;//10秒的循環
 
+                const t1 = (((cameratime % looptime) / looptime) + 0.5) % 1;//起始點
+                const t2 = (((cameratime % looptime) / looptime) + 0.1) % 1;//第二條曲線的起始點
+                const t3 = (((cameratime % looptime) / looptime) + 0.8) % 1;
+                const t4 = (((cameratime % looptime) / looptime) + 0.45) % 1;
 
-                // const t1 = (((cameratime % looptime) / looptime) +0.45) % 1;//弓箭手
-                // const t2 = (((cameratime % looptime) / looptime) +0.1) % 1;//戰士
-                // const t3 = (((cameratime % looptime) / looptime) +0.8) % 1;//騎兵
-                // const t4 = (((cameratime % looptime) / looptime) +0.4) % 1;//起始點
+                const b1 = 0;//0秒的時候 斷點10*(0.8-0.5)
+                const b2 = 3;//3秒的時候 斷點10*(0.8-0.5)
+                const b3 = 6;//7秒的時候 斷點3+10*(0.4-0.1)
+                const b4 = 10;//10秒的時候 斷點7+10*(0.75-0.45)
+                const b5 = 13;//8秒的時候 斷點10+10*(0.75-0.45)
 
-                // const b1 = 0;//0秒的時候 斷點10*(0.8-0.45)
-                // const b2 = 3;//3秒的時候 斷點10*(0.8-0.5)
-                // const b3 = 6.5;//7秒的時候 斷點3+10*(0.4-0.1)
-                // const b4 = 10;//10秒的時候 斷點7+10*(0.75-0.45)
-                // const b5 = 14;//8秒的時候 斷點10+10*(0.75-0.45)
+                if (cameratime >= b5) {//回到原點
+                    controls.target.set(16, 90, 0);//初始的滑鼠控制中心點
+                    cameratime = 0;
 
-                // const test = (((cameratime % looptime) / looptime) +0.7) % 1;//起始點
-                // pos = curve2.geometry.parameters.path.getPointAt(test);
+                    Archer_FBX.visible=true;
+                    Warrior_FBX.visible=true;
+                    Cavalry_FBX.visible=true;
+                }
 
-                // if (cameratime >= b5) {//回到原點
+                if (cameratime >= b4) {//騎兵的曲線
+                    pos = curve4.geometry.parameters.path.getPointAt(t4);
+                    controls.target.set(-156, 110, -58);
+                    camera.lookAt(-156, 110, -58);
 
-                //     cameratime = 0;
-                // }
+                    Archer_FBX.visible=false;
+                    Warrior_FBX.visible=false;
+                    Cavalry_FBX.visible=true;
+                }
 
-                // if (cameratime >= b4) {//全部人的曲線
-                //     pos = curve.geometry.parameters.path.getPointAt(t4);
-                //     controls.target.set(16, 90, 0);//初始的滑鼠控制中心點
-                //     camera.lookAt(0, 0, 0);
+                else if (cameratime >= b3) {//戰士的曲線
+                    pos = curve3.geometry.parameters.path.getPointAt(t3);
+                    controls.target.set(16, 90, 0);
+                    camera.lookAt(16, 90, 0);
 
-                //     Archer_FBX.visible = true;
-                //     Warrior_FBX.visible = true;
-                //     Cavalry_FBX.visible = true;
-                // }
+                    Archer_FBX.visible=false;
+                    Warrior_FBX.visible=true;
+                    Cavalry_FBX.visible=false;
+                }
 
-                // else if (cameratime >= b3) {//騎兵的曲線
-                //     pos = curve4.geometry.parameters.path.getPointAt(t3);
-                //     controls.target.set(-156, 110, -58);
-                //     camera.lookAt(-156, 110, -58);
+                else if (cameratime >= b2) {//弓箭手的曲線
+                    pos = curve2.geometry.parameters.path.getPointAt(t2);
+                    controls.target.set(178, 110, 16);
+                    camera.lookAt(178, 110, 16);
 
-                //     Archer_FBX.visible = false;
-                //     Warrior_FBX.visible = false;
-                //     Cavalry_FBX.visible = true;
+                    Archer_FBX.visible=true;
+                    Warrior_FBX.visible=false;
+                    Cavalry_FBX.visible=false;
+                }
 
-                // }
-
-                // else if (cameratime >= b2) {//戰士的曲線
-                //     pos = curve3.geometry.parameters.path.getPointAt(t2);
-                //     controls.target.set(16, 90, 0);
-                //     camera.lookAt(16, 90, 0);
-
-                //     Archer_FBX.visible = false;
-                //     Warrior_FBX.visible = true;
-                //     Cavalry_FBX.visible = false;
-                // }
-
-                // else if (cameratime >= b1) {//弓箭手的曲線
-                //     pos = curve2.geometry.parameters.path.getPointAt(t1);
-                //     controls.target.set(178, 110, 16);
-                //     camera.lookAt(178, 110, 16);
-
-                //     Archer_FBX.visible = true;
-                //     Warrior_FBX.visible = false;
-                //     Cavalry_FBX.visible = false;
-                // }
+                else if (cameratime >= b1) {//全部人的曲線
+                    pos = curve.geometry.parameters.path.getPointAt(t1);
+                    controls.target.set(16, 90, 0);//初始的滑鼠控制中心點
+                    camera.lookAt(0, 0, 0);
+                }
+                
 
                 // camera_Two.position.copy(pos);
                 // camera_Two.lookAt(0, 0, 0);
-                // camera.position.copy(pos);
-                // camera.lookAt(0, 0, 0);
+                camera.position.copy(pos);
+                camera.lookAt(0, 0, 0);
 
             }
+
 
         }
 
@@ -985,7 +982,6 @@
             }//起點
 
             if (control_Name == 'leave') {//如果鏡頭是近的
-                
                 target = {
                     Camera_x: 0,
                     Camera_y: 320,
@@ -1262,14 +1258,14 @@
                 Cavalry_FBX_action.stop();//動畫停止
                 camera.position.set(0, 320, 434);//初始的Camera位置
                 controls.target.set(16, 90, 0);//初始的滑鼠控制中心點
-
+                
                 //控制點顯示
 
                 material_Archer.visible = true;
                 material_Warrior.visible = true;
                 material_Cavalry.visible = true;
 
-                controls.enabled = true;//滑鼠控制啟用
+                controls.enabled=true;//滑鼠控制啟用
             }
 
             else if (isPlayAnimation) {
@@ -1294,7 +1290,7 @@
                 material_Warrior.visible = false;
                 material_Cavalry.visible = false;
 
-                controls.enabled = false;//滑鼠控制不啟用
+                controls.enabled=false;//滑鼠控制不啟用
             }
 
         }

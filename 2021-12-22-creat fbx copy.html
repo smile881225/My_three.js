@@ -34,8 +34,7 @@
         import { FBXLoader } from './Loader/FBXLoader/FBXLoader.js'
         import { OrbitControls } from './js/OrbitControls.js';
         import { GUI } from './js/lil-gui.module.min.js';
-        import { OBJLoader } from './Loader/OBJLoader.js';
-        import { MTLLoader } from './Loader/MTLLoader.js';
+
         //初始化
 
         var scene = new THREE.Scene();
@@ -45,7 +44,7 @@
         document.body.appendChild(renderer.domElement);
 
         //Palne
-       
+
         const texture = new THREE.TextureLoader().load("./img/carpet-2.jpg");
         const planeGeometry = new THREE.PlaneGeometry(2000, 2000, 32, 32);
         const planeMaterial = new THREE.MeshStandardMaterial({ map: texture })
@@ -54,44 +53,14 @@
         plane.rotateX(-1.57);//旋轉平面 會寫負的是因為Plane的背面預設是不會顯示的，所以要翻對邊
         scene.add(plane);
 
+        //const material = new THREE.MeshNormalMaterial()
 
-        var mtlLoader;
-        mtlLoader = new MTLLoader();
-
-        var Archer_mtl = "./3D_Object/東駿的模型OBJ/弓箭手.mtl";
-        mtlLoader.load(Archer_mtl, function (materials) {
-            materials.preload();
-            var objLoader = new OBJLoader();
-            objLoader.setMaterials(materials);
-            // mtlLoader.setMaterialOptions({
-            //     invertTrProperty:true
-            // })
-            objLoader.load('./3D_Object/東駿的模型OBJ/弓箭手.obj', function (object) {
-
-                object.traverse(function (node) {
-                    if (node instanceof THREE.Mesh) {
-                        node.castShadow = true; //default is false
-                        // node.receiveShadow = false; //default
-                        node.receiveShadow = true; //default
-                    }
-                })
-                object.position.set(100, 65, 150);
-                // object.position.x = 100;
-                // object.position.y = 65;
-
-                scene.add(object);
-                object.name = 'Archer';
-            });
-
-        });
-
-        
         let fbxLoader = new FBXLoader();
         let anim = new FBXLoader();
         let mixer = new THREE.AnimationMixer
-
+        
         fbxLoader.load(
-            './3D_Object/測試用/弓箭手-攻擊-v2.fbx',
+            './3D_Object/FBX/maria_j_j_ong.fbx',
             (object) => {
                 // object.traverse(function (child) {
                 //     if ((child as THREE.Mesh).isMesh) {
@@ -103,15 +72,12 @@
                 // })
                 mixer = new THREE.AnimationMixer(object)
 
-                // object.scale.set(0.3, 0.3, 0.3)
+                object.scale.set(0.3, 0.3, 0.3)
                 scene.add(object)
-                object.position.set(100, 65, 150);
             }
 
 
         )
-
-
 
 
         //camera設定
@@ -125,7 +91,7 @@
 
         /*--------添加燈光--------*/
 
-        var light = new THREE.HemisphereLight(0xffffff, 0x000000,0.5);
+        var light = new THREE.HemisphereLight(0xffffff, 0x000000, 1);
         scene.add(light);
 
         //滑鼠控制camera
