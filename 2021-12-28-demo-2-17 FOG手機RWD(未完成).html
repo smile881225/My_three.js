@@ -53,7 +53,7 @@
         }
 
         .light {
-            height: 43px;
+
             width: 43px;
             cursor: pointer;
             margin: 0 auto;
@@ -142,8 +142,35 @@
                 opacity: 0;
             }
         } */
-        @media (max-width:1080px){
-            
+        @media (max-width:1024px) {
+
+            .music {
+                /* height: 43px; */
+                width: 60px;
+                bottom: 1.75%;
+                left: 1.13%;
+            }
+
+            .right {
+                height: 190px;
+                width: 110px;
+                bottom: 1.75%;
+                right: 1.3%;
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between;
+            }
+
+            .light {
+                width: 60px;
+                margin: 0 auto;
+            }
+
+            .start {
+                /* height: 96px; */
+                width: 100%;
+            }
+
         }
     </style>
 </head>
@@ -194,7 +221,9 @@
 
         var clock = new THREE.Clock();
 
-        scene.fog = new THREE.FogExp2( 0xffffff, 0.0015 );
+        /*--------霧--------*/
+
+        scene.fog = new THREE.FogExp2(0xffffff, 0.0015);
 
         /*--------載入音樂--------*/
 
