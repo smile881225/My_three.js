@@ -21,7 +21,7 @@
 
 <body>
     <script src="./js/three.js"></script>
-    <script type="module" src="GLTFLoader.js"></script>
+    
     <script type="module">
 
         import { GLTFLoader } from "./Loader/GLTFLoader.js";
@@ -42,9 +42,12 @@
 
         // loader.load("./3D_Object/通通的猴子/Monkey-01.glb", function (gltf) {
         // loader.load("./3D_Object/通通的猴子/Monkey-02.gltf", function (gltf) {
-        loader.load("./3D_Object/通通的猴子/Monkey-03-Texutre.gltf", function (gltf) {
+        loader.load("./3D_Object/東駿的模型gltf/", function (gltf) {
+
             obj = gltf.scene;
             scene.add(gltf.scene);
+            console.log(gltf);
+            
         });
         
         /*-------更改場景的背景顏色---------*/
@@ -53,7 +56,7 @@
 
         /*--------添加燈光--------*/
 
-        var light =new THREE.HemisphereLight(0xffffff,0x000000,2);
+        var light =new THREE.HemisphereLight(0xffffff,0x000000,1);
         scene.add(light);
 
         /*-------調整camera位置---------*/

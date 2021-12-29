@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>create my modle</title>
+
+    <style>
+        html {
+            overflow: hidden;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+        }
+
+        canvas {
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+</head>
+
+<body>
+
+
+    <script src="./js/three.js"></script>
+    <!-- <script type="module" src="./Loader/OBJLoader.js"></script>
+    <script type="module" src="./Loader/MTLLoader.js"></script> -->
+    <script type="module">
+        //導入外掛
+        import * as THREE from './js/three.module.js';
+        import { FBXLoader } from './Loader/FBXLoader/FBXLoader.js'
+        import { OrbitControls } from './js/OrbitControls.js';
+        import { GUI } from './js/lil-gui.module.min.js';
+        import { OBJLoader } from './Loader/OBJLoader.js';
+        import { MTLLoader } from './Loader/MTLLoader.js';
+        import { GLTFLoader } from "./Loader/GLTFLoader.js";
+
+        //初始化
+
+        var scene = new THREE.Scene();
+        var camera = new THREE.PerspectiveCamera(80, window.innerWidth / window.innerHeight, 0.1, 10000);
+        var renderer = new THREE.WebGLRenderer({ antialias: true, });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
+
+        //Palne
+        // renderer.physicallyCorrectLights = true;
+        // renderer.outputEncoding = THREE.sRGBEncoding;
+
+        // renderer.gammaOutput = true;
+        // renderer.gammaFactor =0.1;
+
+        const texture = new THREE.TextureLoader().load("./img/carpet-2.jpg");
+        const planeGeometry = new THREE.PlaneGeometry(2000, 2000, 32, 32);
+        const planeMaterial = new THREE.MeshStandardMaterial({ map: texture })
+        const plane = new THREE.Mesh(planeGeometry, planeMaterial);
+        plane.receiveShadow = true;
+        plane.rotateX(-1.57);//旋轉平面 會寫負的是因為Plane的背面預設是不會顯示的，所以要翻對邊
+        scene.add(plane);
+
+
+        var mtlLoader;
+        mtlLoader = new MTLLoader();
+
+        var Archer_mtl = "./3D_Object/東駿的模型OBJ/弓箭手.mtl";
+        mtlLoader.load(Archer_mtl, function (materials) {
+            materials.preload();
+            var objLoader = new OBJLoader();
+            objLoader.setMaterials(materials);
+            // mtlLoader.setMaterialOptions({
+            //     invertTrProperty:true
+            // })
+            objLoader.load('./3D_Object/東駿的模型OBJ/弓箭手.obj', function (object) {
+
+                object.traverse(function (node) {
+                    if (node instanceof THREE.Mesh) {
+                        node.castShadow = true; //default is false
+                        // node.receiveShadow = false; //default
+                        node.receiveShadow = true; //default
+                    }
+                })
+
+                object.position.set(100, 65, 150);
+                scene.add(object);
+                object.name = 'Archer';
+            });
+
+        });
+        
+        
+        // Instantiate a loader
+        const loader = new GLTFLoader();
+
+        // Optional: Provide a DRACOLoader instance to decode compressed mesh data
+        const dracoLoader = new DRACOLoader();
+        dracoLoader.setDecoderPath('/3D_Object/東駿的模型gltf/弓箭手-攻擊-藍色.gltf');
+        loader.setDRACOLoader(dracoLoader);
+
+        // Load a glTF resource
+        loader.load(
+            // resource URL
+            '弓箭手-攻擊-藍色.gltf',
+            // called when the resource is loaded
+            function (gltf) {
+
+                scene.add(gltf.scene);
+
+                gltf.animations; // Array<THREE.AnimationClip>
+                gltf.scene; // THREE.Group
+                gltf.scenes; // Array<THREE.Group>
+                gltf.cameras; // Array<THREE.Camera>
+                gltf.asset; // Object
+
+            },
+            // called while loading is progressing
+            function (xhr) {
+
+                console.log((xhr.loaded / xhr.total * 100) + '% loaded');
+
+            },
+            // called when loading has errors
+            function (error) {
+
+                console.log('An error happened');
+
+            }
+        );
+
+        /*--------開始載我的模型--------*/
+
+        var loader = new GLTFLoader();
+
+        var obj;
+
+        // loader.load("./3D_Object/東駿的模型gltf/弓箭手-攻擊-藍色.gltf", function (gltf) {
+        loader.load("./3D_Object/未分類/scene.gltf", function (gltf) {
+            obj = gltf.scene;
+            scene.add(gltf.scene);
+            obj.position.set(0, 100, 0);
+        });
+
+        //camera設定
+
+        camera.position.set(0, 300, 400);
+        camera.lookAt(0, 0, 0);
+
+        //sence 背景顏色
+
+        scene.background = new THREE.Color(0xffffff);
+
+        /*--------添加燈光--------*/
+
+        var light = new THREE.HemisphereLight(0xffffff, 0x000000, 1.2);
+        scene.add(light);
+
+        //滑鼠控制camera
+
+        var controls = new OrbitControls(camera, renderer.domElement);
+        controls.target.set(-70, 5, -20);
+        controls.enablePan = false;
+        controls.maxPolarAngle = Math.PI / 2;
+        controls.enableDamping = true;
+        controls.minDistance = 100;//controls縮放最小距離
+        controls.maxDistance = 400;//controls縮放最大距離
+
+        function animation() {
+
+            controls.update();
+            requestAnimationFrame(animation);//創造一個循環
+            renderer.render(scene, camera);//繪製場景
+
+        }
+
+        animation();
+    </script>
+
+
+</body>
+
+</html>
