@@ -305,17 +305,20 @@
         changeLight = true;
         lightBtn = document.querySelector('.light');
         lightBtn.addEventListener('click', islight);
+
         function islight() {
             isBtn = true;
             if (changeLight) {
                 changeLight = false;
                 scene.remove(PointLight);
                 switchSpotLight();
+                scene.background = new THREE.Color(0xD0D0D0);
             }
             else {
                 changeLight = true;
                 scene.remove(SpotLight);
                 switchPointLight();
+                scene.background = new THREE.Color(0xffffff);
             }
             // console.log(scene);
         }
