@@ -1393,13 +1393,13 @@
 
         let Scale;
         function control_Scale() {
-            Scale = ((controls.getDistance() +4) / 100);
+            Scale = ((controls.getDistance() +400) / 100);
             // console.log(Scale);
             if (Scale < 5) {
                 Scale = 5;
             }
-            else if (Scale >= 15) {
-                Scale = 15;
+            else if (Scale >= 20) {
+                Scale = 20;
             }
             control_Archer.scale.set(Scale, Scale, Scale);
             control_Warrior.scale.set(Scale, Scale, Scale);
