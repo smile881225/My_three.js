@@ -34,7 +34,7 @@
         .music {
             position: fixed;
             /* height: 43px; */
-            width: 43px;
+            max-width: 43px;
             bottom: 1.75%;
             left: 1.13%;
             /* background-color: aquamarine; */
@@ -44,7 +44,7 @@
         .right {
             position: fixed;
             height: 163px;
-            width: 96px;
+            max-width: 96px;
             bottom: 1.75%;
             right: 1.3%;
             display: flex;
@@ -54,14 +54,14 @@
 
         .light {
 
-            width: 43px;
+            max-width: 43px;
             cursor: pointer;
             margin: 0 auto;
         }
 
         .start {
             /* height: 96px; */
-            width: 96px;
+            max-width: 96px;
             cursor: pointer;
         }
 
@@ -69,7 +69,7 @@
             position: fixed;
             height: 200px;
             /* width: 41.66%; */
-            width: 800px;
+            max-width: 800px;
             opacity: 0.5;
             background-color: aliceblue;
             border-radius: 10px;
@@ -142,61 +142,7 @@
                 opacity: 0;
             }
         } */
-        @media (max-width:1024px) {
 
-            .music {
-                /* height: 43px; */
-                width: 60px;
-                bottom: 1.75%;
-                left: 1.13%;
-            }
-
-            .right {
-                height: 190px;
-                width: 110px;
-                bottom: 1.75%;
-                right: 1.3%;
-            }
-
-            .light {
-                width: 60px;
-                margin: 0 auto;
-            }
-
-            .start {
-                /* height: 96px; */
-                width: 100%;
-            }
-
-        }
-
-        @media (max-width:720px) {
-
-            .music {
-                /* height: 43px; */
-                width:80px;
-                bottom: 1.75%;
-                left: 1.13%;
-            }
-
-            .right {
-                height: 220px;
-                width: 130px;
-                bottom: 1.75%;
-                right: 1.3%;
-            }
-
-            .light {
-                width: 80px;
-                margin: 0 auto;
-            }
-
-            .start {
-                /* height: 96px; */
-                width: 100%;
-            }
-
-        }
     </style>
 </head>
 
@@ -908,6 +854,8 @@
                     Archer_FBX.visible = true;
                     Warrior_FBX.visible = true;
                     Cavalry_FBX.visible = true;
+
+                    dialog.style['display'] = 'none';
                 }
 
                 else if (cameratime >= b3) {//騎兵的曲線
@@ -919,6 +867,12 @@
                     Warrior_FBX.visible = false;
                     Cavalry_FBX.visible = true;
 
+                    dialog.style['display'] = 'flex';
+                    dialogText = "彥澄";
+                    dialogContent.innerHTML = `
+                    <h1 class="dialog-content">${dialogText}</h1>
+                    `
+
                 }
 
                 else if (cameratime >= b2) {//戰士的曲線
@@ -929,6 +883,12 @@
                     Archer_FBX.visible = false;
                     Warrior_FBX.visible = true;
                     Cavalry_FBX.visible = false;
+
+                    dialog.style['display'] = 'flex';
+                    dialogText = "立霖";
+                    dialogContent.innerHTML = `
+                    <h1 class="dialog-content">${dialogText}</h1>
+                    `
                 }
 
                 else if (cameratime >= b1) {//弓箭手的曲線
@@ -939,6 +899,13 @@
                     Archer_FBX.visible = true;
                     Warrior_FBX.visible = false;
                     Cavalry_FBX.visible = false;
+
+                    dialog.style['display'] = 'flex';
+                    dialogText = "軒任";
+                    dialogContent.innerHTML = `
+                    <h1 class="dialog-content">${dialogText}</h1>
+                    `
+
                 }
 
                 // camera_Two.position.copy(pos);
@@ -983,10 +950,10 @@
                     control_Name = intersects[0].object.name;
                     quit.style['display'] = 'block';
                     console.log('逮到你瞜');
-                    console.log(control_Name);
-                    console.log(count);
+                    // console.log(control_Name);
+                    // console.log(count);
                     isOpacity = "clickIn";
-                    console.log(control_Name);
+                    // console.log(control_Name);
 
 
                 }
@@ -1140,13 +1107,13 @@
                     // camera.position.set(170, 140, 164);//弓箭手的Camera
                     // controls.target.set(178, 110, 16);//弓箭手的滑鼠控制中心點
                 }
-                dialogText = "弓箭手";
+                dialogText = "軒任";
                 dialogContent.innerHTML = `
                 <h1 class="dialog-content">${dialogText}</h1>
                 `
             }
             else if (control_Name == 'control_Warrior') {
-                dialogText = "戰士";
+           
                 if (nearWarrior == false) {//如果鏡頭是遠的
                     if (camera.position.z >= 0) {
                         target = {
@@ -1187,12 +1154,13 @@
                     // camera.position.set(16, 116, 140);//戰士的Camera
                     // controls.target.set(16, 90, 0);//戰士的滑鼠控制中心點
                 }
+                dialogText = "立霖";
                 dialogContent.innerHTML = `
                 <h1 class="dialog-content">${dialogText}</h1>
                 `
             }
             if (control_Name == 'control_Cavalry') {
-                dialogText = "騎兵";
+       
                 if (nearCavalry == false) {//如果鏡頭不是近的
                     if (camera.position.z >= 0) {
                         target = {
@@ -1235,6 +1203,7 @@
                     // camera.position.set(-130, 164, 130);//騎兵的Camera
                     // controls.target.set(-156, 110, -58);//騎兵的滑鼠控制中心點
                 }
+                dialogText = "彥澄";
                 dialogContent.innerHTML = `
                 <h1 class="dialog-content">${dialogText}</h1>
                 `
@@ -1380,6 +1349,8 @@
                 material_Cavalry.visible = true;
 
                 controls.enabled = true;//滑鼠控制啟用
+
+                dialog.style['display'] = 'none';//對話框隱藏
             }
 
             else if (isPlayAnimation) {
