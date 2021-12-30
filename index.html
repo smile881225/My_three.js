@@ -16,7 +16,7 @@
         }
 
         body {
-           height: 100%;
+            height: 100%;
             margin: 0;
             padding: 0;
         }
@@ -239,7 +239,7 @@
         var controls;
         var scene = new THREE.Scene();
         var camera = new THREE.PerspectiveCamera(80, window.innerWidth / window.innerHeight, 0.1, 10000);
-        var renderer = new THREE.WebGLRenderer({ antialias: true, });
+        var renderer = new THREE.WebGLRenderer();
         var isBtn;
         renderer.setSize(window.innerWidth, window.innerHeight);
         document.body.appendChild(renderer.domElement);
@@ -363,13 +363,13 @@
                 scene.remove(SpotLight);
                 switchPointLight();
             }
-            console.log(scene);
+            // console.log(scene);
         }
 
         //燈光切換至AmbientLight
 
         function switchAmbientLight() {
-            console.log('switchAmbientLight');
+            // console.log('switchAmbientLight');
             AmbientLight = new THREE.AmbientLight(0xffffff, 0.05);
             scene.add(AmbientLight);
         }
@@ -377,7 +377,7 @@
         //切換燈光至PointLight
 
         function switchPointLight() {
-            console.log('switchPointLighta');
+            // console.log('switchPointLighta');
             renderer.shadowMap.enabled = true;
             renderer.shadowMap.type = THREE.PCFSoftShadowMap;
             PointLight = new THREE.PointLight(0xffffff, 0.9);
@@ -395,17 +395,17 @@
         //切換燈光至SpotLight
 
         function switchSpotLight() {
-            console.log('switchSpotLight');
+            // console.log('switchSpotLight');
             renderer.shadowMap.enabled = true;
             renderer.shadowMap.type = THREE.PCFSoftShadowMap;
             SpotLight = new THREE.SpotLight(0xffffff, 1);
             SpotLight.shadow.mapSize.width = 2048;
             SpotLight.shadow.mapSize.height = 2048;
             SpotLight.castShadow = true;
-            SpotLight.shadow.camera.near = 0.5;
+            SpotLight.shadow.camera.near = 0.01;
             SpotLight.shadow.camera.far = 5000;
             SpotLight.shadow.focus = 1;
-            SpotLight.position.set(300, 400, 200);
+            SpotLight.position.set(0, 250, 0);
             scene.add(SpotLight);
             // helper = new THREE.CameraHelper(SpotLight.shadow.camera);
             // scene.add(helper);
@@ -559,7 +559,7 @@
             });
 
         });
-        console.log(scene);
+        // console.log(scene);
 
         //加入戰士FBX的模型
 
@@ -628,7 +628,7 @@
                 // object.position.y = 110;
                 scene.add(object);
                 object.name = 'Cavalry';
-                console.log(scene.children[9]);
+                // console.log(scene.children[9]);
 
                 // scene.getObjectByName("Cavalry").material.transparent = true;
                 // scene.getObjectByName("Cavalry").material.opacity = (1 - val/100.0);
@@ -673,7 +673,7 @@
             // object.material.opacity.transparent=true;
             object.visible = false;
             scene.add(object);
-            console.log(object);
+            // console.log(object);
             Archer_FBX = scene.getObjectByName('Archer_FBX');
             Warrior_FBX = scene.getObjectByName('Warrior_FBX');
             Cavalry_FBX = scene.getObjectByName('Cavalry_FBX');
@@ -972,6 +972,7 @@
             }
 
         }
+    
 
         /*--------控制點互動--------*/
 
@@ -1005,7 +1006,7 @@
                 if (intersects.length > 0 && intersects[0].object.geometry.type == "SphereGeometry") {
                     control_Name = intersects[0].object.name;
                     quit.style['display'] = 'block';
-                    console.log('逮到你瞜');
+                    // console.log('逮到你瞜');
                     // console.log(control_Name);
                     // console.log(count);
                     isOpacity = "clickIn";
@@ -1038,6 +1039,7 @@
 
 
         }
+
 
         window.addEventListener('click', onMouseClick);
 
@@ -1097,7 +1099,7 @@
                         nearArcher = false;
                         nearWarrior = false;
                         nearCavalry = false;
-                        console.log('拉遠');
+                        // console.log('拉遠');
                         tween.stop();
                         isAnimationPlay = false;
 
@@ -1148,7 +1150,7 @@
                             nearArcher = true;
                             nearWarrior = false;
                             nearCavalry = false;
-                            console.log('拉近');
+                            // console.log('拉近');
                             tween.stop();
                             isAnimationPlay = false;
                         })
@@ -1169,7 +1171,7 @@
                 `
             }
             else if (control_Name == 'control_Warrior') {
-           
+
                 if (nearWarrior == false) {//如果鏡頭是遠的
                     if (camera.position.z >= 0) {
                         target = {
@@ -1201,7 +1203,7 @@
                             nearArcher = false;
                             nearWarrior = true;
                             nearCavalry = false;
-                            console.log('拉近');
+                            // console.log('拉近');
                             tween.stop();
                             isAnimationPlay = false;
                         })
@@ -1216,7 +1218,7 @@
                 `
             }
             if (control_Name == 'control_Cavalry') {
-       
+
                 if (nearCavalry == false) {//如果鏡頭不是近的
                     if (camera.position.z >= 0) {
                         target = {
@@ -1250,7 +1252,7 @@
                             nearArcher = false;
                             nearWarrior = false;
                             nearCavalry = true;
-                            console.log('拉近');
+                            // console.log('拉近');
                             tween.stop();
                             isAnimationPlay = false;
                         })
@@ -1345,6 +1347,7 @@
         gui.add(saoPass.params, 'saoBlurRadius', 0, 200);
         gui.add(saoPass.params, 'saoBlurStdDev', 0.5, 150);
         gui.add(saoPass.params, 'saoBlurDepthCutoff', 0.0, 0.1);
+
 
         var body = document.querySelector("body");
 
@@ -1623,7 +1626,7 @@
             time();
             control_Scale();
             control_Opacity();
-            console.log(downTime);
+            // console.log(downTime);
             // console.log(camera.position);
 
             updateCamera();//運鏡
