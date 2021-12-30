@@ -12,9 +12,11 @@
 
         html {
             overflow: hidden;
+            /* height: 100%; */
         }
 
         body {
+           height: 100%;
             margin: 0;
             padding: 0;
         }
@@ -34,7 +36,7 @@
         .music {
             position: fixed;
             /* height: 43px; */
-            max-width: 43px;
+            width: 43px;
             bottom: 1.75%;
             left: 1.13%;
             /* background-color: aquamarine; */
@@ -44,7 +46,7 @@
         .right {
             position: fixed;
             height: 163px;
-            max-width: 96px;
+            width: 96px;
             bottom: 1.75%;
             right: 1.3%;
             display: flex;
@@ -54,14 +56,14 @@
 
         .light {
 
-            max-width: 43px;
+            width: 43px;
             cursor: pointer;
             margin: 0 auto;
         }
 
         .start {
             /* height: 96px; */
-            max-width: 96px;
+            width: 96px;
             cursor: pointer;
         }
 
@@ -69,7 +71,7 @@
             position: fixed;
             height: 200px;
             /* width: 41.66%; */
-            max-width: 800px;
+            width: 800px;
             opacity: 0.5;
             background-color: aliceblue;
             border-radius: 10px;
@@ -142,7 +144,61 @@
                 opacity: 0;
             }
         } */
+        @media (max-width:1200px) {
 
+            .music {
+                /* height: 43px; */
+                width: 60px;
+                bottom: 1.75%;
+                left: 1.13%;
+            }
+
+            .right {
+                height: 190px;
+                width: 110px;
+                bottom: 1.75%;
+                right: 1.3%;
+            }
+
+            .light {
+                width: 60px;
+                margin: 0 auto;
+            }
+
+            .start {
+                /* height: 96px; */
+                width: 100%;
+            }
+
+        }
+
+        @media (max-width:980px) {
+
+            .music {
+                /* height: 43px; */
+                width: 100px;
+                bottom: 1.75%;
+                left: 1.13%;
+            }
+
+            .right {
+                height: 220px;
+                width: 130px;
+                bottom: 1.75%;
+                right: 1.3%;
+            }
+
+            .light {
+                width: 80px;
+                margin: 0 auto;
+            }
+
+            .start {
+                /* height: 96px; */
+                width: 100%;
+            }
+
+        }
     </style>
 </head>
 
