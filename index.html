@@ -472,7 +472,7 @@
         let circle_Archer = new THREE.SphereGeometry(1.5, 26, 10);
         let material_Archer = new THREE.MeshBasicMaterial(
             {
-                color: 0xBEBEBE,
+                color: 0xFFC78E,
                 side: THREE.DoubleSide,
                 transparent: true,
                 // depthWrite: false,//Renderer這個材質的時候會不會對深度緩衝區有任何影響
@@ -546,7 +546,7 @@
         let circle_Warrior = new THREE.SphereGeometry(1.5, 26, 10);
         let material_Warrior = new THREE.MeshBasicMaterial(
             {
-                color: 0xBEBEBE,
+                color: 0xFFC78E,
                 side: THREE.DoubleSide,
                 transparent: true,
                 // depthWrite: false,//Renderer這個材質的時候會不會對深度緩衝區有任何影響
@@ -637,7 +637,7 @@
         let circle_Cavalry = new THREE.SphereGeometry(1.5, 26, 10);
         let material_Cavalry = new THREE.MeshBasicMaterial(
             {
-                color: 0xBEBEBE,
+                color: 0xFFC78E,
                 side: THREE.DoubleSide,
                 transparent: true,
                 // depthWrite: false,//Renderer這個材質的時候會不會對深度緩衝區有任何影響
@@ -1393,7 +1393,7 @@
 
         let Scale;
         function control_Scale() {
-            Scale = ((controls.getDistance() - 1) / 100);
+            Scale = ((controls.getDistance() - 1) / 10);
             // console.log(Scale);
             if (Scale < 3) {
                 Scale = 3;
