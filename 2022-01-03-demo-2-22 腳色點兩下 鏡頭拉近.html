@@ -183,7 +183,6 @@
         import { EffectComposer } from './postprocessing/EffectComposer/EffectComposer.js';
         import { RenderPass } from './postprocessing/SAO/RenderPass.js';
         import { SAOPass } from './postprocessing/SAO/SAOPass.js';
-        import { Reflector } from './js/Reflector.js';
 
         /*--------創造初始元素--------*/
         var mtlLoader;
@@ -280,7 +279,7 @@
         PointLight.castShadow = true;
         PointLight.shadow.mapSize.width = 2048;
         PointLight.shadow.mapSize.height = 2048;
-        PointLight.shadow.camera.near = 0.01;
+        PointLight.shadow.camera.near = 0.5;
         PointLight.shadow.camera.far = 5000;
         PointLight.position.set(-500, 800, 0);
         scene.add(PointLight);
@@ -371,41 +370,21 @@
 
         /*--------加入Palne--------*/
 
-        let planeGeometry = new THREE.PlaneBufferGeometry(500, 500);
-
-        let planeMaterial =
-            {
-                clipBias: 0.03,
-                textureWidth: window.innerWidth * window.devicePixelRatio,
-                textureHeight: window.innerHeight * window.devicePixelRatio,
-                color: 0xffffff,
-                recursion: 1
-            }
-        
-
-        const plane = new Reflector(planeGeometry, planeMaterial);
-
-        plane.receiveShadow = true;
-        plane.rotateX(-1.57);//旋轉平面 會寫負的是因為Plane的背面預設是不會顯示的，所以要翻對邊
-        plane.position.set(0, 1, 0);
-        scene.add(plane);
-
-        
         const texture = new THREE.TextureLoader().load("./img/carpet-2.jpg");
-        const minnorGeometry = new THREE.PlaneGeometry(2000, 2000, 32, 32);
-        const minnorMaterial = new THREE.MeshStandardMaterial(
+        const planeGeometry = new THREE.PlaneGeometry(2000, 2000, 32, 32);
+        const planeMaterial = new THREE.MeshStandardMaterial(
             {
                 map: texture,
                 transparent: true,
             }
         )
 
-        const minnor = new THREE.Mesh(minnorGeometry, minnorMaterial);
+        const plane = new THREE.Mesh(planeGeometry, planeMaterial);
 
-        minnor.receiveShadow = true;
-        minnor.rotateX(-1.57);//旋轉平面 會寫負的是因為Plane的背面預設是不會顯示的，所以要翻對邊
-        minnor.position.set(0, 0, 0);
-        scene.add(minnor);
+        plane.receiveShadow = true;
+        plane.rotateX(-1.57);//旋轉平面 會寫負的是因為Plane的背面預設是不會顯示的，所以要翻對邊
+        plane.position.set(0, 0, 0);
+        scene.add(plane);
 
         /*--------加入圓錐--------*/
 
@@ -757,7 +736,7 @@
 
             scene.add(curve2);
 
-        }
+            }
 
         creatCurve2();
 
@@ -975,21 +954,21 @@
 
                 intersects = raycaster.intersectObjects(scene.children);
                 // console.log(control_Name != 'changePlaymusic');
-
+      
                 //滑鼠點兩下模型
 
-
+               
                 if (intersects.length > 0 && intersects[0].object.geometry.type == "BufferGeometry" && isPlayAnimation) {
                     moudleCount++;
-                    if (moudleCount == 2) {
+                    if(moudleCount==2){
                         control_Name = intersects[0].object.parent.name;
                         quit.style['display'] = 'block';
                         isOpacity = "clickIn";
                     }
                 }
 
-                if (downTime > 0.7) {
-                    moudleCount = 0;
+                if(downTime > 0.7){
+                    moudleCount=0;
                 }
 
                 //滑鼠點到控制點
@@ -1018,9 +997,9 @@
                     // Warrior_Material.depthWrite = false;
                     // Cavalry_Material.depthWrite = false;
 
-                    moudleCount = 0;
+                    moudleCount=0;
                 }
-
+               
 
                 isBtn = false;
 
@@ -1107,7 +1086,7 @@
                 // controls.target.set(16, 90, 0);//初始的滑鼠控制中心點
             }
 
-            else if (control_Name == 'control_Archer' || control_Name == 'Archer' || control_Name == 'Archer_FBX') {
+            else if (control_Name == 'control_Archer'||control_Name == 'Archer'||control_Name == 'Archer_FBX') {
                 if (nearArcher == false) {//如果鏡頭是遠的
                     if (camera.position.z >= 0) {
                         target = {
@@ -1159,7 +1138,7 @@
                 <h1 class="dialog-content">${dialogText}</h1>
                 `
             }
-            else if (control_Name == 'control_Warrior' || control_Name == 'Warrior' || control_Name == 'Warrior_FBX') {
+            else if (control_Name == 'control_Warrior'||control_Name == 'Warrior'||control_Name == 'Warrior_FBX') {
 
                 if (nearWarrior == false) {//如果鏡頭是遠的
                     if (camera.position.z >= 0) {
@@ -1206,7 +1185,7 @@
                 <h1 class="dialog-content">${dialogText}</h1>
                 `
             }
-            if (control_Name == 'control_Cavalry' || control_Name == 'Cavalry' || control_Name == 'Cavalry_FBX') {
+            if (control_Name == 'control_Cavalry'||control_Name == 'Cavalry'||control_Name == 'Cavalry_FBX') {
 
                 if (nearCavalry == false) {//如果鏡頭不是近的
                     if (camera.position.z >= 0) {

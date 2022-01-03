@@ -184,7 +184,7 @@
         import { RenderPass } from './postprocessing/SAO/RenderPass.js';
         import { SAOPass } from './postprocessing/SAO/SAOPass.js';
         import { Reflector } from './js/Reflector.js';
-
+        import { Water } from './js/Water.js';
         /*--------創造初始元素--------*/
         var mtlLoader;
         var PointLight, AmbientLight, SpotLight, helper;//light
@@ -371,7 +371,9 @@
 
         /*--------加入Palne--------*/
 
-        let planeGeometry = new THREE.PlaneBufferGeometry(500, 500);
+        const texture = new THREE.TextureLoader().load("./img/carpet-2.jpg");
+
+        let planeGeometry = new THREE.PlaneBufferGeometry(1000, 1000);
 
         let planeMaterial =
             {
@@ -387,25 +389,8 @@
 
         plane.receiveShadow = true;
         plane.rotateX(-1.57);//旋轉平面 會寫負的是因為Plane的背面預設是不會顯示的，所以要翻對邊
-        plane.position.set(0, 1, 0);
+        plane.position.set(0, 0, 0);
         scene.add(plane);
-
-        
-        const texture = new THREE.TextureLoader().load("./img/carpet-2.jpg");
-        const minnorGeometry = new THREE.PlaneGeometry(2000, 2000, 32, 32);
-        const minnorMaterial = new THREE.MeshStandardMaterial(
-            {
-                map: texture,
-                transparent: true,
-            }
-        )
-
-        const minnor = new THREE.Mesh(minnorGeometry, minnorMaterial);
-
-        minnor.receiveShadow = true;
-        minnor.rotateX(-1.57);//旋轉平面 會寫負的是因為Plane的背面預設是不會顯示的，所以要翻對邊
-        minnor.position.set(0, 0, 0);
-        scene.add(minnor);
 
         /*--------加入圓錐--------*/
 
