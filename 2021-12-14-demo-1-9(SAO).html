@@ -123,13 +123,13 @@
         //模型
 
         mtlLoader = new MTLLoader();
-        url = "/3D_Object/teapot.mtl";
+        url = "/3D_Object/未分類/teapot.mtl";
         mtlLoader.load(url, function (materials) {
             var teapot;
             materials.preload();
             var objLoader = new OBJLoader();
             objLoader.setMaterials(materials);
-            var teapot = objLoader.load('./3D_Object/teapot.obj', function (object) {
+            var teapot = objLoader.load('./3D_Object/未分類/teapot.obj', function (object) {
 
                 object.traverse(function (node) {
                     if (node instanceof THREE.Mesh) {

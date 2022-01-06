@@ -81,7 +81,7 @@
         //記住！！！！！OBJ、MTL、PNG貼圖來源檔一定要放在同個資料夾才可以
 
         // var url = "/3D_Object/test1.mtl";
-        var url = "/3D_Object/teapot.mtl";
+        var url = "/3D_Object/未分類/teapot.mtl";
         mtlLoader.load(url, function (materials) {
 
             materials.preload();
@@ -89,7 +89,7 @@
             var objLoader = new OBJLoader();
             objLoader.setMaterials(materials);
             // objLoader.load('./3D_Object/test1.obj', function (object) {
-            objLoader.load('./3D_Object/teapot.obj', function (object) {
+            objLoader.load('./3D_Object/未分類/teapot.obj', function (object) {
 
                 scene.add(object);
 
