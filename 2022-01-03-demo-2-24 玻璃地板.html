@@ -1044,6 +1044,7 @@
             }//起點
 
             if (control_Name == 'leave') {//如果鏡頭是近的
+                
                 if (camera.position.z >= 0) {
                     target = {
                         Camera_x: 0,
@@ -1300,8 +1301,8 @@
         gui.add(saoPass.params, 'output', {
             'Beauty+SAO': SAOPass.OUTPUT.Default,
             'Beauty': SAOPass.OUTPUT.Beauty,
-            'SAO': SAOPass.OUTPUT.SAO,
-            'Depth': SAOPass.OUTPUT.Depth,
+            // 'SAO': SAOPass.OUTPUT.SAO,
+            // 'Depth': SAOPass.OUTPUT.Depth,
             'Normal': SAOPass.OUTPUT.Normal
         }).onChange(function (value) {
             saoPass.params.output = parseInt(value);

@@ -267,8 +267,8 @@
         controls.enablePan = false;
         controls.maxPolarAngle = Math.PI / 2;
         controls.enableDamping = true;
-        controls.autoRotate = true;//自動旋轉
-        controls.autoRotateSpeed = 2;//控制旋轉速度
+        // controls.autoRotate = true;//自動旋轉
+        // controls.autoRotateSpeed = 2;//控制旋轉速度
         controls.minDistance = 100;//controls縮放最小距離
         controls.maxDistance = 1000;//controls縮放最大距離
 
@@ -371,7 +371,9 @@
 
         /*--------加入Palne--------*/
 
-        let planeGeometry = new THREE.PlaneBufferGeometry(500, 500);
+        const texture = new THREE.TextureLoader().load("./img/carpet-2.jpg");
+
+        let planeGeometry = new THREE.PlaneBufferGeometry(1000, 1000);
 
         let planeMaterial =
             {
@@ -387,25 +389,8 @@
 
         plane.receiveShadow = true;
         plane.rotateX(-1.57);//旋轉平面 會寫負的是因為Plane的背面預設是不會顯示的，所以要翻對邊
-        plane.position.set(0, 1, 0);
+        plane.position.set(0, 0, 0);
         scene.add(plane);
-
-        
-        const texture = new THREE.TextureLoader().load("./img/carpet-2.jpg");
-        const minnorGeometry = new THREE.PlaneGeometry(2000, 2000, 32, 32);
-        const minnorMaterial = new THREE.MeshStandardMaterial(
-            {
-                map: texture,
-                transparent: true,
-            }
-        )
-
-        const minnor = new THREE.Mesh(minnorGeometry, minnorMaterial);
-
-        minnor.receiveShadow = true;
-        minnor.rotateX(-1.57);//旋轉平面 會寫負的是因為Plane的背面預設是不會顯示的，所以要翻對邊
-        minnor.position.set(0, 0, 0);
-        scene.add(minnor);
 
         /*--------加入圓錐--------*/
 
@@ -1059,6 +1044,7 @@
             }//起點
 
             if (control_Name == 'leave') {//如果鏡頭是近的
+                
                 if (camera.position.z >= 0) {
                     target = {
                         Camera_x: 0,
@@ -1315,8 +1301,8 @@
         gui.add(saoPass.params, 'output', {
             'Beauty+SAO': SAOPass.OUTPUT.Default,
             'Beauty': SAOPass.OUTPUT.Beauty,
-            'SAO': SAOPass.OUTPUT.SAO,
-            'Depth': SAOPass.OUTPUT.Depth,
+            // 'SAO': SAOPass.OUTPUT.SAO,
+            // 'Depth': SAOPass.OUTPUT.Depth,
             'Normal': SAOPass.OUTPUT.Normal
         }).onChange(function (value) {
             saoPass.params.output = parseInt(value);
